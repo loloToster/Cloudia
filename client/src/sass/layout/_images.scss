@@ -25,9 +25,76 @@ $gap: 6px;
 
     &__image {
         width: calc((100% / var(--items-in-row)) - ($gap * (var(--items-in-row) - 1) / var(--items-in-row)));
-
         aspect-ratio: 1;
-        background-image: var(--src);
+        background: var(--src) grey;
         background-size: cover;
+        background-position: center;
+    }
+
+    $options-size: 50px;
+    $options-gap: 5px;
+
+    &__options {
+        display: none;
+        gap: $options-gap;
+        width: 100%;
+        height: $options-size + $options-gap;
+        padding: $options-gap;
+        padding-bottom: 0;
+
+        &>* {
+            height: $options-size;
+            background-color: #212121dd;
+            border-radius: 100vh;
+        }
+    }
+
+    &__image:hover &__options {
+        display: flex;
+    }
+
+    &__metadata {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1;
+        padding: 3px 20px;
+        overflow: hidden;
+        height: $options-size;
+    }
+
+    &__title {
+        line-height: 110%;
+    }
+
+    &__user {
+        font-size: .8rem;
+        line-height: 110%;
+        color: #909090;
+    }
+
+    &__button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        width: $options-size;
+        height: $options-size;
+
+        &:hover svg {
+            transform: scale(1.1);
+        }
+
+        svg {
+            vertical-align: middle;
+        }
+
+        &--download svg {
+            fill: #2281bc;
+        }
+
+        &--delete svg {
+            fill: #bc2222;
+        }
     }
 }
