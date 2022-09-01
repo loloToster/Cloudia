@@ -19,7 +19,7 @@ function ImageList() {
             }).catch(err => {
                 console.error(err)
             }).finally(() => {
-                setLoading(false)
+                setTimeout(() => setLoading(false), 1000)
             })
     }, [])
 
@@ -30,6 +30,9 @@ function ImageList() {
 
     return (
         <div className="images">
+            {loading && [...Array(5)].map((_, i) => (
+                <div key={i} className="images__dummy"></div>
+            ))}
             {!loading && images.map(img => (
                 <div style={{ "--src": `url("/cdn/${img.file}")` } as React.CSSProperties}
                     className="images__image"

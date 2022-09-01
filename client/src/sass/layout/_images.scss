@@ -23,10 +23,29 @@ $gap: 6px;
     width: 100%;
     margin-top: 8px;
 
-    &__image {
-        width: calc((100% / var(--items-in-row)) - ($gap * (var(--items-in-row) - 1) / var(--items-in-row)));
+    --size-of-item: calc((100% / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row)));
+
+    @keyframes dummy-animation {
+        from {
+            background-color: #343434;
+        }
+
+        to {
+            background-color: #2a2a2a;
+        }
+    }
+
+    &__dummy {
+        width: var(--size-of-item);
         aspect-ratio: 1;
-        background: var(--src) grey;
+        background-color: #343434;
+        animation: dummy-animation .8s infinite alternate linear;
+    }
+
+    &__image {
+        width: var(--size-of-item);
+        aspect-ratio: 1;
+        background: var(--src) #343434;
         background-size: cover;
         background-position: center;
     }
@@ -61,6 +80,7 @@ $gap: 6px;
         padding: 3px 20px;
         overflow: hidden;
         height: $options-size;
+        white-space: nowrap;
     }
 
     &__title {

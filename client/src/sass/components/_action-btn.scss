@@ -12,4 +12,43 @@
     &:focus {
         background-color: c.$main;
     }
+
+    &__loading {
+        display: none;
+    }
+
+    &.loading &__loading {
+        display: unset;
+    }
+
+    &.loading &__content {
+        display: none;
+    }
+
+    @keyframes loading {
+        0% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-60%);
+        }
+
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    &__loading-item {
+        display: inline-block;
+        font-size: 1.7rem;
+        line-height: 10%;
+        animation: loading 900ms infinite;
+
+        @for $i from 0 through 2 {
+            &:nth-child(#{$i + 1}) {
+                animation-delay: #{$i * 200ms};
+            }
+        }
+    }
 }

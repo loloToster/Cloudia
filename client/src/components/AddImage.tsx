@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
@@ -20,20 +20,28 @@ function AddImage() {
     } = useForm<Inputs>()
 
     const imageInput = useRef<HTMLInputElement>(null)
-    const imagePreview = useRef<HTMLDivElement>(null)
+
+    const [imagePreview, setImagePreview] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const onSubmit: SubmitHandler<Inputs> = async ({ title, username, image }) => {
+        if (loading) return
+
         let data = new FormData()
 
         data.append("title", title)
         data.append("username", username)
         data.append("image", image!)
 
+        setLoading(true)
         fetch("/api/image", {
             method: "POST",
             body: data
         }).finally(() => {
-            navigate("/")
+            setTimeout(() => {
+                setLoading(false)
+                navigate("/")
+            }, 500)
         })
     }
 
@@ -46,7 +54,7 @@ function AddImage() {
         if (!value) return
 
         clearErrors("image")
-        imagePreview.current?.style.setProperty("--src", `url("${URL.createObjectURL(value)}")`)
+        setImagePreview(`url("${URL.createObjectURL(value)}")`)
     }
 
     return (
@@ -59,7 +67,8 @@ function AddImage() {
                     <div className="add-image__choose-file__text">
                         Add an image
                     </div>
-                    <div ref={imagePreview} className="add-image__choose-file__preview"></div>
+                    <div style={{ "--src": imagePreview } as React.CSSProperties}
+                        className="add-image__choose-file__preview"></div>
                 </button>
                 <input {...register("image", { required: "Upload an image" })}
                     onChange={handleImageUpload}
@@ -86,7 +95,15 @@ function AddImage() {
                 <div className="add-image__input-validation">
                     {errors.username?.message}
                 </div>
-                <button className="action-btn" type="submit">Submit</button>
+                <button className={`action-btn ${loading ? "loading" : ""}`} type="submit">
+                    <span className="action-btn__content">Upload</span>
+                    <span className="action-btn__loading">
+                        Loading
+                        <span className="action-btn__loading-item">.</span>
+                        <span className="action-btn__loading-item">.</span>
+                        <span className="action-btn__loading-item">.</span>
+                    </span>
+                </button>
             </div>
         </form>
     )
