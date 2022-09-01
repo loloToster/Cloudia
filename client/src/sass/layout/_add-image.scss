@@ -20,9 +20,14 @@
         height: 400px;
         background-color: #1c1c1c;
         cursor: pointer;
+        outline: 3px solid transparent;
 
         &:focus {
-            outline: 3px solid c.$main;
+            outline-color: c.$main;
+        }
+
+        &.err {
+            outline-color: red;
         }
 
         &__plus {
@@ -60,11 +65,10 @@
 
     &__col:nth-child(2)>* {
         display: block;
-        margin-bottom: 12px;
     }
 
     input[type="text"] {
-        padding: 4px 6px;
+        padding: 0 6px 4px 2px;
         font-size: 1.3rem;
         border-bottom: 2px solid;
         border-bottom-color: grey;
@@ -73,5 +77,15 @@
         &:focus {
             border-bottom-color: c.$main;
         }
+
+        &.err {
+            border-bottom-color: red;
+        }
+    }
+
+    &__input-validation {
+        color: red;
+        margin-top: 4px;
+        margin-bottom: 10px;
     }
 }

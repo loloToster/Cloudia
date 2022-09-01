@@ -9,9 +9,11 @@
   "author": "loloToster",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.13"
+    "@types/express": "^4.17.13",
+    "@types/multer": "^1.4.7"
   }
 }
