@@ -1,0 +1,32 @@
+@use "../abstract/colors" as c;
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px 60px;
+    border-bottom: 1px grey solid;
+
+    @media (max-width: 800px) {
+        padding: 20px 10px;
+    }
+
+    &__logo {
+        font-size: 2rem;
+        color: c.$main;
+    }
+
+    &__add-img {
+        padding: 6px 10px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        border: 3px c.$main solid;
+        border-radius: 6px;
+        transition: all 100ms;
+
+        &:hover {
+            background-color: c.$main;
+        }
+    }
+}

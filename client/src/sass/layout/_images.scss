@@ -1,0 +1,33 @@
+@use "sass:math" as math;
+
+$gap: 6px;
+
+.images {
+    --items-in-row: 4;
+
+    @media (max-width: 1250px) {
+        --items-in-row: 3;
+    }
+
+    @media (max-width: 850px) {
+        --items-in-row: 2;
+    }
+
+    @media (max-width: 630px) {
+        --items-in-row: 1;
+    }
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: $gap;
+    width: 100%;
+    margin-top: 8px;
+
+    &__image {
+        width: calc((100% / var(--items-in-row)) - ($gap * (var(--items-in-row) - 1) / var(--items-in-row)));
+
+        aspect-ratio: 1;
+        background-image: var(--src);
+        background-size: cover;
+    }
+}
