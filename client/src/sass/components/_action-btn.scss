@@ -1,0 +1,15 @@
+@use "../abstract/colors" as c;
+
+.action-btn {
+    padding: 6px 10px;
+    font-size: 1.2rem;
+    border: 3px c.$main solid;
+    border-radius: 6px;
+    transition: all 100ms;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+        background-color: c.$main;
+    }
+}

@@ -1,0 +1,77 @@
+@use "sass:math" as math;
+@use "../abstract/colors" as c;
+
+.add-image {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: auto;
+    margin-top: 16px;
+    width: fit-content;
+    max-width: 90%;
+
+    &__choose-file {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        width: 400px;
+        height: 400px;
+        background-color: #1c1c1c;
+        cursor: pointer;
+
+        &:focus {
+            outline: 3px solid c.$main;
+        }
+
+        &__plus {
+            $size: 80px;
+            $thickness: 20px;
+
+            position: relative;
+            width: $size;
+            height: $size;
+
+            $translate-value: math.div($size, 2) - math.div($thickness, 2);
+
+            &::before,
+            &::after {
+                content: "";
+                top: 0;
+                left: 0;
+                position: absolute;
+                width: $size;
+                height: $thickness;
+                background-color: grey;
+                transform: translateY($translate-value) rotate(var(--rotate, 0));
+            }
+
+            &::after {
+                --rotate: 90deg;
+            }
+        }
+
+        &__text {
+            color: gray;
+            font-size: 1.4rem;
+        }
+    }
+
+    &__col:nth-child(2)>* {
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    input[type="text"] {
+        padding: 4px 6px;
+        font-size: 1.3rem;
+        border-bottom: 2px solid;
+        border-bottom-color: grey;
+        transition: border-bottom-color 100ms;
+
+        &:focus {
+            border-bottom-color: c.$main;
+        }
+    }
+}
