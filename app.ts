@@ -57,6 +57,8 @@ apiRouter.post("/image", upload.single("image"), async (req, res) => {
             })
         }
     )
+
+    res.send()
 })
 
 apiRouter.get("/images", async (req, res) => {

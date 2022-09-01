@@ -1,39 +1,52 @@
 import { useRef } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 
 interface Inputs {
     title: string,
     username: string,
-    image: any
+    image: File | null
 }
 
 function AddImage() {
-    const imageInput = useRef<HTMLInputElement>(null)
+    const navigate = useNavigate()
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-        setError
+        clearErrors,
+        setValue
     } = useForm<Inputs>()
 
-    const onSubmit: SubmitHandler<Inputs> = ({ title, username }) => {
-        const images = imageInput.current?.files
-        if (!images)
-            return setError("image", {
-                message: "Upload an image"
-            })
+    const imageInput = useRef<HTMLInputElement>(null)
+    const imagePreview = useRef<HTMLDivElement>(null)
 
+    const onSubmit: SubmitHandler<Inputs> = async ({ title, username, image }) => {
         let data = new FormData()
 
         data.append("title", title)
         data.append("username", username)
-        data.append("image", images[0])
+        data.append("image", image!)
 
         fetch("/api/image", {
             method: "POST",
             body: data
+        }).finally(() => {
+            navigate("/")
         })
+    }
+
+    const handleImageUpload = (e: React.ChangeEvent) => {
+        const input = e.target as HTMLInputElement
+        const value = input.files && input.files.length ? input.files[0] : null
+
+        setValue("image", value)
+
+        if (!value) return
+
+        clearErrors("image")
+        imagePreview.current?.style.setProperty("--src", `url("${URL.createObjectURL(value)}")`)
     }
 
     return (
@@ -46,8 +59,10 @@ function AddImage() {
                     <div className="add-image__choose-file__text">
                         Add an image
                     </div>
+                    <div ref={imagePreview} className="add-image__choose-file__preview"></div>
                 </button>
-                <input {...register("image")}
+                <input {...register("image", { required: "Upload an image" })}
+                    onChange={handleImageUpload}
                     ref={imageInput}
                     accept="image/png, image/jpeg"
                     style={{ display: "none" }}
