@@ -1,8 +1,14 @@
+import { Link } from "react-router-dom"
+
 function Header() {
     return (
         <div className="header">
-            <div className="header__logo">Cloudia</div>
-            <button className="header__add-img">Add Image</button>
+            <Link to="/" className="header__logo">
+                Cloudia
+            </Link>
+            <Link to="/add">
+                <button className="header__add-img">Add Image</button>
+            </Link>
         </div>
     )
 }

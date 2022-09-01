@@ -1,5 +1,8 @@
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
+
 import Header from "./Header"
 import ImageList from "./ImageList"
+import AddImage from "./AddImage"
 
 function App() {
   const imgs = [
@@ -11,10 +14,16 @@ function App() {
   ]
 
   return (
-    <div className="app">
-      <Header />
-      <ImageList images={imgs} />
-    </div>
+    <Router>
+      <div className="app">
+        <Header />
+        <Routes>
+          <Route path="/" element={<ImageList images={imgs} />} />
+          <Route path="/add" element={<AddImage />} />
+          <Route path="/*" element={<span>404</span>} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
