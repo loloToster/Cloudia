@@ -35,7 +35,7 @@ apiRouter.get("/", (req, res) => {
 
 apiRouter.post("/image", upload.single("image"), async (req, res) => {
     const body = {
-        title: req.body.username,
+        title: req.body.title,
         user: req.body.username,
         file: req.file
     }
