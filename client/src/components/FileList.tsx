@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-export interface Image {
+export interface File {
     id: string,
     title: string,
     user: string,
     file: string
 }
 
-function ImageList() {
+function FileList() {
     const navigate = useNavigate()
 
-    const [images, setImages] = useState<Image[]>([])
+    const [files, setFiles] = useState<File[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch("/api/images")
+        fetch("/api/files")
             .then(async data => {
                 const json = await data.json()
-                setImages(json)
+                setFiles(json)
             }).catch(err => {
                 console.error(err)
             }).finally(() => {
@@ -26,37 +26,37 @@ function ImageList() {
             })
     }, [])
 
-    const handleImageClick = (id: string) => {
-        navigate("/image/" + id)
+    const handleFileClick = (id: string) => {
+        navigate("/file/" + id)
     }
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation()
-        let res = await fetch("/api/image/" + id, { method: "DELETE" })
-        if (res.ok) setImages(images.filter(img => img.id !== id))
+        let res = await fetch("/api/file/" + id, { method: "DELETE" })
+        if (res.ok) setFiles(files.filter(file => file.id !== id))
     }
 
     return (
-        <div className="images">
+        <div className="files">
             {loading && [...Array(5)].map((_, i) => (
-                <div key={i} className="images__dummy"></div>
+                <div key={i} className="files__dummy"></div>
             ))}
-            {!loading && images.map(img => (
-                <div onClick={() => handleImageClick(img.id)}
+            {!loading && files.map(img => (
+                <div onClick={() => handleFileClick(img.id)}
                     style={{ "--src": `url("/cdn/${img.file}")` } as React.CSSProperties}
-                    className="images__image"
+                    className="files__file"
                     key={img.id}>
-                    <div className="images__options">
-                        <div className="images__metadata">
-                            <div className="images__title">{img.title}</div>
-                            <div className="images__user">{img.user}</div>
+                    <div className="files__options">
+                        <div className="files__metadata">
+                            <div className="files__title">{img.title}</div>
+                            <div className="files__user">{img.user}</div>
                         </div>
-                        <a onClick={e => e.stopPropagation()} href={`/cdn/${img.file}`} download={img.file} className="images__button images__button--download">
+                        <a onClick={e => e.stopPropagation()} href={`/cdn/${img.file}`} download={img.file} className="files__button files__button--download">
                             <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                                 <path d="M6 20q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20Zm6-4-5-5 1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11Z" />
                             </svg>
                         </a>
-                        <button onClick={e => handleDelete(e, img.id)} className="images__button images__button--delete">
+                        <button onClick={e => handleDelete(e, img.id)} className="files__button files__button--delete">
                             <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                                 <path d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM9 17h2V8H9Zm4 0h2V8h-2ZM7 6v13Z" />
                             </svg>
@@ -65,12 +65,12 @@ function ImageList() {
                 </div>
             ))}
             {!loading && (
-                <div onClick={() => navigate("/add")} className="images__add">
-                    <div className="images__add__plus"></div>
+                <div onClick={() => navigate("/add")} className="files__add">
+                    <div className="files__add__plus"></div>
                 </div>
             )}
         </div>
     )
 }
 
-export default ImageList
+export default FileList

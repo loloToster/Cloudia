@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
 import Header from "./Header"
-import ImageList from "./ImageList"
-import AddImage from "./AddImage"
-import ImageDetails from "./ImageDetails"
+import FileList from "./FileList"
+import AddFile from "./AddFile"
+import FileDetails from "./FileDetails"
 
 function App() {
   return (
@@ -11,9 +11,9 @@ function App() {
       <div className="app">
         <Header />
         <Routes>
-          <Route path="/" element={<ImageList />} />
-          <Route path="/add" element={<AddImage />} />
-          <Route path="/image/:id" element={<ImageDetails />} />
+          <Route path="/" element={<FileList />} />
+          <Route path="/add" element={<AddFile />} />
+          <Route path="/file/:id" element={<FileDetails />} />
           <Route path="/*" element={<span>404</span>} />
         </Routes>
       </div>

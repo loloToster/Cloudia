@@ -7,7 +7,7 @@ function Header() {
                 Cloudia
             </Link>
             <Link to="/add" className="action-btn">
-                Add Image
+                Add File
             </Link>
         </div>
     )

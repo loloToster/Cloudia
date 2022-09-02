@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
-function ImageDetails() {
+function FileDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -13,7 +13,7 @@ function ImageDetails() {
     const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {
-        fetch("/api/image/" + id)
+        fetch("/api/file/" + id)
             .then(async res => {
                 const json = await res.json()
 
@@ -29,7 +29,7 @@ function ImageDetails() {
 
         setDeleting(true)
 
-        fetch("/api/image/" + id, { method: "DELETE" })
+        fetch("/api/file/" + id, { method: "DELETE" })
             .then(res => {
                 if (res.ok) navigate("/")
             }).finally(() => {
@@ -38,18 +38,18 @@ function ImageDetails() {
     }
 
     return (
-        <div className="image-details">
-            <div className="image-details__col">
-                <div className="image-details__img-wrapper">
-                    <div style={{ "--src": img } as React.CSSProperties} className="image-details__img"></div>
+        <div className="file-details">
+            <div className="file-details__col">
+                <div className="file-details__img-wrapper">
+                    <div style={{ "--src": img } as React.CSSProperties} className="file-details__img"></div>
                 </div>
             </div>
-            <div className="image-details__col">
-                <div className="image-details__title">{title}</div>
-                <div className="image-details__user">{user}</div>
-                <div className="image-details__btns">
-                    <a href={`/cdn/${file}`} download={file} className="image-details__btn image-details__btn--download action-btn">Download</a>
-                    <button onClick={() => handleDelete(id)} className={`${deleting ? "loading" : ""} image-details__btn image-details__btn--delete action-btn`}>
+            <div className="file-details__col">
+                <div className="file-details__title">{title}</div>
+                <div className="file-details__user">{user}</div>
+                <div className="file-details__btns">
+                    <a href={`/cdn/${file}`} download={file} className="file-details__btn file-details__btn--download action-btn">Download</a>
+                    <button onClick={() => handleDelete(id)} className={`${deleting ? "loading" : ""} file-details__btn file-details__btn--delete action-btn`}>
                         <div className="action-btn__content">Delete</div>
                         <div className="action-btn__loading">
                             Deleting
@@ -64,4 +64,4 @@ function ImageDetails() {
     )
 }
 
-export default ImageDetails
+export default FileDetails

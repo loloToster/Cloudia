@@ -3,7 +3,7 @@
 
 $gap: 6px;
 
-.images {
+.files {
     --items-in-row: 4;
 
     @media (max-width: 1250px) {
@@ -43,7 +43,7 @@ $gap: 6px;
         animation: dummy-animation .8s infinite alternate linear;
     }
 
-    &__image {
+    &__file {
         width: var(--size-of-item);
         aspect-ratio: 1;
         background: var(--src) c.$grey;
@@ -83,7 +83,7 @@ $gap: 6px;
         }
     }
 
-    &__image:hover &__options {
+    &__file:hover &__options {
         display: flex;
     }
 

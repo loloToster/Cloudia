@@ -6,10 +6,10 @@ import { FileDrop } from "react-file-drop"
 interface Inputs {
     title: string,
     username: string,
-    image: File | null
+    file: File | null
 }
 
-function AddImage() {
+function AddFile() {
     const navigate = useNavigate()
 
     const {
@@ -20,22 +20,22 @@ function AddImage() {
         setValue
     } = useForm<Inputs>()
 
-    const imageInput = useRef<HTMLInputElement>(null)
+    const fileInput = useRef<HTMLInputElement>(null)
 
-    const [imagePreview, setImagePreview] = useState("")
+    const [filePreview, setFilePreview] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const onSubmit: SubmitHandler<Inputs> = async ({ title, username, image }) => {
+    const onSubmit: SubmitHandler<Inputs> = async ({ title, username, file }) => {
         if (loading) return
 
         let data = new FormData()
 
         data.append("title", title)
         data.append("username", username)
-        data.append("image", image!)
+        data.append("file", file!)
 
         setLoading(true)
-        fetch("/api/image", {
+        fetch("/api/file", {
             method: "POST",
             body: data
         }).finally(() => {
@@ -46,46 +46,46 @@ function AddImage() {
         })
     }
 
-    const handleImageUpload = (files: FileList | null) => {
+    const handleFileUpload = (files: FileList | null) => {
         const value = (files && files.length) ? files[0] : null
 
-        setValue("image", value)
-        setImagePreview(value ? `url("${URL.createObjectURL(value)}")` : "")
+        setValue("file", value)
+        setFilePreview(value ? `url("${URL.createObjectURL(value)}")` : "")
 
-        if (!value) clearErrors("image")
+        if (!value) clearErrors("file")
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="add-image">
-            <div className="add-image__col">
-                <button onClick={() => imageInput.current?.click()}
+        <form onSubmit={handleSubmit(onSubmit)} className="add-file">
+            <div className="add-file__col">
+                <button onClick={() => fileInput.current?.click()}
                     type="button"
-                    className={"add-image__choose-file" + (errors.image?.message ? " err" : "")}>
-                    <FileDrop onDrop={handleImageUpload}>
-                        <div className="add-image__choose-file__plus"></div>
-                        <div className="add-image__choose-file__text">
-                            Add an image
+                    className={"add-file__choose-file" + (errors.file?.message ? " err" : "")}>
+                    <FileDrop onDrop={handleFileUpload}>
+                        <div className="add-file__choose-file__plus"></div>
+                        <div className="add-file__choose-file__text">
+                            Add a file
                         </div>
-                        <div style={{ "--src": imagePreview } as React.CSSProperties}
-                            className="add-image__choose-file__preview"></div>
+                        <div style={{ "--src": filePreview } as React.CSSProperties}
+                            className="add-file__choose-file__preview"></div>
                     </FileDrop>
                 </button>
-                <input {...register("image", { required: "Upload an image" })}
-                    onChange={e => handleImageUpload(e.target.files)}
-                    ref={imageInput}
-                    accept="image/png, image/jpeg"
+                <input {...register("file", { required: "Upload a file" })}
+                    onChange={e => handleFileUpload(e.target.files)}
+                    accept="image/png,image/jpg"
+                    ref={fileInput}
                     style={{ display: "none" }}
                     type="file" />
-                <div className="add-image__input-validation">
-                    {errors.image?.message?.toString()}
+                <div className="add-file__input-validation">
+                    {errors.file?.message?.toString()}
                 </div>
             </div>
-            <div className="add-image__col">
+            <div className="add-file__col">
                 <input {...register("title", {
                     required: "This field is required",
                     maxLength: 32
                 })} type="text" placeholder="Title" className={errors.title ? "err" : ""} />
-                <div className="add-image__input-validation">
+                <div className="add-file__input-validation">
                     {errors.title?.message}
                 </div>
                 <input {...register("username", {
@@ -93,7 +93,7 @@ function AddImage() {
                     maxLength: 16,
                     value: "Anonymous"
                 })} type="text" placeholder="Username" className={errors.username ? "err" : ""} />
-                <div className="add-image__input-validation">
+                <div className="add-file__input-validation">
                     {errors.username?.message}
                 </div>
                 <button className={`action-btn ${loading ? "loading" : ""}`} type="submit">
@@ -110,4 +110,4 @@ function AddImage() {
     )
 }
 
-export default AddImage
+export default AddFile

@@ -34,7 +34,7 @@ apiRouter.get("/", (req, res) => {
     res.send("hello!")
 })
 
-apiRouter.post("/image", upload.single("image"), async (req, res) => {
+apiRouter.post("/file", upload.single("file"), async (req, res) => {
     const ip = getClientIp(req)
 
     const body = {
@@ -55,7 +55,7 @@ apiRouter.post("/image", upload.single("image"), async (req, res) => {
         async err => {
             if (err) return console.error(err)
 
-            await db.push("/images[]", {
+            await db.push("/files[]", {
                 id, title: body.title, user: `${body.user} (${ip})`, file: fileName
             })
         }
@@ -64,19 +64,19 @@ apiRouter.post("/image", upload.single("image"), async (req, res) => {
     res.send()
 })
 
-apiRouter.get("/images", async (req, res) => {
-    res.json(await db.getData("/images"))
+apiRouter.get("/files", async (req, res) => {
+    res.json(await db.getData("/files"))
 })
 
-apiRouter.get("/image/:id", async (req, res) => {
-    res.json(await db.find("/images", img => img.id == req.params.id))
+apiRouter.get("/file/:id", async (req, res) => {
+    res.json(await db.find("/files", img => img.id == req.params.id))
 })
 
-apiRouter.delete("/image/:id", async (req, res) => {
-    const index = await db.getIndex("/images", req.params.id)
+apiRouter.delete("/file/:id", async (req, res) => {
+    const index = await db.getIndex("/files", req.params.id)
     if (index < 0) return res.status(404).send()
 
-    await db.delete(`/images[${index}]`)
+    await db.delete(`/files[${index}]`)
 
     res.send()
 })
