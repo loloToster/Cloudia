@@ -50,6 +50,43 @@ $gap: 6px;
         background-position: center;
     }
 
+    &__add {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--size-of-item);
+        aspect-ratio: 1;
+        border: dashed #343434 6px;
+        cursor: pointer;
+
+        &__plus {
+            $size: 60px;
+            $thickness: 12px;
+
+            position: relative;
+            width: $size;
+            height: $size;
+
+            $translate-value: math.div($size, 2) - math.div($thickness, 2);
+
+            &::before,
+            &::after {
+                content: "";
+                top: 0;
+                left: 0;
+                position: absolute;
+                width: $size;
+                height: $thickness;
+                background-color: #343434;
+                transform: translateY($translate-value) rotate(var(--rotate, 0));
+            }
+
+            &::after {
+                --rotate: 90deg;
+            }
+        }
+    }
+
     $options-size: 50px;
     $options-gap: 5px;
 
