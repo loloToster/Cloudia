@@ -1,6 +1,7 @@
-import { useRef, useState } from "react"
-import { useForm, SubmitHandler } from "react-hook-form"
+import React, { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useForm, SubmitHandler } from "react-hook-form"
+import { FileDrop } from "react-file-drop"
 
 interface Inputs {
     title: string,
@@ -45,16 +46,13 @@ function AddImage() {
         })
     }
 
-    const handleImageUpload = (e: React.ChangeEvent) => {
-        const input = e.target as HTMLInputElement
-        const value = input.files && input.files.length ? input.files[0] : null
+    const handleImageUpload = (files: FileList | null) => {
+        const value = (files && files.length) ? files[0] : null
 
         setValue("image", value)
+        setImagePreview(value ? `url("${URL.createObjectURL(value)}")` : "")
 
-        if (!value) return
-
-        clearErrors("image")
-        setImagePreview(`url("${URL.createObjectURL(value)}")`)
+        if (!value) clearErrors("image")
     }
 
     return (
@@ -63,15 +61,17 @@ function AddImage() {
                 <button onClick={() => imageInput.current?.click()}
                     type="button"
                     className={"add-image__choose-file" + (errors.image?.message ? " err" : "")}>
-                    <div className="add-image__choose-file__plus"></div>
-                    <div className="add-image__choose-file__text">
-                        Add an image
-                    </div>
-                    <div style={{ "--src": imagePreview } as React.CSSProperties}
-                        className="add-image__choose-file__preview"></div>
+                    <FileDrop onDrop={handleImageUpload}>
+                        <div className="add-image__choose-file__plus"></div>
+                        <div className="add-image__choose-file__text">
+                            Add an image
+                        </div>
+                        <div style={{ "--src": imagePreview } as React.CSSProperties}
+                            className="add-image__choose-file__preview"></div>
+                    </FileDrop>
                 </button>
                 <input {...register("image", { required: "Upload an image" })}
-                    onChange={handleImageUpload}
+                    onChange={e => handleImageUpload(e.target.files)}
                     ref={imageInput}
                     accept="image/png, image/jpeg"
                     style={{ display: "none" }}
@@ -90,7 +90,8 @@ function AddImage() {
                 </div>
                 <input {...register("username", {
                     required: "This field is required",
-                    maxLength: 16
+                    maxLength: 16,
+                    value: "Anonymous"
                 })} type="text" placeholder="Username" className={errors.username ? "err" : ""} />
                 <div className="add-image__input-validation">
                     {errors.username?.message}
