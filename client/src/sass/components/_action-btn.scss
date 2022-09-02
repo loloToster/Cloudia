@@ -3,14 +3,16 @@
 .action-btn {
     padding: 6px 10px;
     font-size: 1.2rem;
-    border: 3px c.$main solid;
+    border: 3px var(--color, c.$main) solid;
     border-radius: 6px;
     transition: all 100ms;
     cursor: pointer;
+    color: white;
+    text-decoration: none;
 
     &:hover,
     &:focus {
-        background-color: c.$main;
+        background-color: var(--color, c.$main);
     }
 
     &__loading {

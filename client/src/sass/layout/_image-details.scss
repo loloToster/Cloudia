@@ -1,0 +1,56 @@
+.image-details {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+
+    &__col {
+        width: 50%;
+        padding: 8px;
+
+        @media (max-width: 800px) {
+            width: 100%;
+        }
+    }
+
+    &__img-wrapper {
+        width: 100%;
+        aspect-ratio: 1;
+        background-color: #1c1c1c;
+    }
+
+    &__img {
+        width: 96%;
+        margin: 2%;
+        aspect-ratio: 1;
+        background-image: var(--src);
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    &__title {
+        margin-top: 16px;
+        font-size: 1.4rem;
+    }
+
+    &__user {
+        font-size: 1.1rem;
+        color: grey;
+    }
+
+    &__btns {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    &__btn {
+        &--download {
+            --color: #2281bc;
+        }
+
+        &--delete {
+            --color: #bc2222;
+        }
+    }
+}

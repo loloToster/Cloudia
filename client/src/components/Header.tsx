@@ -6,8 +6,8 @@ function Header() {
             <Link to="/" className="header__logo">
                 Cloudia
             </Link>
-            <Link to="/add">
-                <button className="action-btn">Add Image</button>
+            <Link to="/add" className="action-btn">
+                Add Image
             </Link>
         </div>
     )
