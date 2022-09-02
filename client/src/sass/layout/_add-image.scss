@@ -1,14 +1,19 @@
-@use "sass:math" as math;
 @use "../abstract/colors" as c;
+@use "../abstract/mixins" as m;
 
 .add-image {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 16px;
     margin: auto;
     margin-top: 16px;
     width: fit-content;
-    max-width: 90%;
+    width: 90%;
+
+    &__col:nth-child(1) {
+        width: min(400px, 100%);
+    }
 
     &__choose-file {
         position: relative;
@@ -17,9 +22,9 @@
         align-items: center;
         justify-content: center;
         gap: 16px;
-        width: 400px;
-        height: 400px;
-        background-color: #1c1c1c;
+        width: 100%;
+        aspect-ratio: 1;
+        background-color: c.$dark-grey;
         outline: 3px solid transparent;
         cursor: pointer;
 
@@ -28,34 +33,11 @@
         }
 
         &.err {
-            outline-color: red;
+            outline-color: c.$error-red;
         }
 
         &__plus {
-            $size: 80px;
-            $thickness: 20px;
-
-            position: relative;
-            width: $size;
-            height: $size;
-
-            $translate-value: math.div($size, 2) - math.div($thickness, 2);
-
-            &::before,
-            &::after {
-                content: "";
-                top: 0;
-                left: 0;
-                position: absolute;
-                width: $size;
-                height: $thickness;
-                background-color: grey;
-                transform: translateY($translate-value) rotate(var(--rotate, 0));
-            }
-
-            &::after {
-                --rotate: 90deg;
-            }
+            @include m.plus(80px, 20px, c.$light-grey);
         }
 
         &__text {
@@ -68,7 +50,7 @@
             width: 96%;
             height: 96%;
             margin: 2%;
-            background: var(--src) #1c1c1c;
+            background: var(--src) c.$dark-grey;
             background-position: center;
             background-size: contain;
             background-repeat: no-repeat;
@@ -83,7 +65,7 @@
         padding: 0 6px 4px 2px;
         font-size: 1.3rem;
         border-bottom: 2px solid;
-        border-bottom-color: grey;
+        border-bottom-color: c.$light-grey;
         transition: border-bottom-color 100ms;
 
         &:focus {
@@ -91,12 +73,12 @@
         }
 
         &.err {
-            border-bottom-color: red;
+            border-bottom-color: c.$error-red;
         }
     }
 
     &__input-validation {
-        color: red;
+        color: c.$error-red;
         margin-top: 4px;
         margin-bottom: 10px;
     }

@@ -1,4 +1,5 @@
-@use "sass:math" as math;
+@use "../abstract/colors" as c;
+@use "../abstract/mixins" as m;
 
 $gap: 6px;
 
@@ -27,7 +28,7 @@ $gap: 6px;
 
     @keyframes dummy-animation {
         from {
-            background-color: #343434;
+            background-color: c.$grey;
         }
 
         to {
@@ -38,14 +39,14 @@ $gap: 6px;
     &__dummy {
         width: var(--size-of-item);
         aspect-ratio: 1;
-        background-color: #343434;
+        background-color: c.$grey;
         animation: dummy-animation .8s infinite alternate linear;
     }
 
     &__image {
         width: var(--size-of-item);
         aspect-ratio: 1;
-        background: var(--src) #343434;
+        background: var(--src) c.$grey;
         background-size: cover;
         background-position: center;
     }
@@ -56,34 +57,11 @@ $gap: 6px;
         justify-content: center;
         width: var(--size-of-item);
         aspect-ratio: 1;
-        border: dashed #343434 6px;
+        border: dashed c.$grey 6px;
         cursor: pointer;
 
         &__plus {
-            $size: 60px;
-            $thickness: 12px;
-
-            position: relative;
-            width: $size;
-            height: $size;
-
-            $translate-value: math.div($size, 2) - math.div($thickness, 2);
-
-            &::before,
-            &::after {
-                content: "";
-                top: 0;
-                left: 0;
-                position: absolute;
-                width: $size;
-                height: $thickness;
-                background-color: #343434;
-                transform: translateY($translate-value) rotate(var(--rotate, 0));
-            }
-
-            &::after {
-                --rotate: 90deg;
-            }
+            @include m.plus(60px, 12px, c.$grey);
         }
     }
 
@@ -147,11 +125,11 @@ $gap: 6px;
         }
 
         &--download svg {
-            fill: #2281bc;
+            fill: c.$download-blue;
         }
 
         &--delete svg {
-            fill: #bc2222;
+            fill: c.$red;
         }
     }
 }

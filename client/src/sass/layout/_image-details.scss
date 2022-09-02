@@ -1,3 +1,5 @@
+@use "../abstract/colors" as c;
+
 .image-details {
     display: flex;
     flex-wrap: wrap;
@@ -15,7 +17,7 @@
     &__img-wrapper {
         width: 100%;
         aspect-ratio: 1;
-        background-color: #1c1c1c;
+        background-color: c.$dark-grey;
     }
 
     &__img {
@@ -35,7 +37,7 @@
 
     &__user {
         font-size: 1.1rem;
-        color: grey;
+        color: c.$light-grey;
     }
 
     &__btns {
@@ -46,11 +48,11 @@
 
     &__btn {
         &--download {
-            --color: #2281bc;
+            --color: #{c.$download-blue};
         }
 
         &--delete {
-            --color: #bc2222;
+            --color: #{c.$red};
         }
     }
 }

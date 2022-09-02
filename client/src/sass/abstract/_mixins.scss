@@ -1,0 +1,25 @@
+@use "sass:math" as math;
+
+@mixin plus($size, $thickness, $color) {
+    position: relative;
+    width: $size;
+    height: $size;
+
+    $translate-value: math.div($size, 2) - math.div($thickness, 2);
+
+    &::before,
+    &::after {
+        content: "";
+        top: 0;
+        left: 0;
+        position: absolute;
+        width: $size;
+        height: $thickness;
+        background-color: $color;
+        transform: translateY($translate-value) rotate(var(--rotate, 0));
+    }
+
+    &::after {
+        --rotate: 90deg;
+    }
+}
