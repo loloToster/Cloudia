@@ -6,33 +6,40 @@ import { FileDrop } from "react-file-drop"
 interface Inputs {
     title: string,
     username: string,
-    file: File | null
+    files: File[]
+}
+
+function useForceUpdate() {
+    const [value, setValue] = useState(0)
+    return () => setValue(value => value + 1)
 }
 
 function AddFile() {
     const navigate = useNavigate()
+    const forceUpdate = useForceUpdate()
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-        clearErrors,
-        setValue
+        setValue,
+        getValues,
+        clearErrors
     } = useForm<Inputs>()
 
     const fileInput = useRef<HTMLInputElement>(null)
 
-    const [filePreview, setFilePreview] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const onSubmit: SubmitHandler<Inputs> = async ({ title, username, file }) => {
+    const onSubmit: SubmitHandler<Inputs> = async ({ title, username, files }) => {
         if (loading) return
 
         let data = new FormData()
 
         data.append("title", title)
         data.append("username", username)
-        data.append("file", file!)
+
+        files.forEach(f => data.append("files", f))
 
         setLoading(true)
         fetch("/api/file", {
@@ -46,37 +53,51 @@ function AddFile() {
         })
     }
 
-    const handleFileUpload = (files: FileList | null) => {
-        const value = (files && files.length) ? files[0] : null
-
-        setValue("file", value)
-        setFilePreview(value ? `url("${URL.createObjectURL(value)}")` : "")
-
-        if (!value) clearErrors("file")
+    const handleFileUpload = (fl: FileList | null) => {
+        const newFiles = getValues("files").concat(Array.from(fl || []))
+        setValue("files", newFiles)
+        forceUpdate()
+        if (fl?.length) clearErrors("files")
     }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="add-file">
             <div className="add-file__col">
+                {getValues("files")?.map((file, i) => (
+                    <div className="add-file__file" key={i}>
+                        <div className="add-file__file__top">
+                            <img src={"/icon/" + file.name} className="add-file__file__icon" />
+                            <div className="add-file__file__name">
+                                {file.name}
+                            </div>
+                            <button type="button" className="add-file__file__remove">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                                    <path d="m6.4 19.8-2.2-2.2L9.8 12 4.2 6.4l2.2-2.2L12 9.8l5.6-5.6 2.2 2.2-5.6 5.6 5.6 5.6-2.2 2.2-5.6-5.6Z" />
+                                </svg>
+                            </button>
+                        </div>
+                        {/(.png|.jpg|.jpeg|.gif)$/.test(file.name) &&
+                            <img className="add-file__file__preview" src={URL.createObjectURL(file)} alt="preview" />}
+                    </div>
+                ))}
                 <button onClick={() => fileInput.current?.click()}
                     type="button"
-                    className={"add-file__choose-file" + (errors.file?.message ? " err" : "")}>
+                    className={"add-file__choose-file" + (errors.files?.message ? " err" : "")}>
                     <FileDrop onDrop={handleFileUpload}>
                         <div className="add-file__choose-file__plus"></div>
                         <div className="add-file__choose-file__text">
                             Add a file
                         </div>
-                        <div style={{ "--src": filePreview } as React.CSSProperties}
-                            className="add-file__choose-file__preview"></div>
                     </FileDrop>
                 </button>
-                <input {...register("file", { required: "Upload a file" })}
+                <input {...register("files", { required: "Upload a file", value: [] })}
                     onChange={e => handleFileUpload(e.target.files)}
                     ref={fileInput}
                     style={{ display: "none" }}
-                    type="file" />
+                    type="file"
+                    multiple />
                 <div className="add-file__input-validation">
-                    {errors.file?.message?.toString()}
+                    {errors.files?.message?.toString()}
                 </div>
             </div>
             <div className="add-file__col">

@@ -8,4 +8,5 @@ module.exports = function (app) {
 
     app.use("/api", middleware)
     app.use("/cdn", middleware)
+    app.use("/icon", middleware)
 }

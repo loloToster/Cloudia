@@ -6,10 +6,11 @@ import { getClientIp } from "request-ip"
 
 import path from "path"
 import fs from "fs"
+import { writeFile as writeFileAsync } from "fs/promises"
 
+const iconsDir = __dirname + "/client/public/icons"
 const defaultIcon = "file"
-let supportedIcons = fs.readdirSync(__dirname + "/client/public/icons")
-    .map(iconFile => iconFile.split(".")[0])
+let supportedIcons = fs.readdirSync(iconsDir).map(iconFile => iconFile.split(".")[0])
 
 const dbPath = __dirname + "/db.json"
 const cdnDir = __dirname + "/cdn"
@@ -38,52 +39,56 @@ apiRouter.get("/", (req, res) => {
     res.send("hello!")
 })
 
-apiRouter.post("/file", upload.single("file"), async (req, res) => {
+interface FileMetadata {
+    title: string,
+    user: string,
+    ip: string | null
+}
+
+async function addFile(file: Express.Multer.File, metadata: FileMetadata) {
+    const id = (
+        uuid() + path.extname(file.originalname)
+    ).toLowerCase()
+
+    await writeFileAsync(`${cdnDir}/${id}`, file.buffer)
+
+    let icon: string | null
+
+    if (/(.png|.jpg|.jpeg|.gif)$/.test(id))
+        icon = null
+    else {
+        const i = id.lastIndexOf(".")
+
+        if (i < 0 || i + 1 == id.length)
+            icon = defaultIcon
+        else {
+            const ext = id.substring(i + 1)
+            if (supportedIcons.includes(ext))
+                icon = ext
+            else
+                icon = defaultIcon
+        }
+    }
+
+    await db.push("/files[]", {
+        id, title: metadata.title, user: `${metadata.user} (${metadata.ip})`, icon
+    })
+}
+
+apiRouter.post("/file", upload.array("files"), async (req, res) => {
     const ip = getClientIp(req)
 
     const body = {
         title: req.body.title,
         user: req.body.username,
-        file: req.file
+        files: req.files
     }
 
-    if (!body.title || !body.user || !body.file)
+    if (!body.title || !body.user || !Array.isArray(body.files) || !body.files.length)
         return res.status(400).send()
 
-
-    const id = (
-        uuid() + path.extname(body.file.originalname)
-    ).toLowerCase()
-
-    fs.writeFile(
-        `${cdnDir}/${id}`,
-        body.file.buffer,
-        async err => {
-            if (err) return console.error(err)
-
-            let icon: string | null
-
-            if (/(.png|.jpg|.jpeg|.gif)$/.test(id))
-                icon = null
-            else {
-                const i = id.lastIndexOf(".")
-
-                if (i < 0 || i + 1 == id.length)
-                    icon = defaultIcon
-                else {
-                    const ext = id.substring(i + 1)
-                    if (supportedIcons.includes(ext))
-                        icon = ext
-                    else
-                        icon = defaultIcon
-                }
-            }
-
-            await db.push("/files[]", {
-                id, title: body.title, user: `${body.user} (${ip})`, icon
-            })
-        }
-    )
+    for (const file of body.files)
+        await addFile(file, { ip, ...body })
 
     res.send()
 })
@@ -115,6 +120,13 @@ app.get("/cdn/:file", (req, res) => {
             res.status(404).send()
         }
     })
+})
+
+// icons
+app.get("/icon/:file", (req, res) => {
+    const ext = path.extname(req.params.file).substring(1)
+    const file = supportedIcons.includes(ext) ? ext : defaultIcon
+    res.sendFile(`${iconsDir}/${file}.png`)
 })
 
 // React App
