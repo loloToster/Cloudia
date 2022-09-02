@@ -2,6 +2,7 @@ import express, { Router } from "express"
 import multer from "multer"
 import { JsonDB, Config } from "node-json-db"
 import { v4 as uuid } from "uuid"
+import { getClientIp } from "request-ip"
 
 import path from "path"
 import fs from "fs"
@@ -34,6 +35,8 @@ apiRouter.get("/", (req, res) => {
 })
 
 apiRouter.post("/image", upload.single("image"), async (req, res) => {
+    const ip = getClientIp(req)
+
     const body = {
         title: req.body.title,
         user: req.body.username,
@@ -53,7 +56,7 @@ apiRouter.post("/image", upload.single("image"), async (req, res) => {
             if (err) return console.error(err)
 
             await db.push("/images[]", {
-                id, title: body.title, user: body.user, file: fileName
+                id, title: body.title, user: `${body.user} (${ip})`, file: fileName
             })
         }
     )
