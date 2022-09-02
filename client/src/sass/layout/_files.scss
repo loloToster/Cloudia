@@ -49,6 +49,11 @@ $gap: 6px;
         background: var(--src) c.$grey;
         background-size: cover;
         background-position: center;
+        background-repeat: no-repeat;
+
+        &--with-icon {
+            background-size: 40%;
+        }
     }
 
     &__add {

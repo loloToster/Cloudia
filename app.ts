@@ -7,6 +7,10 @@ import { getClientIp } from "request-ip"
 import path from "path"
 import fs from "fs"
 
+const defaultIcon = "file"
+let supportedIcons = fs.readdirSync(__dirname + "/client/public/icons")
+    .map(iconFile => iconFile.split(".")[0])
+
 const dbPath = __dirname + "/db.json"
 const cdnDir = __dirname + "/cdn"
 
@@ -46,17 +50,37 @@ apiRouter.post("/file", upload.single("file"), async (req, res) => {
     if (!body.title || !body.user || !body.file)
         return res.status(400).send()
 
-    const id = uuid()
-    const fileName = id + path.extname(body.file.originalname)
+
+    const id = (
+        uuid() + path.extname(body.file.originalname)
+    ).toLowerCase()
 
     fs.writeFile(
-        `${cdnDir}/${fileName}`,
+        `${cdnDir}/${id}`,
         body.file.buffer,
         async err => {
             if (err) return console.error(err)
 
+            let icon: string | null
+
+            if (/(.png|.jpg|.jpeg|.gif)$/.test(id))
+                icon = null
+            else {
+                const i = id.lastIndexOf(".")
+
+                if (i < 0 || i + 1 == id.length)
+                    icon = defaultIcon
+                else {
+                    const ext = id.substring(i + 1)
+                    if (supportedIcons.includes(ext))
+                        icon = ext
+                    else
+                        icon = defaultIcon
+                }
+            }
+
             await db.push("/files[]", {
-                id, title: body.title, user: `${body.user} (${ip})`, file: fileName
+                id, title: body.title, user: `${body.user} (${ip})`, icon
             })
         }
     )

@@ -72,7 +72,6 @@ function AddFile() {
                 </button>
                 <input {...register("file", { required: "Upload a file" })}
                     onChange={e => handleFileUpload(e.target.files)}
-                    accept="image/png,image/jpg"
                     ref={fileInput}
                     style={{ display: "none" }}
                     type="file" />
