@@ -1,6 +1,7 @@
 @use "./abstract/colors" as c;
 
 @forward "./components/action-btn";
+@forward "./components/loader";
 
 @forward "./base/reset";
 @forward "./layout/header";

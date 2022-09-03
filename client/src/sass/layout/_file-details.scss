@@ -16,18 +16,22 @@
 
     &__img-wrapper {
         width: 100%;
+        padding: 2%;
         aspect-ratio: 1;
         background-color: c.$dark-grey;
     }
 
     &__img {
-        width: 96%;
-        margin: 2%;
+        width: 100%;
         aspect-ratio: 1;
         background-image: var(--src);
         background-position: center;
         background-size: contain;
         background-repeat: no-repeat;
+
+        &--icon {
+            background-size: 60%;
+        }
     }
 
     &__title {

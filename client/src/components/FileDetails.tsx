@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
+export interface File {
+    id: string,
+    title: string,
+    user: string
+    icon: string | null
+}
+
 function FileDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
 
-    const [img, setImg] = useState("")
-    const [file, setFile] = useState("")
-    const [title, setTitle] = useState("---")
-    const [user, setUser] = useState("---")
-
+    const [file, setFile] = useState<File | null>(null)
     const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {
         fetch("/api/file/" + id)
             .then(async res => {
                 const json = await res.json()
-
-                setImg(`url("/cdn/${json.file}")`)
-                setFile(json.file)
-                setTitle(json.title)
-                setUser(json.user)
+                setFile(json)
             })
     }, [id])
 
@@ -37,19 +36,37 @@ function FileDetails() {
             })
     }
 
+    if (!file) return (
+        <div className="loader"></div>
+    )
+
+    const icon = file.icon ? `/icons/${file.icon}.png` : `/cdn/${file.id}`
+
     return (
         <div className="file-details">
             <div className="file-details__col">
                 <div className="file-details__img-wrapper">
-                    <div style={{ "--src": img } as React.CSSProperties} className="file-details__img"></div>
+                    <div style={{ "--src": `url("${icon}")` } as React.CSSProperties}
+                        className={`file-details__img ${file.icon ? "file-details__img--icon" : ""}`}></div>
                 </div>
             </div>
             <div className="file-details__col">
-                <div className="file-details__title">{title}</div>
-                <div className="file-details__user">{user}</div>
+                <div className="file-details__title">{file.title}</div>
+                <div className="file-details__user">{file.user}</div>
                 <div className="file-details__btns">
-                    <a href={`/cdn/${file}`} download={file} className="file-details__btn file-details__btn--download action-btn">Download</a>
-                    <button onClick={() => handleDelete(id)} className={`${deleting ? "loading" : ""} file-details__btn file-details__btn--delete action-btn`}>
+                    <a href={`/cdn/${id}`}
+                        download={id}
+                        className="file-details__btn file-details__btn--download action-btn">
+                        Download
+                    </a>
+                    <a href={`/cdn/${id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="file-details__btn file-details__btn--open action-btn">
+                        Open in new tab
+                    </a>
+                    <button onClick={() => handleDelete(id)}
+                        className={`${deleting ? "loading" : ""} file-details__btn file-details__btn--delete action-btn`}>
                         <div className="action-btn__content">Delete</div>
                         <div className="action-btn__loading">
                             Deleting
