@@ -84,10 +84,6 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     for (const file of files)
         await addFile(file, { ip })
 
-    res.send()
-})
-
-apiRouter.get("/files", async (req, res) => {
     res.json(await db.getData("/files"))
 })
 
@@ -102,6 +98,10 @@ apiRouter.delete("/file/:id", async (req, res) => {
     await db.delete(`/files[${index}]`)
 
     res.send()
+})
+
+apiRouter.get("/files", async (req, res) => {
+    res.json(await db.getData("/files"))
 })
 
 app.use("/api", apiRouter)

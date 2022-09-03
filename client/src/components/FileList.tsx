@@ -36,6 +36,32 @@ function FileList() {
         if (res.ok) setFiles(files.filter(file => file.id !== id))
     }
 
+    const handleQuickUpload = () => {
+        const input = document.createElement("input")
+        input.type = "file"
+        input.setAttribute("multiple", "")
+        input.click()
+
+        input.addEventListener("change", async () => {
+            const files = input.files
+            input.remove()
+
+            if (!files) return
+
+            let data = new FormData()
+
+            Array.from(files)
+                .forEach(f => data.append("files", f))
+
+            const res = await fetch("/api/file", {
+                method: "POST",
+                body: data
+            })
+
+            setFiles(await res.json())
+        })
+    }
+
     return (
         <div className="files">
             {loading && [...Array(5)].map((_, i) => (
@@ -69,7 +95,7 @@ function FileList() {
                 )
             })}
             {!loading && (
-                <div onClick={() => navigate("/add")} className="files__add">
+                <div onClick={handleQuickUpload} className="files__add">
                     <div className="files__add__plus"></div>
                 </div>
             )}
