@@ -19,7 +19,7 @@ if (!fs.existsSync(cdnDir)) {
     fs.mkdirSync(cdnDir)
     if (fs.existsSync(dbPath)) fs.rmSync(dbPath)
 } else if (!fs.existsSync(dbPath)) {
-    fs.rmSync(cdnDir)
+    fs.rmdirSync(cdnDir, { recursive: true })
     fs.mkdirSync(cdnDir)
 }
 
@@ -40,8 +40,6 @@ apiRouter.get("/", (req, res) => {
 })
 
 interface FileMetadata {
-    title: string,
-    user: string,
     ip: string | null
 }
 
@@ -54,7 +52,7 @@ async function addFile(file: Express.Multer.File, metadata: FileMetadata) {
 
     let icon: string | null
 
-    if (/(.png|.jpg|.jpeg|.gif)$/.test(id))
+    if (/(.png|.jpg|.jpeg|.gif|.svg)$/.test(id))
         icon = null
     else {
         const i = id.lastIndexOf(".")
@@ -71,24 +69,20 @@ async function addFile(file: Express.Multer.File, metadata: FileMetadata) {
     }
 
     await db.push("/files[]", {
-        id, title: metadata.title, user: `${metadata.user} (${metadata.ip})`, icon
+        id, title: file.originalname, ip: metadata.ip || "unknown", icon
     })
 }
 
 apiRouter.post("/file", upload.array("files"), async (req, res) => {
     const ip = getClientIp(req)
 
-    const body = {
-        title: req.body.title,
-        user: req.body.username,
-        files: req.files
-    }
+    const files = req.files
 
-    if (!body.title || !body.user || !Array.isArray(body.files) || !body.files.length)
+    if (!Array.isArray(files) || !files.length)
         return res.status(400).send()
 
-    for (const file of body.files)
-        await addFile(file, { ip, ...body })
+    for (const file of files)
+        await addFile(file, { ip })
 
     res.send()
 })

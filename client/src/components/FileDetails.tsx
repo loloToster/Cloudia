@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 export interface File {
     id: string,
     title: string,
-    user: string
+    ip: string
     icon: string | null
 }
 
@@ -52,7 +52,7 @@ function FileDetails() {
             </div>
             <div className="file-details__col">
                 <div className="file-details__title">{file.title}</div>
-                <div className="file-details__user">{file.user}</div>
+                <div className="file-details__user">{file.ip}</div>
                 <div className="file-details__btns">
                     <a href={`/cdn/${id}`}
                         download={id}

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 export interface File {
     id: string,
     title: string,
-    user: string
+    ip: string
     icon: string | null
 }
 
@@ -22,7 +22,7 @@ function FileList() {
             }).catch(err => {
                 console.error(err)
             }).finally(() => {
-                setTimeout(() => setLoading(false), 1000)
+                setLoading(false)
             })
     }, [])
 
@@ -52,7 +52,7 @@ function FileList() {
                         <div className="files__options">
                             <div className="files__metadata">
                                 <div className="files__title">{file.title}</div>
-                                <div className="files__user">{file.user}</div>
+                                <div className="files__user">{file.ip}</div>
                             </div>
                             <a onClick={e => e.stopPropagation()} href={`/cdn/${file.id}`} download={file.id} className="files__button files__button--download">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">

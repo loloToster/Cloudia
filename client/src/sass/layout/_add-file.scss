@@ -11,8 +11,12 @@
     width: fit-content;
     width: 90%;
 
-    &__col:nth-child(1) {
+    &__col {
         width: min(400px, 100%);
+
+        &:empty {
+            display: none;
+        }
     }
 
     &__file {
@@ -52,9 +56,10 @@
         }
 
         &__preview {
-            width: 100%;
+            display: block;
+            max-width: 100%;
+            margin: auto;
             padding: 8px;
-            vertical-align: middle;
         }
     }
 
@@ -99,24 +104,8 @@
         }
     }
 
-    &__col:nth-child(2)>* {
-        display: block;
-    }
-
-    input[type="text"] {
-        padding: 0 6px 4px 2px;
-        font-size: 1.3rem;
-        border-bottom: 2px solid;
-        border-bottom-color: c.$light-grey;
-        transition: border-bottom-color 100ms;
-
-        &:focus {
-            border-bottom-color: c.$main;
-        }
-
-        &.err {
-            border-bottom-color: c.$error-red;
-        }
+    &__upload {
+        width: 100%;
     }
 
     &__input-validation {

@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
 import Header from "./Header"
 import FileList from "./FileList"
-import AddFile from "./AddFile"
+import AddFile from "./AddFiles"
 import FileDetails from "./FileDetails"
 
 function App() {
