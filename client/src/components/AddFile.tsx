@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { FileDrop } from "react-file-drop"
@@ -10,7 +10,7 @@ interface Inputs {
 }
 
 function useForceUpdate() {
-    const [value, setValue] = useState(0)
+    const setValue = useState(0)[1]
     return () => setValue(value => value + 1)
 }
 
@@ -38,7 +38,6 @@ function AddFile() {
 
         data.append("title", title)
         data.append("username", username)
-
         files.forEach(f => data.append("files", f))
 
         setLoading(true)
@@ -53,11 +52,22 @@ function AddFile() {
         })
     }
 
+    const setFiles = (newFiles: File[]) => {
+        setValue("files", newFiles)
+        if (!getValues("title") && newFiles.length)
+            setValue("title", newFiles[0].name)
+        forceUpdate()
+    }
+
     const handleFileUpload = (fl: FileList | null) => {
         const newFiles = getValues("files").concat(Array.from(fl || []))
-        setValue("files", newFiles)
-        forceUpdate()
+        setFiles(newFiles)
         if (fl?.length) clearErrors("files")
+    }
+
+    const handleRemove = (file: File) => {
+        const newFiles = getValues("files").filter(fl => fl !== file)
+        setFiles(newFiles)
     }
 
     return (
@@ -66,11 +76,11 @@ function AddFile() {
                 {getValues("files")?.map((file, i) => (
                     <div className="add-file__file" key={i}>
                         <div className="add-file__file__top">
-                            <img src={"/icon/" + file.name} className="add-file__file__icon" />
+                            <img src={"/icon/" + file.name} className="add-file__file__icon" alt="icon" />
                             <div className="add-file__file__name">
                                 {file.name}
                             </div>
-                            <button type="button" className="add-file__file__remove">
+                            <button onClick={() => handleRemove(file)} type="button" className="add-file__file__remove">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                                     <path d="m6.4 19.8-2.2-2.2L9.8 12 4.2 6.4l2.2-2.2L12 9.8l5.6-5.6 2.2 2.2-5.6 5.6 5.6 5.6-2.2 2.2-5.6-5.6Z" />
                                 </svg>
