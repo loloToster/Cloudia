@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-
-export interface File {
-    id: string,
-    title: string,
-    ip: string
-    icon: string | null
-}
+import { FileJson } from "@backend-types/types"
 
 function FileDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
 
-    const [file, setFile] = useState<File | null>(null)
+    const [file, setFile] = useState<FileJson | null>(null)
     const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {

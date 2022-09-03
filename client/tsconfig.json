@@ -1,5 +1,18 @@
 {
+  "include": [
+    "src"
+  ],
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@backend-types/*": [
+        "../types/*"
+      ]
+    },
+    "rootDirs": [
+      "./src",
+      "../types"
+    ],
     "target": "es5",
     "lib": [
       "dom",
@@ -19,8 +32,5 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
-  },
-  "include": [
-    "src"
-  ]
+  }
 }
