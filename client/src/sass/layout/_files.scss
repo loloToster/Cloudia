@@ -1,20 +1,19 @@
 @use "../abstract/colors" as c;
-@use "../abstract/mixins" as m;
 
 $gap: 6px;
 
 .files {
     --items-in-row: 4;
 
-    @media (max-width: 1250px) {
+    @media (max-width: 1400px) {
         --items-in-row: 3;
     }
 
-    @media (max-width: 850px) {
+    @media (max-width: 1000px) {
         --items-in-row: 2;
     }
 
-    @media (max-width: 630px) {
+    @media (max-width: 580px) {
         --items-in-row: 1;
     }
 
@@ -56,20 +55,6 @@ $gap: 6px;
         }
     }
 
-    &__add {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: var(--size-of-item);
-        aspect-ratio: 1;
-        border: dashed c.$grey 6px;
-        cursor: pointer;
-
-        &__plus {
-            @include m.plus(60px, 12px, c.$grey);
-        }
-    }
-
     $options-size: 50px;
     $options-gap: 5px;
 
@@ -96,21 +81,24 @@ $gap: 6px;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        flex-grow: 1;
+        width: calc(100% - (2 * $options-size) - (2 * $options-gap));
         padding: 3px 20px;
-        overflow: hidden;
         height: $options-size;
         white-space: nowrap;
     }
 
     &__title {
         line-height: 110%;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &__user {
         font-size: .8rem;
         line-height: 110%;
         color: #909090;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &__button {
@@ -135,6 +123,31 @@ $gap: 6px;
 
         &--delete svg {
             fill: c.$red;
+        }
+    }
+
+    $quick-actions-gap: 8px;
+
+    &__quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $quick-actions-gap;
+        width: var(--size-of-item);
+        aspect-ratio: 1;
+    }
+
+    &__quick-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: calc(100%);
+        height: calc(50% - ($quick-actions-gap / 2));
+        border: dashed c.$grey 6px;
+        cursor: pointer;
+
+        svg {
+            fill: c.$grey;
+            transform: scale(1.3);
         }
     }
 }

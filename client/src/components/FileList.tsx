@@ -67,6 +67,20 @@ function FileList() {
             {loading && [...Array(5)].map((_, i) => (
                 <div key={i} className="files__dummy"></div>
             ))}
+            {!loading && (
+                <div className="files__quick-actions">
+                    <div onClick={handleQuickUpload} className="files__quick-action">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                            <path d="M11 40q-1.2 0-2.1-.9Q8 38.2 8 37v-7.15h3V37h26v-7.15h3V37q0 1.2-.9 2.1-.9.9-2.1.9Zm11.5-7.65V13.8l-6 6-2.15-2.15L24 8l9.65 9.65-2.15 2.15-6-6v18.55Z" />
+                        </svg>
+                    </div>
+                    <div className="files__quick-action">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                            <path d="M24 42v-3.55l10.8-10.8 3.55 3.55L27.55 42ZM6 31.5v-3h15v3Zm34.5-2.45-3.55-3.55 1.45-1.45q.4-.4 1.05-.4t1.05.4l1.45 1.45q.4.4.4 1.05t-.4 1.05ZM6 23.25v-3h23.5v3ZM6 15v-3h23.5v3Z" />
+                        </svg>
+                    </div>
+                </div>
+            )}
             {!loading && files.map(file => {
                 const icon = file.icon ? `/icons/${file.icon}.png` : `/cdn/${file.id}`
 
@@ -94,11 +108,6 @@ function FileList() {
                     </div>
                 )
             })}
-            {!loading && (
-                <div onClick={handleQuickUpload} className="files__add">
-                    <div className="files__add__plus"></div>
-                </div>
-            )}
         </div>
     )
 }
