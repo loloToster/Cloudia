@@ -1,6 +1,6 @@
 import express, { Router } from "express"
 import multer from "multer"
-import { JsonDB, Config } from "node-json-db"
+import sqlite3 from "sqlite3"
 import { v4 as uuid } from "uuid"
 import { getClientIp } from "request-ip"
 
@@ -8,27 +8,41 @@ import path from "path"
 import fs from "fs"
 import { writeFile as writeFileAsync } from "fs/promises"
 
+import { FileJson } from "./types/types"
+
 const iconsDir = __dirname + "/client/public/icons"
 const defaultIcon = "file"
 let supportedIcons = fs.readdirSync(iconsDir).map(iconFile => iconFile.split(".")[0])
 
-const dbPath = __dirname + "/db.json"
+const dbPath = __dirname + "/database.db"
 const cdnDir = __dirname + "/cdn"
-
-if (!fs.existsSync(cdnDir)) {
-    fs.mkdirSync(cdnDir)
-    if (fs.existsSync(dbPath)) fs.rmSync(dbPath)
-} else if (!fs.existsSync(dbPath)) {
-    fs.rmdirSync(cdnDir, { recursive: true })
-    fs.mkdirSync(cdnDir)
-}
-
-const db = new JsonDB(
-    new Config(dbPath)
-)
 
 const PORT = 3001
 const app = express()
+
+const DataBase = sqlite3.verbose().Database
+const db = new DataBase(dbPath, err => {
+    if (err) {
+        console.error("Error while connecting to database:\n", err)
+        return
+    }
+
+    console.log("Connected to database")
+
+    db.run(
+        `CREATE TABLE IF NOT EXISTS files (
+            id TEXT,
+            title TEXT,
+            ip TEXT,
+            icon TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`
+    )
+
+    app.listen(PORT, () => {
+        console.log("Listening on port", PORT)
+    })
+})
 
 // API
 const apiRouter = Router()
@@ -39,37 +53,51 @@ apiRouter.get("/", (req, res) => {
     res.send("hello!")
 })
 
-interface FileMetadata {
-    ip: string | null
-}
+function addFiles(files: Express.Multer.File[], ip: string) {
+    return new Promise<void>(async (res, rej) => {
+        const sqlValues: Omit<FileJson, "ip" | "created_at">[] = []
 
-async function addFile(file: Express.Multer.File, metadata: FileMetadata) {
-    const id = (
-        uuid() + path.extname(file.originalname)
-    ).toLowerCase()
+        for (const file of files) {
+            const id = (
+                uuid() + path.extname(file.originalname)
+            ).toLowerCase()
 
-    await writeFileAsync(`${cdnDir}/${id}`, file.buffer)
+            let icon: string
 
-    let icon: string | null
+            if (/(.png|.jpg|.jpeg|.gif|.svg)$/.test(id))
+                icon = ""
+            else {
+                const i = id.lastIndexOf(".")
 
-    if (/(.png|.jpg|.jpeg|.gif|.svg)$/.test(id))
-        icon = null
-    else {
-        const i = id.lastIndexOf(".")
+                if (i < 0 || i + 1 == id.length)
+                    icon = defaultIcon
+                else {
+                    const ext = id.substring(i + 1)
+                    if (supportedIcons.includes(ext))
+                        icon = ext
+                    else
+                        icon = defaultIcon
+                }
+            }
 
-        if (i < 0 || i + 1 == id.length)
-            icon = defaultIcon
-        else {
-            const ext = id.substring(i + 1)
-            if (supportedIcons.includes(ext))
-                icon = ext
-            else
-                icon = defaultIcon
+            try {
+                await writeFileAsync(`${cdnDir}/${id}`, file.buffer)
+                sqlValues.push({
+                    id, icon, title: file.originalname
+                })
+            } catch (err) {
+                console.error(err)
+            }
         }
-    }
 
-    await db.push("/files[]", {
-        id, title: file.originalname, ip: metadata.ip || "unknown", icon
+        const paramsPlaceholders = sqlValues.map(() => "(?, ?, ?, ?)").join(", ")
+        const params = sqlValues.map(v => [v.id, v.title, ip, v.icon]).flat()
+
+        db.run(
+            `INSERT INTO files(id, title, ip, icon) VALUES ${paramsPlaceholders}`,
+            params,
+            err => err ? rej(err) : res()
+        )
     })
 }
 
@@ -81,27 +109,47 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     if (!Array.isArray(files) || !files.length)
         return res.status(400).send()
 
-    for (const file of files)
-        await addFile(file, { ip })
+    await addFiles(files, ip || "unknown")
 
-    res.json(await db.getData("/files"))
+    db.all(
+        "SELECT * FROM files ORDER BY created_at DESC",
+        (err, rows) => {
+            if (err) return res.status(500).send()
+            res.send(rows)
+        }
+    )
 })
 
 apiRouter.get("/file/:id", async (req, res) => {
-    res.json(await db.find("/files", img => img.id == req.params.id))
+    db.get(
+        "SELECT * FROM files WHERE id = ?",
+        [req.params.id],
+        (err, row) => {
+            if (err) return res.status(500).send()
+            res.send(row)
+        }
+    )
 })
 
 apiRouter.delete("/file/:id", async (req, res) => {
-    const index = await db.getIndex("/files", req.params.id)
-    if (index < 0) return res.status(404).send()
-
-    await db.delete(`/files[${index}]`)
-
-    res.send()
+    db.run(
+        "DELETE FROM files WHERE id = ?",
+        [req.params.id],
+        err => {
+            if (err) return res.status(500).send()
+            res.send()
+        }
+    )
 })
 
 apiRouter.get("/files", async (req, res) => {
-    res.json(await db.getData("/files"))
+    db.all(
+        "SELECT * FROM files ORDER BY created_at DESC",
+        (err, rows) => {
+            if (err) return res.status(500).send()
+            res.send(rows)
+        }
+    )
 })
 
 app.use("/api", apiRouter)
@@ -128,8 +176,4 @@ app.use(express.static(__dirname + "/client/build"))
 
 app.get("/*", (req, res) => {
     res.sendFile(__dirname + "/client/build/index.html")
-})
-
-app.listen(PORT, () => {
-    console.log("Listening on port", PORT)
 })
