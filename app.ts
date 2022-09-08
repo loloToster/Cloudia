@@ -33,7 +33,7 @@ const db = new DataBase(dbPath, err => {
     console.log("Connected to database")
 
     db.run(
-        `CREATE TABLE IF NOT EXISTS files (
+        `CREATE TABLE IF NOT EXISTS items (
             is_file INT,
             id TEXT,
             title TEXT,
@@ -60,7 +60,9 @@ apiRouter.get("/", (req, res) => {
 
 function addFiles(files: Express.Multer.File[], ip: string) {
     return new Promise<void>(async (res, rej) => {
-        const sqlValues: Omit<FileJson, "ip" | "created_at" | "is_file">[] = []
+        const sqlValues: Array<{
+            id: string, icon: string, title: string
+        }> = []
 
         for (const file of files) {
             const id = (
@@ -99,7 +101,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
         const params = sqlValues.map(v => [1, v.id, v.title, ip, v.icon, ""]).flat()
 
         db.run(
-            `INSERT INTO files(is_file, id, title, ip, icon, text) VALUES ${paramsPlaceholders}`,
+            `INSERT INTO items(is_file, id, title, ip, icon, text) VALUES ${paramsPlaceholders}`,
             params,
             err => err ? rej(err) : res()
         )
@@ -117,7 +119,7 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     await addFiles(files, ip || "unknown")
 
     db.all(
-        "SELECT * FROM files ORDER BY created_at DESC",
+        "SELECT * FROM items ORDER BY created_at DESC",
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)
@@ -132,12 +134,12 @@ apiRouter.post("/text", express.json(), async (req, res) => {
     const ip = getClientIp(req)
 
     db.run(
-        `INSERT INTO files(is_file, id, title, ip, icon, text) VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO items(is_file, id, title, ip, icon, text) VALUES (?, ?, ?, ?, ?, ?)`,
         [0, uuid(), "", ip || "unknown", "", req.body.text],
         err => {
             if (err) return res.status(500).send()
             db.all(
-                "SELECT * FROM files ORDER BY created_at DESC",
+                "SELECT * FROM items ORDER BY created_at DESC",
                 (err, rows) => {
                     if (err) return res.status(500).send()
                     res.send(rows)
@@ -147,9 +149,9 @@ apiRouter.post("/text", express.json(), async (req, res) => {
     )
 })
 
-apiRouter.get("/file/:id", async (req, res) => {
+apiRouter.get("/item/:id", async (req, res) => {
     db.get(
-        "SELECT * FROM files WHERE id = ?",
+        "SELECT * FROM items WHERE id = ?",
         [req.params.id],
         (err, row) => {
             if (err) return res.status(500).send()
@@ -158,9 +160,9 @@ apiRouter.get("/file/:id", async (req, res) => {
     )
 })
 
-apiRouter.delete("/file/:id", async (req, res) => {
+apiRouter.delete("/item/:id", async (req, res) => {
     db.run(
-        "DELETE FROM files WHERE id = ?",
+        "DELETE FROM items WHERE id = ?",
         [req.params.id],
         err => {
             if (err) return res.status(500).send()
@@ -169,9 +171,9 @@ apiRouter.delete("/file/:id", async (req, res) => {
     )
 })
 
-apiRouter.get("/files", async (req, res) => {
+apiRouter.get("/items", async (req, res) => {
     db.all(
-        "SELECT * FROM files ORDER BY created_at DESC",
+        "SELECT * FROM items ORDER BY created_at DESC",
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)

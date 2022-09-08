@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
 import Header from "./Header"
-import FileList from "./FileList"
+import FileList from "./ItemList"
 import AddFile from "./AddFiles"
 import FileDetails from "./FileDetails"
 

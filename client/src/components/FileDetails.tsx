@@ -10,7 +10,7 @@ function FileDetails() {
     const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {
-        fetch("/api/file/" + id)
+        fetch("/api/item/" + id)
             .then(async res => {
                 const json = await res.json()
                 setFile(json)
@@ -22,7 +22,7 @@ function FileDetails() {
 
         setDeleting(true)
 
-        fetch("/api/file/" + id, { method: "DELETE" })
+        fetch("/api/item/" + id, { method: "DELETE" })
             .then(res => {
                 if (res.ok) navigate("/")
             }).finally(() => {
