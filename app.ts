@@ -17,6 +17,9 @@ let supportedIcons = fs.readdirSync(iconsDir).map(iconFile => iconFile.split("."
 const dbPath = __dirname + "/database.db"
 const cdnDir = __dirname + "/cdn"
 
+if (!fs.existsSync(cdnDir))
+    fs.mkdirSync(cdnDir)
+
 const PORT = 3001
 const app = express()
 
@@ -31,10 +34,12 @@ const db = new DataBase(dbPath, err => {
 
     db.run(
         `CREATE TABLE IF NOT EXISTS files (
+            is_file INT,
             id TEXT,
             title TEXT,
             ip TEXT,
             icon TEXT,
+            text TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`
     )
@@ -55,7 +60,7 @@ apiRouter.get("/", (req, res) => {
 
 function addFiles(files: Express.Multer.File[], ip: string) {
     return new Promise<void>(async (res, rej) => {
-        const sqlValues: Omit<FileJson, "ip" | "created_at">[] = []
+        const sqlValues: Omit<FileJson, "ip" | "created_at" | "is_file">[] = []
 
         for (const file of files) {
             const id = (
@@ -90,11 +95,11 @@ function addFiles(files: Express.Multer.File[], ip: string) {
             }
         }
 
-        const paramsPlaceholders = sqlValues.map(() => "(?, ?, ?, ?)").join(", ")
-        const params = sqlValues.map(v => [v.id, v.title, ip, v.icon]).flat()
+        const paramsPlaceholders = sqlValues.map(() => "(?, ?, ?, ?, ?, ?)").join(", ")
+        const params = sqlValues.map(v => [1, v.id, v.title, ip, v.icon, ""]).flat()
 
         db.run(
-            `INSERT INTO files(id, title, ip, icon) VALUES ${paramsPlaceholders}`,
+            `INSERT INTO files(is_file, id, title, ip, icon, text) VALUES ${paramsPlaceholders}`,
             params,
             err => err ? rej(err) : res()
         )
@@ -116,6 +121,28 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)
+        }
+    )
+})
+
+apiRouter.post("/text", express.json(), async (req, res) => {
+    if (typeof req.body.text !== "string")
+        return res.status(400).send()
+
+    const ip = getClientIp(req)
+
+    db.run(
+        `INSERT INTO files(is_file, id, title, ip, icon, text) VALUES (?, ?, ?, ?, ?, ?)`,
+        [0, uuid(), "", ip || "unknown", "", req.body.text],
+        err => {
+            if (err) return res.status(500).send()
+            db.all(
+                "SELECT * FROM files ORDER BY created_at DESC",
+                (err, rows) => {
+                    if (err) return res.status(500).send()
+                    res.send(rows)
+                }
+            )
         }
     )
 })

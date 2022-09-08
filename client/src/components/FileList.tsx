@@ -56,6 +56,8 @@ function FileList() {
         })
     }
 
+    const [savingQuickText, setSavingQuickText] = useState(false)
+
     const firstActionBtn = useRef<HTMLButtonElement>(null)
     const secondActionBtn = useRef<HTMLButtonElement>(null)
     const textarea = useRef<HTMLTextAreaElement>(null)
@@ -66,11 +68,35 @@ function FileList() {
         textarea.current?.focus()
     }
 
-    const handleQuickTextClose = (e: React.MouseEvent) => {
+    const handleQuickTextClose = (e?: React.MouseEvent) => {
         firstActionBtn.current?.classList.remove("hidden")
         secondActionBtn.current?.classList.remove("active")
         if (textarea.current) textarea.current.value = ""
-        e.stopPropagation()
+        e?.stopPropagation()
+    }
+
+    const handleQuickTextSave = async () => {
+        if (savingQuickText || !textarea.current) return
+
+        setSavingQuickText(true)
+
+        const text = textarea.current.value
+
+        try {
+            const res = await fetch("/api/text", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ text })
+            })
+
+            setFiles(await res.json())
+
+            handleQuickTextClose()
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setSavingQuickText(false)
+        }
     }
 
     return (
@@ -93,7 +119,7 @@ function FileList() {
                             <textarea ref={textarea} placeholder="Type in your text here..."></textarea>
                             <div>
                                 <div onClick={handleQuickTextClose} className="action-btn">Cancel</div>
-                                <div className="action-btn">
+                                <div onClick={handleQuickTextSave} className={`action-btn ${savingQuickText ? "loading" : ""}`}>
                                     <div className="action-btn__content">
                                         Save
                                     </div>
