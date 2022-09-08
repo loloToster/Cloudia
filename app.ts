@@ -8,7 +8,7 @@ import path from "path"
 import fs from "fs"
 import { writeFile as writeFileAsync } from "fs/promises"
 
-import { FileJson } from "./types/types"
+import { FileJson, TextJson } from "./types/types"
 
 const iconsDir = __dirname + "/client/public/icons"
 const defaultIcon = "file"
@@ -59,10 +59,8 @@ apiRouter.get("/", (req, res) => {
 })
 
 function addFiles(files: Express.Multer.File[], ip: string) {
-    return new Promise<void>(async (res, rej) => {
-        const sqlValues: Array<{
-            id: string, icon: string, title: string
-        }> = []
+    return new Promise<FileJson[]>(async (res, rej) => {
+        let newDbItems: FileJson[] = []
 
         for (const file of files) {
             const id = (
@@ -89,21 +87,33 @@ function addFiles(files: Express.Multer.File[], ip: string) {
 
             try {
                 await writeFileAsync(`${cdnDir}/${id}`, file.buffer)
-                sqlValues.push({
-                    id, icon, title: file.originalname
+
+                newDbItems.push({
+                    is_file: 1,
+                    id,
+                    title: file.originalname,
+                    ip,
+                    icon,
+                    text: "",
+                    created_at: new Date()
                 })
             } catch (err) {
                 console.error(err)
             }
         }
 
-        const paramsPlaceholders = sqlValues.map(() => "(?, ?, ?, ?, ?, ?)").join(", ")
-        const params = sqlValues.map(v => [1, v.id, v.title, ip, v.icon, ""]).flat()
+        const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?, ?, ?)").join(", ")
+        const params = newDbItems.map(item => {
+            let parsedItem = Object.values(item)
+            // remove created_at
+            parsedItem.splice(-1)
+            return parsedItem
+        }).flat()
 
         db.run(
             `INSERT INTO items(is_file, id, title, ip, icon, text) VALUES ${paramsPlaceholders}`,
             params,
-            err => err ? rej(err) : res()
+            err => err ? rej(err) : res(newDbItems)
         )
     })
 }
@@ -116,35 +126,35 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     if (!Array.isArray(files) || !files.length)
         return res.status(400).send()
 
-    await addFiles(files, ip || "unknown")
+    const newItems = await addFiles(files, ip || "unknown")
 
-    db.all(
-        "SELECT * FROM items ORDER BY created_at DESC",
-        (err, rows) => {
-            if (err) return res.status(500).send()
-            res.send(rows)
-        }
-    )
+    res.send(newItems)
 })
 
 apiRouter.post("/text", express.json(), async (req, res) => {
     if (typeof req.body.text !== "string")
         return res.status(400).send()
 
-    const ip = getClientIp(req)
+    const newItem: TextJson = {
+        is_file: 0,
+        id: uuid(),
+        title: "",
+        ip: getClientIp(req) || "unknown",
+        icon: "",
+        text: req.body.text,
+        created_at: new Date()
+    }
+
+    let params = Object.values(newItem)
+    // remove created_at
+    params.splice(-1)
 
     db.run(
         `INSERT INTO items(is_file, id, title, ip, icon, text) VALUES (?, ?, ?, ?, ?, ?)`,
-        [0, uuid(), "", ip || "unknown", "", req.body.text],
+        params,
         err => {
             if (err) return res.status(500).send()
-            db.all(
-                "SELECT * FROM items ORDER BY created_at DESC",
-                (err, rows) => {
-                    if (err) return res.status(500).send()
-                    res.send(rows)
-                }
-            )
+            res.send([newItem])
         }
     )
 })
