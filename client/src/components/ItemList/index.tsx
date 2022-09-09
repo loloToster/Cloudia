@@ -37,9 +37,9 @@ function ItemList() {
             {!loading && <QuickActions addItems={addItems} />}
             {!loading && items.map(item => {
                 if (item.is_file)
-                    return <FileItem fileItem={item} removeItem={removeItem} />
+                    return <FileItem key={item.id} fileItem={item} removeItem={removeItem} />
                 else
-                    return <TextItem textItem={item} removeItem={removeItem} />
+                    return <TextItem key={item.id} textItem={item} removeItem={removeItem} />
             })}
         </div>
     )
