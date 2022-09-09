@@ -29,6 +29,22 @@ $gap: 6px;
 
     --size-of-item: calc((100% / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row)));
 
+    * {
+        scrollbar-width: thin;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #6f6f71;
+
+        &:hover {
+            background-color: #5c5c5e;
+        }
+    }
+
     @keyframes dummy-animation {
         from {
             background-color: c.$grey;
