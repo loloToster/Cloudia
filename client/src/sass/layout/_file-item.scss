@@ -1,0 +1,85 @@
+@use "../abstract/colors" as c;
+
+.file-item {
+    width: var(--size-of-item);
+    aspect-ratio: 1;
+    background: var(--src) c.$grey;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    &--with-icon {
+        background-size: 40%;
+    }
+
+    $options-size: 50px;
+    $options-gap: 5px;
+
+    &__options {
+        display: none;
+        gap: $options-gap;
+        width: 100%;
+        height: $options-size + $options-gap;
+        padding: $options-gap;
+        padding-bottom: 0;
+
+        &>* {
+            height: $options-size;
+            background-color: #212121dd;
+            border-radius: 100vh;
+        }
+    }
+
+    &:hover &__options {
+        display: flex;
+    }
+
+    &__metadata {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: calc(100% - (2 * $options-size) - (2 * $options-gap));
+        padding: 3px 20px;
+        height: $options-size;
+        white-space: nowrap;
+    }
+
+    &__title {
+        line-height: 110%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__user {
+        font-size: .8rem;
+        line-height: 110%;
+        color: #909090;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        width: $options-size;
+        height: $options-size;
+
+        &:hover svg {
+            transform: scale(1.1);
+        }
+
+        svg {
+            vertical-align: middle;
+        }
+
+        &--download svg {
+            fill: c.$download-blue;
+        }
+
+        &--delete svg {
+            fill: c.$red;
+        }
+    }
+}

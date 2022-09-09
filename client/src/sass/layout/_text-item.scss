@@ -1,0 +1,7 @@
+@use "../abstract/colors" as c;
+
+.text-item {
+    width: var(--size-of-item);
+    aspect-ratio: 1;
+    overflow: hidden;
+}
