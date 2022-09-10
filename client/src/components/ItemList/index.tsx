@@ -22,7 +22,7 @@ function ItemList() {
     }, [])
 
     const addItems = (itms: Item[]) => {
-        setItems(itms.concat(items))
+        setItems(prevItems => itms.concat(prevItems))
     }
 
     const removeItem = (id: string) => {
