@@ -12,14 +12,12 @@ function AddFiles() {
     const [loading, setLoading] = useState(false)
 
     const handleFileUpload = (fl: FileList | null) => {
-        const newFiles = files.concat(Array.from(fl || []))
-        setFiles(newFiles)
+        setFiles(prevFiles => prevFiles.concat(Array.from(fl || [])))
         setError("")
     }
 
     const handleRemove = (file: File) => {
-        const newFiles = files.filter(fl => fl !== file)
-        setFiles(newFiles)
+        setFiles(prevFiles => prevFiles.filter(fl => fl !== file))
     }
 
     const handleSubmit = () => {
