@@ -1,7 +1,31 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 function QuickActions(props: { addItems: Function }) {
     const { addItems } = props
+
+    const uploadText = async (text: string) => {
+        const res = await fetch("/api/text", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ text })
+        })
+
+        addItems(await res.json())
+    }
+
+    const uploadFiles = async (files: FileList) => {
+        let data = new FormData()
+
+        Array.from(files)
+            .forEach(f => data.append("files", f))
+
+        const res = await fetch("/api/file", {
+            method: "POST",
+            body: data
+        })
+
+        addItems(await res.json())
+    }
 
     const handleQuickUpload = () => {
         const input = document.createElement("input")
@@ -15,17 +39,7 @@ function QuickActions(props: { addItems: Function }) {
 
             if (!files) return
 
-            let data = new FormData()
-
-            Array.from(files)
-                .forEach(f => data.append("files", f))
-
-            const res = await fetch("/api/file", {
-                method: "POST",
-                body: data
-            })
-
-            addItems(await res.json())
+            uploadFiles(files)
         })
     }
 
@@ -56,14 +70,7 @@ function QuickActions(props: { addItems: Function }) {
         const text = textarea.current.value
 
         try {
-            const res = await fetch("/api/text", {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ text })
-            })
-
-            addItems(await res.json())
-
+            uploadText(text)
             handleQuickTextClose()
         } catch (err) {
             console.error(err)
@@ -71,6 +78,23 @@ function QuickActions(props: { addItems: Function }) {
             setSavingQuickText(false)
         }
     }
+
+    useEffect(() => {
+        document.onpaste = e => {
+            if (!e.clipboardData) return
+
+            const { files } = e.clipboardData
+
+            if (files.length)
+                uploadFiles(files)
+            else
+                uploadText(e.clipboardData.getData("text"))
+        }
+
+        return () => {
+            document.onpaste = null
+        }
+    }, [])
 
     return (<div className="items__quick-actions">
         <button ref={firstActionBtn} onClick={handleQuickUpload} className="items__quick-action">
