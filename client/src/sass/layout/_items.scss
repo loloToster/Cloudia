@@ -91,6 +91,12 @@ $gap: 6px;
             transform: scale(1.3);
         }
 
+        input {
+            padding: 8px;
+            padding-bottom: 0;
+            font-size: 1.3rem;
+        }
+
         &__textarea-wrapper {
             display: none;
             flex-direction: column;

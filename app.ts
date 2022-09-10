@@ -138,7 +138,7 @@ apiRouter.post("/text", express.json(), async (req, res) => {
     const newItem: TextJson = {
         is_file: 0,
         id: uuid(),
-        title: "",
+        title: req.body.title || "",
         ip: getClientIp(req) || "unknown",
         icon: "",
         text: req.body.text,

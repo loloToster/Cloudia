@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react"
 function QuickActions(props: { addItems: Function }) {
     const { addItems } = props
 
-    const uploadText = async (text: string) => {
+    const uploadText = async (text: string, title?: string) => {
         const res = await fetch("/api/text", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text, title })
         })
 
         addItems(await res.json())
@@ -27,6 +27,23 @@ function QuickActions(props: { addItems: Function }) {
         addItems(await res.json())
     }
 
+    useEffect(() => {
+        document.onpaste = e => {
+            if (!e.clipboardData) return
+
+            const { files } = e.clipboardData
+
+            if (files.length)
+                uploadFiles(files)
+            else
+                uploadText(e.clipboardData.getData("text"))
+        }
+
+        return () => {
+            document.onpaste = null
+        }
+    }, [])
+
     const handleQuickUpload = () => {
         const input = document.createElement("input")
         input.type = "file"
@@ -43,13 +60,17 @@ function QuickActions(props: { addItems: Function }) {
         })
     }
 
-    const [savingQuickText, setSavingQuickText] = useState(false)
-
     const firstActionBtn = useRef<HTMLButtonElement>(null)
     const secondActionBtn = useRef<HTMLButtonElement>(null)
+
+    const [savingQuickText, setSavingQuickText] = useState(false)
+    const [title, setTitle] = useState("")
     const textarea = useRef<HTMLTextAreaElement>(null)
 
     const handleQuickTextOpen = () => {
+        if (secondActionBtn.current?.classList.contains("active"))
+            return
+
         firstActionBtn.current?.classList.add("hidden")
         secondActionBtn.current?.classList.add("active")
         textarea.current?.focus()
@@ -70,7 +91,7 @@ function QuickActions(props: { addItems: Function }) {
         const text = textarea.current.value
 
         try {
-            uploadText(text)
+            await uploadText(text, title)
             handleQuickTextClose()
         } catch (err) {
             console.error(err)
@@ -78,23 +99,6 @@ function QuickActions(props: { addItems: Function }) {
             setSavingQuickText(false)
         }
     }
-
-    useEffect(() => {
-        document.onpaste = e => {
-            if (!e.clipboardData) return
-
-            const { files } = e.clipboardData
-
-            if (files.length)
-                uploadFiles(files)
-            else
-                uploadText(e.clipboardData.getData("text"))
-        }
-
-        return () => {
-            document.onpaste = null
-        }
-    }, [])
 
     return (<div className="items__quick-actions">
         <button ref={firstActionBtn} onClick={handleQuickUpload} className="items__quick-action">
@@ -107,6 +111,10 @@ function QuickActions(props: { addItems: Function }) {
                 <path d="M24 42v-3.55l10.8-10.8 3.55 3.55L27.55 42ZM6 31.5v-3h15v3Zm34.5-2.45-3.55-3.55 1.45-1.45q.4-.4 1.05-.4t1.05.4l1.45 1.45q.4.4.4 1.05t-.4 1.05ZM6 23.25v-3h23.5v3ZM6 15v-3h23.5v3Z" />
             </svg>
             <div className="items__quick-action__textarea-wrapper">
+                <input onInput={e => setTitle((e.target as HTMLInputElement).value)}
+                    value={title}
+                    placeholder="Title"
+                    type="text" />
                 <textarea ref={textarea} placeholder="Type in your text here..."></textarea>
                 <div>
                     <div onClick={handleQuickTextClose} className="action-btn">Cancel</div>
