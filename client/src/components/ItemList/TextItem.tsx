@@ -1,5 +1,24 @@
 import { TextJson } from "@backend-types/types"
 
+// https://stackoverflow.com/questions/71873824/copy-text-to-clipboard-cannot-read-properties-of-undefined-reading-writetext
+function copyToClipboard(text: string) {
+    if (window.isSecureContext && navigator.clipboard) {
+        navigator.clipboard.writeText(text)
+    } else {
+        const textArea = document.createElement("textarea")
+        textArea.value = text
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        try {
+            document.execCommand("copy")
+        } catch (err) {
+            console.error("Unable to copy to clipboard", err)
+        }
+        document.body.removeChild(textArea)
+    }
+}
+
 function TextItem(props: { textItem: TextJson, removeItem: Function }) {
     const { textItem, removeItem } = props
 
@@ -9,7 +28,7 @@ function TextItem(props: { textItem: TextJson, removeItem: Function }) {
     }
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(textItem.text)
+        copyToClipboard(textItem.text)
     }
 
     return (<div className="text-item">
