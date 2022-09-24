@@ -1,6 +1,7 @@
 @use "../abstract/colors" as c;
 
 .action-btn {
+    position: relative;
     padding: 6px 10px;
     font-size: 1.2rem;
     border: 3px var(--color, c.$main) solid;
@@ -52,5 +53,15 @@
                 animation-delay: #{$i * 200ms};
             }
         }
+    }
+
+    &__progress {
+        z-index: -1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: var(--color, c.$main);
+        width: calc(var(--value, 0) * 100%);
     }
 }
