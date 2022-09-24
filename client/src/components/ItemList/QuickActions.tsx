@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
+import ActionBtn from "../ActionBtn"
 
 function QuickActions(props: { addItems: Function }) {
     const { addItems } = props
@@ -131,18 +132,11 @@ function QuickActions(props: { addItems: Function }) {
                     type="text" />
                 <textarea ref={textarea} placeholder="Type in your text here..."></textarea>
                 <div>
-                    <div onClick={handleQuickTextClose} className="action-btn">Cancel</div>
-                    <div onClick={handleQuickTextSave} className={`action-btn ${savingQuickText ? "loading" : ""}`}>
-                        <div className="action-btn__content">
-                            Save
-                        </div>
-                        <div className="action-btn__loading">
-                            Saving
-                            <span className="action-btn__loading-item">.</span>
-                            <span className="action-btn__loading-item">.</span>
-                            <span className="action-btn__loading-item">.</span>
-                        </div>
-                    </div>
+                    <ActionBtn text="Cancel" onClick={handleQuickTextClose} />
+                    <ActionBtn text="Save"
+                        textLoading="Saving"
+                        onClick={handleQuickTextSave}
+                        loading={savingQuickText} />
                 </div>
             </div>
         </button>

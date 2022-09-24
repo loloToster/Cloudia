@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { FileJson } from "@backend-types/types"
+import ActionBtn from "./ActionBtn"
 
 function FileDetails() {
     const { id } = useParams()
@@ -47,27 +48,19 @@ function FileDetails() {
                 <div className="file-details__title">{file.title}</div>
                 <div className="file-details__user">{file.ip}</div>
                 <div className="file-details__btns">
-                    <a href={`/cdn/${id}`}
+                    <ActionBtn text="Download"
+                        onClick={`/cdn/${id}`}
                         download={id}
-                        className="file-details__btn file-details__btn--download action-btn">
-                        Download
-                    </a>
-                    <a href={`/cdn/${id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="file-details__btn file-details__btn--open action-btn">
-                        Open in new tab
-                    </a>
-                    <button onClick={() => handleDelete(id)}
-                        className={`${deleting ? "loading" : ""} file-details__btn file-details__btn--delete action-btn`}>
-                        <div className="action-btn__content">Delete</div>
-                        <div className="action-btn__loading">
-                            Deleting
-                            <span className="action-btn__loading-item">.</span>
-                            <span className="action-btn__loading-item">.</span>
-                            <span className="action-btn__loading-item">.</span>
-                        </div>
-                    </button>
+                        className="file-details__btn--download" />
+                    <ActionBtn text="Open in new tab"
+                        onClick={`/cdn/${id}`}
+                        newPage
+                        className="file-details__btn--open" />
+                    <ActionBtn text="Delete"
+                        textLoading="Deleting"
+                        onClick={() => handleDelete(id)}
+                        loading={deleting}
+                        className="file-details__btn--delete" />
                 </div>
             </div>
         </div>

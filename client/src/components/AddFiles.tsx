@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { FileDrop } from "react-file-drop"
+import ActionBtn from "./ActionBtn"
 
 function AddFiles() {
     const navigate = useNavigate()
@@ -77,15 +78,11 @@ function AddFiles() {
                     type="file"
                     multiple />
                 <div className="add-file__input-validation">{error}</div>
-                <button onClick={handleSubmit} className={`add-file__upload action-btn ${loading ? "loading" : ""}`}>
-                    <span className="action-btn__content">Upload</span>
-                    <span className="action-btn__loading">
-                        Uploading
-                        <span className="action-btn__loading-item">.</span>
-                        <span className="action-btn__loading-item">.</span>
-                        <span className="action-btn__loading-item">.</span>
-                    </span>
-                </button>
+                <ActionBtn text="Upload"
+                    textLoading="Uploading"
+                    onClick={handleSubmit}
+                    loading={loading}
+                    className="add-file__upload" />
             </div>
         </div>
     )
