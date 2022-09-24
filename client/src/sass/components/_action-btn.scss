@@ -16,6 +16,11 @@
         background-color: var(--color, c.$main);
     }
 
+    &.loading:hover,
+    &.loading:focus {
+        background-color: transparent;
+    }
+
     &__loading {
         display: none;
     }

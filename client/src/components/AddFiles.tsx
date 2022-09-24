@@ -11,6 +11,7 @@ function AddFiles() {
     const [files, setFiles] = useState<File[]>([])
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const [progress, setProgress] = useState(0)
 
     const handleFileUpload = (fl: FileList | null) => {
         setFiles(prevFiles => prevFiles.concat(Array.from(fl || [])))
@@ -31,13 +32,20 @@ function AddFiles() {
         files.forEach(f => data.append("files", f))
 
         setLoading(true)
-        fetch("/api/file", {
-            method: "POST",
-            body: data
-        }).finally(() => {
-            setLoading(false)
-            navigate("/")
+
+        const req = new XMLHttpRequest()
+
+        req.addEventListener("readystatechange", () => {
+            if (req.readyState === 4) {
+                setLoading(false)
+                navigate("/")
+            }
         })
+
+        req.upload.addEventListener("progress", e => setProgress(e.loaded / e.total))
+
+        req.open("post", "/api/file")
+        req.send(data)
     }
 
     return (
@@ -82,6 +90,7 @@ function AddFiles() {
                     textLoading="Uploading"
                     onClick={handleSubmit}
                     loading={loading}
+                    progress={progress}
                     className="add-file__upload" />
             </div>
         </div>
