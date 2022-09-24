@@ -27,10 +27,12 @@ body {
 }
 
 .app {
-    width: 65vw;
+    --app-width: 65vw;
+
+    width: var(--app-width);
     margin: auto;
 
     @media (max-width: 800px) {
-        width: 90vw;
+        --app-width: 90vw;
     }
 }

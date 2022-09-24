@@ -24,10 +24,10 @@ $gap: 6px;
     display: flex;
     flex-wrap: wrap;
     gap: $gap;
-    width: 100%;
-    margin-top: 8px;
+    width: var(--app-width);
+    margin: 8px 0;
 
-    --size-of-item: calc((100% / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row)));
+    --size-of-item: calc((var(--app-width) / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row)));
 
     * {
         scrollbar-width: thin;

@@ -1,23 +1,30 @@
 @use "../abstract/colors" as c;
 
 .file-item {
+    position: relative;
     width: var(--size-of-item);
-    aspect-ratio: 1;
-    background: var(--src) c.$grey;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    height: var(--size-of-item);
+    background-color: c.$grey;
 
-    &--with-icon {
-        background-size: 40%;
+    &__icon {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &--with-icon &__icon {
+        padding: 25%;
     }
 
     $options-size: 50px;
     $options-gap: 5px;
 
     &__options {
+        position: absolute;
         display: none;
         gap: $options-gap;
+        top: 0;
+        left: 0;
         width: 100%;
         height: $options-size + $options-gap;
         padding: $options-gap;
