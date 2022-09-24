@@ -24,7 +24,7 @@ function FileItem(props: { fileItem: FileJson, removeItem: Function }) {
         <div onClick={() => handleFileClick(fileItem.id)}
             className={`file-item ${fileItem.icon ? "file-item--with-icon" : ""}`}
             key={fileItem.id}>
-            <img className="file-item__icon" src={icon} />
+            <img alt="icon" src={icon} className="file-item__icon" />
             <div className="file-item__options">
                 <div className="file-item__metadata">
                     <div className="file-item__title">{fileItem.title}</div>

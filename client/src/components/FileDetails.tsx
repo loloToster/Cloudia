@@ -40,7 +40,7 @@ function FileDetails() {
         <div className="file-details">
             <div className="file-details__col">
                 <div className="file-details__img-wrapper">
-                    <img src={icon} className={`file-details__img ${file.icon ? "file-details__img--icon" : ""}`} />
+                    <img alt="preview" src={icon} className={`file-details__img ${file.icon ? "file-details__img--icon" : ""}`} />
                 </div>
             </div>
             <div className="file-details__col">

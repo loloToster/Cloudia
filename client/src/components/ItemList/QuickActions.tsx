@@ -1,31 +1,37 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 
 function QuickActions(props: { addItems: Function }) {
     const { addItems } = props
 
-    const uploadText = async (text: string, title?: string) => {
-        const res = await fetch("/api/text", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ text, title })
-        })
+    const uploadText = useCallback(
+        async (text: string, title?: string) => {
+            const res = await fetch("/api/text", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ text, title })
+            })
 
-        addItems(await res.json())
-    }
+            addItems(await res.json())
+        },
+        [addItems]
+    )
 
-    const uploadFiles = async (files: FileList) => {
-        let data = new FormData()
+    const uploadFiles = useCallback(
+        async (files: FileList) => {
+            let data = new FormData()
 
-        Array.from(files)
-            .forEach(f => data.append("files", f))
+            Array.from(files)
+                .forEach(f => data.append("files", f))
 
-        const res = await fetch("/api/file", {
-            method: "POST",
-            body: data
-        })
+            const res = await fetch("/api/file", {
+                method: "POST",
+                body: data
+            })
 
-        addItems(await res.json())
-    }
+            addItems(await res.json())
+        },
+        [addItems]
+    )
 
     useEffect(() => {
         document.onpaste = e => {
@@ -50,7 +56,7 @@ function QuickActions(props: { addItems: Function }) {
         return () => {
             document.onpaste = null
         }
-    }, [])
+    }, [uploadFiles, uploadText])
 
     const handleQuickUpload = () => {
         const input = document.createElement("input")
