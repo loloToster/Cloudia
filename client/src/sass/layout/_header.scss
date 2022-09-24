@@ -1,12 +1,16 @@
 @use "../abstract/colors" as c;
 
 .header {
+    position: sticky;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    top: 0;
     width: 100%;
     padding: 20px 60px;
     border-bottom: 1px c.$light-grey solid;
+    background-color: #{c.$bg}ee;
+    z-index: 1;
 
     @media (max-width: 800px) {
         padding: 20px 10px;
