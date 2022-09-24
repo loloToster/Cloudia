@@ -19,6 +19,28 @@ function copyToClipboard(text: string) {
     }
 }
 
+// https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript
+function escapeHtml(unsafe: string) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+}
+
+// https://stackoverflow.com/questions/1500260/detect-urls-in-text-with-javascript
+function urlify(text: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+
+    text = escapeHtml(text)
+
+    return text.replace(
+        urlRegex,
+        (url) => `<a href="${url}" target="_blank">${url}</a>`
+    )
+}
+
 function TextItem(props: { textItem: TextJson, removeItem: Function }) {
     const { textItem, removeItem } = props
 
@@ -48,9 +70,7 @@ function TextItem(props: { textItem: TextJson, removeItem: Function }) {
                 </svg>
             </button>
         </div>
-        <div className="text-item__text">
-            {textItem.text}
-        </div>
+        <div className="text-item__text" dangerouslySetInnerHTML={{ __html: urlify(textItem.text) }}></div>
     </div>)
 }
 
