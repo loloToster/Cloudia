@@ -10,6 +10,8 @@ import { writeFile as writeFileAsync } from "fs/promises"
 
 import { FileJson, TextJson } from "./types/types"
 
+process.title = "Cloudia"
+
 const iconsDir = __dirname + "/client/public/icons"
 const defaultIcon = "file"
 let supportedIcons = fs.readdirSync(iconsDir).map(iconFile => iconFile.split(".")[0])
