@@ -6,7 +6,7 @@ import { getClientIp } from "request-ip"
 
 import path from "path"
 import fs from "fs"
-import { writeFile as writeFileAsync } from "fs/promises"
+import { writeFile as writeFileAsync, rm as removeAsync } from "fs/promises"
 
 import { FileJson, TextJson } from "./types/types"
 
@@ -173,12 +173,20 @@ apiRouter.get("/item/:id", async (req, res) => {
 })
 
 apiRouter.delete("/item/:id", async (req, res) => {
+    const { id } = req.params
+
     db.run(
         "DELETE FROM items WHERE id = ?",
-        [req.params.id],
-        err => {
+        [id],
+        async err => {
             if (err) return res.status(500).send()
-            res.send()
+
+            try {
+                await removeAsync(`${cdnDir}/${id}`, { force: true })
+                res.send()
+            } catch {
+                res.status(500).send()
+            }
         }
     )
 })
