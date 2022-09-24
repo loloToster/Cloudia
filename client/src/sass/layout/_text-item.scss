@@ -22,6 +22,32 @@
             margin-left: 7px;
             cursor: pointer;
 
+            @keyframes success {
+                from {
+                    fill: #36df41;
+                }
+
+                to {
+                    fill: currentColor;
+                }
+            }
+
+            & svg:nth-child(2) {
+                display: none;
+            }
+
+            &.success svg:nth-child(1) {
+                display: none;
+            }
+
+            &.success svg:nth-child(2) {
+                display: block;
+            }
+
+            &.success svg {
+                animation: success 3s ease-in;
+            }
+
             &:hover svg {
                 filter: brightness(.8);
             }
