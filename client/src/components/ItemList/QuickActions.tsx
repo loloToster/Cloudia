@@ -31,6 +31,14 @@ function QuickActions(props: { addItems: Function }) {
         document.onpaste = e => {
             if (!e.clipboardData) return
 
+            if (!e.composedPath().every(
+                el => {
+                    const tag = (el as Partial<HTMLElement>).tagName?.toLocaleLowerCase()
+                    return tag !== "input" && tag !== "textarea"
+                })
+            )
+                return
+
             const { files } = e.clipboardData
 
             if (files.length)
