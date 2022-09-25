@@ -4,6 +4,7 @@ import { Item } from "@backend-types/types"
 import QuickActions from "./QuickActions"
 import FileItem from "./FileItem"
 import TextItem from "./TextItem"
+import UploadItem, { Upload } from "./UploadItem"
 
 export type UploadContent = {
     isText: true,
@@ -15,8 +16,9 @@ export type UploadContent = {
 }
 
 function ItemList() {
-    const [items, setItems] = useState<Item[]>([])
     const [loading, setLoading] = useState(true)
+    const [uploads, setUploads] = useState<Upload[]>([])
+    const [items, setItems] = useState<Item[]>([])
 
     useEffect(() => {
         fetch("/api/items")
@@ -31,29 +33,47 @@ function ItemList() {
     }, [])
 
     const handleUpload = async (content: UploadContent) => {
-        let res: Response
-
         if (content.isText) {
-            res = await fetch("/api/text", {
+            const res = await fetch("/api/text", {
                 method: "POST",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify({ ...content })
             })
+
+            const newItems = await res.json()
+            setItems(prevItems => newItems.concat(prevItems))
         } else {
             let data = new FormData()
 
             Array.from(content.files)
                 .forEach(f => data.append("files", f))
 
-            res = await fetch("/api/file", {
-                method: "POST",
-                body: data
+            let upload: Upload = {
+                numberOfFiles: content.files.length,
+                progress: 0
+            }
+
+            setUploads(prev => [upload, ...prev])
+
+            const req = new XMLHttpRequest()
+
+            req.upload.addEventListener("progress", e => {
+                upload.progress = e.loaded / e.total
+                setUploads(prev => [...prev])
             })
+
+            req.onload = () => {
+                setUploads(prev => (
+                    [...prev.filter(u => u !== upload)]
+                ))
+
+                const newItems = req.status === 200 ? JSON.parse(req.responseText) : []
+                setItems(prevItems => newItems.concat(prevItems))
+            }
+
+            req.open("post", "/api/file")
+            req.send(data)
         }
-
-        const newItems = await res.json()
-
-        setItems(prevItems => newItems.concat(prevItems))
     }
 
     const handleDelete = async (id: string) => {
@@ -67,6 +87,9 @@ function ItemList() {
                 <div key={i} className="items__dummy"></div>
             ))}
             {!loading && <QuickActions upload={handleUpload} />}
+            {uploads.map((up, i) => (
+                <UploadItem key={i} {...up} />
+            ))}
             {!loading && items.map(item => {
                 if (item.is_file)
                     return <FileItem key={item.id} fileItem={item} onDelete={handleDelete} />

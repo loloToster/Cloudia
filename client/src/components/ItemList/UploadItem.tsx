@@ -1,6 +1,11 @@
 import { CSSProperties } from "react"
 
-function UploadItem(props: { numberOfFiles: number, progress: number }) {
+export interface Upload {
+    numberOfFiles: number,
+    progress: number
+}
+
+function UploadItem(props: Upload) {
     const { numberOfFiles, progress } = props
 
     if (progress < 0 || progress > 1)
