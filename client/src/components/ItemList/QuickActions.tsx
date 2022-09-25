@@ -1,38 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { UploadContent } from "."
 import ActionBtn from "../ActionBtn"
 
-function QuickActions(props: { addItems: Function }) {
-    const { addItems } = props
+type uploadFunc = (c: UploadContent) => Promise<any>
 
-    const uploadText = useCallback(
-        async (text: string, title?: string) => {
-            const res = await fetch("/api/text", {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ text, title })
-            })
-
-            addItems(await res.json())
-        },
-        [addItems]
-    )
-
-    const uploadFiles = useCallback(
-        async (files: FileList) => {
-            let data = new FormData()
-
-            Array.from(files)
-                .forEach(f => data.append("files", f))
-
-            const res = await fetch("/api/file", {
-                method: "POST",
-                body: data
-            })
-
-            addItems(await res.json())
-        },
-        [addItems]
-    )
+function QuickActions(props: { upload: uploadFunc }) {
+    const { upload } = props
 
     useEffect(() => {
         document.onpaste = e => {
@@ -49,15 +22,15 @@ function QuickActions(props: { addItems: Function }) {
             const { files } = e.clipboardData
 
             if (files.length)
-                uploadFiles(files)
+                upload({ isText: false, files })
             else
-                uploadText(e.clipboardData.getData("text"))
+                upload({ isText: true, text: e.clipboardData.getData("text") })
         }
 
         return () => {
             document.onpaste = null
         }
-    }, [uploadFiles, uploadText])
+    })
 
     const handleQuickUpload = () => {
         const input = document.createElement("input")
@@ -71,7 +44,7 @@ function QuickActions(props: { addItems: Function }) {
 
             if (!files) return
 
-            uploadFiles(files)
+            upload({ isText: false, files })
         })
     }
 
@@ -106,7 +79,7 @@ function QuickActions(props: { addItems: Function }) {
         const text = textarea.current.value
 
         try {
-            await uploadText(text, title)
+            await upload({ isText: true, title, text })
             handleQuickTextClose()
         } catch (err) {
             console.error(err)

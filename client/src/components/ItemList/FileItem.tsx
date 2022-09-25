@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom"
 
 import { FileJson } from "@backend-types/types"
 
-function FileItem(props: { fileItem: FileJson, removeItem: Function }) {
+function FileItem(props: { fileItem: FileJson, onDelete: Function }) {
     const navigate = useNavigate()
 
-    const { fileItem, removeItem } = props
+    const { fileItem, onDelete } = props
 
     const handleFileClick = (id: string) => {
         navigate("/file/" + id)
@@ -14,8 +14,7 @@ function FileItem(props: { fileItem: FileJson, removeItem: Function }) {
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation()
-        let res = await fetch("/api/item/" + id, { method: "DELETE" })
-        if (res.ok) removeItem(id)
+        onDelete(id)
     }
 
     const icon = fileItem.icon ? `/icons/${fileItem.icon}.png` : `/cdn/${fileItem.id}`
