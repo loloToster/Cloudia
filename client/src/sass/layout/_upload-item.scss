@@ -1,0 +1,65 @@
+@use "../abstract/colors" as c;
+
+.upload-item {
+    width: var(--size-of-item);
+    aspect-ratio: 1;
+    padding: 16px;
+    border: c.$grey 2px solid;
+
+    &__title {
+        height: 10%;
+        font-size: 1.1rem;
+    }
+
+    @keyframes jumping-dots {
+        0% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-5%);
+        }
+
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    &__loading-item {
+        display: inline-block;
+        animation: jumping-dots 900ms infinite;
+
+        @for $i from 0 through 2 {
+            &:nth-child(#{$i + 1}) {
+                animation-delay: #{$i * 200ms};
+            }
+        }
+    }
+
+    &__progress {
+        height: 90%;
+        padding: 8px;
+
+        &__circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            aspect-ratio: 1;
+            margin: auto;
+            background: conic-gradient(c.$main 0deg, c.$main calc(360deg * var(--progress, 0)), c.$grey calc(360deg * var(--progress, 0)), c.$grey 360deg);
+            border-radius: 50%;
+        }
+
+        &__inner-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 75%;
+            aspect-ratio: 1;
+            background-color: c.$bg;
+            border-radius: 50%;
+            font-size: 2rem;
+        }
+    }
+}

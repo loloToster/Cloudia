@@ -1,6 +1,7 @@
 @use "sass:math" as math;
 @use "../abstract/colors" as c;
 
+@forward "./upload-item";
 @forward "./file-item";
 @forward "./text-item";
 
