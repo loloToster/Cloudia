@@ -1,3 +1,5 @@
+// .d.ts instead of .ts to avoid compilation of this file
+
 export interface TextJson {
     is_file: 0,
     id: string,

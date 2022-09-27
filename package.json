@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "normal-install": "npm i --verbose && cd ./client && npm i --verbose",
     "rPi-install": "npm i sqlite3 --verbose --build-from-source --sqlite=/usr && npm i --verbose && cd ./client && npm i --verbose",
-    "build": "cd ./client && npm run build",
-    "start": "ts-node ./app.ts",
+    "build": "tsc && cd ./client && npm run build",
+    "start": "node ./app.js",
     "stop": "pkill --signal SIGTERM Cloudia"
   },
   "author": "loloToster",
