@@ -1,12 +1,12 @@
 import express, { Router } from "express"
-import fileUpload from "express-fileupload"
+import multer from "multer"
 import sqlite3 from "sqlite3"
 import { v4 as uuid } from "uuid"
 import { getClientIp } from "request-ip"
 
 import path from "path"
 import fs from "fs"
-import { rm as removeAsync } from "fs/promises"
+import { rm as removeAsync, rename as renameAsync } from "fs/promises"
 
 import { FileJson, TextJson } from "./types/types"
 
@@ -58,31 +58,19 @@ const db = new DataBase(dbPath, err => {
 // API
 const apiRouter = Router()
 
-const upload = fileUpload({
-    useTempFiles: true,
-    tempFileDir: __dirname + "/tmp",
-    uploadTimeout: 0
-})
+const upload = multer({ dest: __dirname + "/tmp" })
 
 apiRouter.get("/", (req, res) => {
     res.send("hello!")
 })
 
-function moveAsync(file: fileUpload.UploadedFile, path: string) {
-    return new Promise<void>((res, rej) => {
-        file.mv(path, err => {
-            err ? rej(err) : res()
-        })
-    })
-}
-
-function addFiles(files: fileUpload.UploadedFile[], ip: string) {
+function addFiles(files: Express.Multer.File[], ip: string) {
     return new Promise<FileJson[]>(async (res, rej) => {
         let newDbItems: FileJson[] = []
 
         for (const file of files) {
             const id = (
-                uuid() + path.extname(file.name)
+                uuid() + path.extname(file.originalname)
             ).toLowerCase()
 
             let icon: string
@@ -104,12 +92,12 @@ function addFiles(files: fileUpload.UploadedFile[], ip: string) {
             }
 
             try {
-                await moveAsync(file, `${cdnDir}/${id}`)
+                await renameAsync(file.path, `${cdnDir}/${id}`)
 
                 newDbItems.push({
                     is_file: 1,
                     id,
-                    title: file.name,
+                    title: file.originalname,
                     ip,
                     icon,
                     text: "",
@@ -136,15 +124,15 @@ function addFiles(files: fileUpload.UploadedFile[], ip: string) {
     })
 }
 
-apiRouter.post("/file", upload, async (req, res) => {
+apiRouter.post("/file", upload.array("files"), async (req, res) => {
     const ip = getClientIp(req)
 
-    const files = req.files?.files
+    const files = req.files
 
-    if (!files)
+    if (!Array.isArray(files) || !files.length)
         return res.status(400).send()
 
-    const newItems = await addFiles(Array.isArray(files) ? files : [files], ip || "unknown")
+    const newItems = await addFiles(files, ip || "unknown")
 
     res.send(newItems)
 })
