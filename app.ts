@@ -1,12 +1,12 @@
 import express, { Router } from "express"
-import multer from "multer"
+import fileUpload from "express-fileupload"
 import sqlite3 from "sqlite3"
 import { v4 as uuid } from "uuid"
 import { getClientIp } from "request-ip"
 
 import path from "path"
 import fs from "fs"
-import { writeFile as writeFileAsync, rm as removeAsync } from "fs/promises"
+import { rm as removeAsync } from "fs/promises"
 
 import { FileJson, TextJson } from "./types/types"
 
@@ -17,7 +17,11 @@ const defaultIcon = "file"
 let supportedIcons = fs.readdirSync(iconsDir).map(iconFile => iconFile.split(".")[0])
 
 const dbPath = __dirname + "/database.db"
+const tmpFileDir = __dirname + "/tmp"
 const cdnDir = __dirname + "/cdn"
+
+if (fs.existsSync(tmpFileDir))
+    fs.rmSync(tmpFileDir, { recursive: true, force: true })
 
 if (!fs.existsSync(cdnDir))
     fs.mkdirSync(cdnDir)
@@ -54,19 +58,31 @@ const db = new DataBase(dbPath, err => {
 // API
 const apiRouter = Router()
 
-const upload = multer()
+const upload = fileUpload({
+    useTempFiles: true,
+    tempFileDir: __dirname + "/tmp",
+    uploadTimeout: 0
+})
 
 apiRouter.get("/", (req, res) => {
     res.send("hello!")
 })
 
-function addFiles(files: Express.Multer.File[], ip: string) {
+function moveAsync(file: fileUpload.UploadedFile, path: string) {
+    return new Promise<void>((res, rej) => {
+        file.mv(path, err => {
+            err ? rej(err) : res()
+        })
+    })
+}
+
+function addFiles(files: fileUpload.UploadedFile[], ip: string) {
     return new Promise<FileJson[]>(async (res, rej) => {
         let newDbItems: FileJson[] = []
 
         for (const file of files) {
             const id = (
-                uuid() + path.extname(file.originalname)
+                uuid() + path.extname(file.name)
             ).toLowerCase()
 
             let icon: string
@@ -88,12 +104,12 @@ function addFiles(files: Express.Multer.File[], ip: string) {
             }
 
             try {
-                await writeFileAsync(`${cdnDir}/${id}`, file.buffer)
+                await moveAsync(file, `${cdnDir}/${id}`)
 
                 newDbItems.push({
                     is_file: 1,
                     id,
-                    title: file.originalname,
+                    title: file.name,
                     ip,
                     icon,
                     text: "",
@@ -120,15 +136,15 @@ function addFiles(files: Express.Multer.File[], ip: string) {
     })
 }
 
-apiRouter.post("/file", upload.array("files"), async (req, res) => {
+apiRouter.post("/file", upload, async (req, res) => {
     const ip = getClientIp(req)
 
-    const files = req.files
+    const files = req.files?.files
 
-    if (!Array.isArray(files) || !files.length)
+    if (!files)
         return res.status(400).send()
 
-    const newItems = await addFiles(files, ip || "unknown")
+    const newItems = await addFiles(Array.isArray(files) ? files : [files], ip || "unknown")
 
     res.send(newItems)
 })

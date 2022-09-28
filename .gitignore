@@ -1,5 +1,6 @@
 database.db
 cdn/
+tmp/
 
 # dependencies
 node_modules/
