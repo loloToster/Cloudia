@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { UploadContent } from "."
-import ActionBtn from "../ActionBtn"
+import ActionBtn from "src/components/ActionBtn"
 
 type uploadFunc = (c: UploadContent) => Promise<any>
 
