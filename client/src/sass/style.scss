@@ -1,13 +1,7 @@
 @use "./abstract/colors" as c;
 
-@forward "./components/action-btn";
-@forward "./components/loader";
-
 @forward "./base/reset";
-@forward "./layout/header";
-@forward "./layout/items";
-@forward "./layout/add-file";
-@forward "./layout/file-details";
+@forward "./components/loader";
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap');
 

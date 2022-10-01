@@ -2,7 +2,9 @@ import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { FileDrop } from "react-file-drop"
 
-import ActionBtn from "src/components/ActionBtn"
+import "./AddFilesPage.scss"
+
+import ActionBtn from "src/components/ActionBtn/ActionBtn"
 
 function AddFiles() {
     const navigate = useNavigate()

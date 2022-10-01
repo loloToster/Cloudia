@@ -1,4 +1,5 @@
 import { MouseEvent, CSSProperties } from "react"
+import "./ActionBtn.scss"
 
 interface Props {
     text: string,

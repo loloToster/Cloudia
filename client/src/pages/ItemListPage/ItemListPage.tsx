@@ -1,4 +1,4 @@
-import ItemList from "src/components/ItemList"
+import ItemList from "src/components/ItemList/ItemList"
 
 function ItemListPage() {
     return (<ItemList />)

@@ -2,7 +2,9 @@ import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { FileJson } from "@backend-types/types"
 
-import ActionBtn from "src/components/ActionBtn"
+import "./FileDetailsPage.scss"
+
+import ActionBtn from "src/components/ActionBtn/ActionBtn"
 
 function FileDetails() {
     const { id } = useParams()

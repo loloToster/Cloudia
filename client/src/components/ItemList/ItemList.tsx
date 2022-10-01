@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react"
 import { Item } from "@backend-types/types"
 
-import QuickActions from "./QuickActions"
-import FileItem from "./FileItem"
-import TextItem from "./TextItem"
-import UploadItem, { Upload } from "./UploadItem"
+import "./ItemList.scss"
+
+import QuickActions from "../QuickActions/QuickActions"
+import FileItem from "../FileItem/FileItem"
+import TextItem from "../TextItem/TextItem"
+import UploadItem, { Upload } from "../UploadItem/UploadItem"
 
 export type UploadContent = {
     isText: true,

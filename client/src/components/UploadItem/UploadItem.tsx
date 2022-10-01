@@ -1,5 +1,7 @@
 import { CSSProperties } from "react"
 
+import "./UploadItem.scss"
+
 export interface Upload {
     numberOfFiles: number,
     progress: number

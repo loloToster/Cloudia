@@ -1,6 +1,8 @@
 import { useRef, MouseEvent } from "react"
 import { TextJson } from "@backend-types/types"
 
+import "./TextItem.scss"
+
 // https://stackoverflow.com/questions/71873824/copy-text-to-clipboard-cannot-read-properties-of-undefined-reading-writetext
 function copyToClipboard(text: string) {
     if (window.isSecureContext && navigator.clipboard) {

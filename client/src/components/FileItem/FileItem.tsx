@@ -1,6 +1,8 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
 
+import "./FileItem.scss"
+
 import { FileJson } from "@backend-types/types"
 
 function FileItem(props: { fileItem: FileJson, onDelete: Function }) {

@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
-import Header from "./components/Header"
+import Header from "./components/Header/Header"
 
-import ItemListPage from "./pages/ItemListPage"
-import AddFilePage from "./pages/AddFilesPage"
-import FileDetailsPage from "./pages/FileDetailsPage"
+import ItemListPage from "./pages/ItemListPage/ItemListPage"
+import AddFilePage from "./pages/AddFilesPage/AddFilesPage"
+import FileDetailsPage from "./pages/FileDetailsPage/FileDetailsPage"
 
 function App() {
   return (

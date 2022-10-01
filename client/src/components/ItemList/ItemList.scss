@@ -1,0 +1,60 @@
+@use "src/sass/abstract/colors" as c;
+
+$gap: 6px;
+
+.items {
+    --items-in-row: 4;
+
+    @media (max-width: 1400px) {
+        --items-in-row: 3;
+    }
+
+    @media (max-width: 1000px) {
+        --items-in-row: 2;
+    }
+
+    @media (max-width: 580px) {
+        --items-in-row: 1;
+    }
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: $gap;
+    width: var(--app-width);
+    margin: 8px 0;
+
+    --size-of-item: calc((var(--app-width) / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row)));
+
+    * {
+        scrollbar-width: thin;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #6f6f71;
+
+        &:hover {
+            background-color: #5c5c5e;
+        }
+    }
+
+    @keyframes dummy-animation {
+        from {
+            background-color: c.$grey;
+        }
+
+        to {
+            background-color: #2a2a2a;
+        }
+    }
+
+    &__dummy {
+        width: var(--size-of-item);
+        aspect-ratio: 1;
+        background-color: c.$grey;
+        animation: dummy-animation .8s infinite alternate linear;
+    }
+}

@@ -1,5 +1,5 @@
-@use "../abstract/colors" as c;
-@use "../abstract/mixins" as m;
+@use "src/sass/abstract/colors" as c;
+@use "src/sass/abstract/mixins" as m;
 
 .add-file {
     display: flex;
