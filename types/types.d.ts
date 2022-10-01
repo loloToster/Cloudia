@@ -3,7 +3,7 @@
 export interface TextJson {
     is_file: 0,
     id: string,
-    title: "",
+    title: string,
     ip: string,
     icon: "",
     text: string,
