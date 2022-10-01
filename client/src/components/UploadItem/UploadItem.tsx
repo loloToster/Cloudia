@@ -26,7 +26,10 @@ function UploadItem(props: Upload) {
             <span className="upload-item__loading-item">.</span>
         </div>
         <div className="upload-item__progress">
-            <div className="upload-item__progress__circle" style={{ "--progress": progress } as CSSProperties}>
+            <div
+                className="upload-item__progress__circle"
+                style={{ "--progress": progress } as CSSProperties}
+                data-testid="progress-circle">
                 <div className="upload-item__progress__inner-circle">{progressPercentage}%</div>
             </div>
         </div>

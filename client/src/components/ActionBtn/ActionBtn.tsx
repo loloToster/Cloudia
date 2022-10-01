@@ -49,7 +49,8 @@ function ActionBtn(props: Partial<Props>) {
         target={newPage ? "_blank" : undefined}
         rel={newPage ? "noreferrer" : undefined}>
         <div className="action-btn__progress"
-            style={{ "--value": progress } as CSSProperties}></div>
+            style={{ "--value": progress } as CSSProperties}
+            data-testid="progress-bar"></div>
         <span className="action-btn__content">
             {text}
         </span>

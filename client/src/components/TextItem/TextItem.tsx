@@ -4,20 +4,24 @@ import { TextJson } from "@backend-types/types"
 import "./TextItem.scss"
 
 // https://stackoverflow.com/questions/71873824/copy-text-to-clipboard-cannot-read-properties-of-undefined-reading-writetext
-function copyToClipboard(text: string) {
-    if (window.isSecureContext && navigator.clipboard) {
-        navigator.clipboard.writeText(text)
-    } else {
+async function copyToClipboard(text: string) {
+    try {
+        await window.navigator.clipboard.writeText(text)
+    } catch {
+        console.warn("could not copy with clipboard.writeText")
+
         const textArea = document.createElement("textarea")
         textArea.value = text
         document.body.appendChild(textArea)
         textArea.focus()
         textArea.select()
+
         try {
             document.execCommand("copy")
         } catch (err) {
             console.error("Unable to copy to clipboard", err)
         }
+
         document.body.removeChild(textArea)
     }
 }
@@ -55,7 +59,7 @@ function TextItem(props: { textItem: TextJson, onDelete: Function }) {
         if (!button) return
 
         clearTimeout(copyTimeout)
-        copyToClipboard(textItem.text);
+        copyToClipboard(textItem.text)
         button.classList.remove("success")
         // restarts color animation
         void button.querySelector("svg:nth-child(2)")?.scrollHeight
@@ -72,12 +76,12 @@ function TextItem(props: { textItem: TextJson, onDelete: Function }) {
                 <div className="text-item__title">{textItem.title || "No Title"}</div>
                 <div className="text-item__user">{textItem.ip}</div>
             </div>
-            <button onClick={() => onDelete(textItem.id)}>
+            <button onClick={() => onDelete(textItem.id)} title="Delete Text">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                     <path d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM9 17h2V8H9Zm4 0h2V8h-2ZM7 6v13Z"></path>
                 </svg>
             </button>
-            <button onClick={handleCopy} ref={copyBtn}>
+            <button onClick={handleCopy} ref={copyBtn} title="Copy Text">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                     <path d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z" />
                 </svg>
