@@ -5,6 +5,7 @@ import { FileDrop } from "react-file-drop"
 import "./AddFilesPage.scss"
 
 import ActionBtn from "src/components/ActionBtn/ActionBtn"
+import UploadedFilesList from "src/components/UploadedFilesList/UploadedFilesList"
 
 function AddFiles() {
     const navigate = useNavigate()
@@ -53,25 +54,7 @@ function AddFiles() {
 
     return (
         <div className="add-file">
-            <div className="add-file__col">
-                {files.map((file, i) => (
-                    <div className="add-file__file" key={i}>
-                        <div className="add-file__file__top">
-                            <img src={"/icon/" + file.name} className="add-file__file__icon" alt="icon" />
-                            <div className="add-file__file__name">
-                                {file.name}
-                            </div>
-                            <button onClick={() => handleRemove(file)} type="button" className="add-file__file__remove">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                                    <path d="m6.4 19.8-2.2-2.2L9.8 12 4.2 6.4l2.2-2.2L12 9.8l5.6-5.6 2.2 2.2-5.6 5.6 5.6 5.6-2.2 2.2-5.6-5.6Z" />
-                                </svg>
-                            </button>
-                        </div>
-                        {/(.png|.jpg|.jpeg|.gif|.svg)$/.test(file.name) &&
-                            <img className="add-file__file__preview" src={URL.createObjectURL(file)} alt="preview" />}
-                    </div>
-                ))}
-            </div>
+            <UploadedFilesList className="add-file__col" files={files} handleDelete={handleRemove} />
             <div className="add-file__col">
                 <button onClick={() => fileInput.current?.click()}
                     type="button"
