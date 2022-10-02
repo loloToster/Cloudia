@@ -86,7 +86,7 @@ function ItemList() {
     return (
         <div className="items">
             {loading && [...Array(5)].map((_, i) => (
-                <div key={i} className="items__dummy"></div>
+                <div key={i} data-testid={"dummy-" + i} className="items__dummy"></div>
             ))}
             {!loading && <QuickActions upload={handleUpload} />}
             {uploads.map((up, i) => (
