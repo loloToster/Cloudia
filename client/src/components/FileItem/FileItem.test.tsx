@@ -74,12 +74,13 @@ describe("FileItem", () => {
     it("renders icon if present", () => {
         let itemData = createDummyFileItemData()
         itemData.type = "file"
+        itemData.title = "test.txt"
 
         render(<MockFileItem fileItem={itemData} />)
 
         const img: HTMLImageElement = screen.getByAltText("icon")
 
-        expect(img.src).toMatch(/\/icons\/test.png$/)
+        expect(img.src).toMatch(/\/icon\/test.txt$/)
     })
 
     it("renders preview if no icon", () => {
