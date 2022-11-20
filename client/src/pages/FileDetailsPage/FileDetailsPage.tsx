@@ -38,13 +38,14 @@ function FileDetails() {
         <div className="loader"></div>
     )
 
-    const icon = file.is_img ? `/cdn/${file.id}` : `/icon/${file.title}`
+    const isImg = file.type === "img"
+    const icon = isImg ? `/cdn/${file.id}` : `/icon/${file.title}`
 
     return (
         <div className="file-details">
             <div className="file-details__col">
                 <div className="file-details__img-wrapper">
-                    <img alt="preview" src={icon} className={`file-details__img ${file.is_img ? "" : "file-details__img--icon"}`} />
+                    <img alt="preview" src={icon} className={`file-details__img ${isImg ? "" : "file-details__img--icon"}`} />
                 </div>
             </div>
             <div className="file-details__col">

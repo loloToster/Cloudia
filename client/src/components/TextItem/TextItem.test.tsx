@@ -7,10 +7,9 @@ import TextItem from "./TextItem"
 
 function createDummyTextItemData(): TextJson {
     return {
+        type: "text",
         id: "123",
-        is_img: 0,
         ip: "0.0.0.0",
-        is_file: 0,
         text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda natus vitae cumque laboriosam a, quos excepturi facere sapiente voluptatibus. Consectetur odio eius numquam quaerat ratione illo aspernatur libero, assumenda sed.",
         title: "Lorem Ipsum",
         created_at: new Date()

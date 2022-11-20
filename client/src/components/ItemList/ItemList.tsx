@@ -88,10 +88,10 @@ function ItemList(props: Props) {
                 <UploadItem key={i} {...up} />
             ))}
             {!loading && items.map(item => {
-                if (item.is_file)
-                    return <FileItem key={item.id} fileItem={item} onDelete={handleDelete} />
-                else
+                if (item.type === "text")
                     return <TextItem key={item.id} textItem={item} onDelete={handleDelete} />
+                else
+                    return <FileItem key={item.id} fileItem={item} onDelete={handleDelete} />
             })}
         </div>
     )

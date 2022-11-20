@@ -1,23 +1,17 @@
-// .d.ts instead of .ts to avoid compilation of this file
-
-export interface TextJson {
-    is_file: 0,
+export interface ItemBaseJson {
     id: string,
-    title: string,
     ip: string,
-    is_img: 0,
-    text: string,
+    title: string,
     created_at: Date
 }
 
-export interface FileJson {
-    is_file: 1,
-    id: string,
-    title: string,
-    ip: string,
-    is_img: 1 | 0,
-    text: "",
-    created_at: Date
+export interface FileJson extends ItemBaseJson {
+    type: "file" | "img"
+}
+
+export interface TextJson extends ItemBaseJson {
+    type: "text",
+    text: string
 }
 
 export type Item = FileJson | TextJson

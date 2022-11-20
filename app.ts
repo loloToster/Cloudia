@@ -39,12 +39,11 @@ const db = new DataBase(dbPath, err => {
 
     db.run(
         `CREATE TABLE IF NOT EXISTS items (
-            is_file INT,
+            type TEXT,
             id TEXT,
             title TEXT,
             ip TEXT,
-            is_img INT,
-            text TEXT,
+            text TEXT DEFAULT '',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`
     )
@@ -76,12 +75,10 @@ function addFiles(files: Express.Multer.File[], ip: string) {
                 await renameAsync(file.path, `${cdnDir}/${id}`)
 
                 newDbItems.push({
-                    is_file: 1,
+                    type: /(.png|.jpg|.jpeg|.gif|.svg)$/.test(id) ? "img" : "file",
                     id,
                     title: file.originalname,
                     ip,
-                    is_img: /(.png|.jpg|.jpeg|.gif|.svg)$/.test(id) ? 1 : 0,
-                    text: "",
                     created_at: new Date()
                 })
             } catch (err) {
@@ -89,7 +86,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
             }
         }
 
-        const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?, ?, ?)").join(", ")
+        const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?)").join(", ")
         const params = newDbItems.map(item => {
             let parsedItem = Object.values(item)
             // remove created_at
@@ -98,7 +95,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
         }).flat()
 
         db.run(
-            `INSERT INTO items(is_file, id, title, ip, is_img, text) VALUES ${paramsPlaceholders}`,
+            `INSERT INTO items(type, id, title, ip) VALUES ${paramsPlaceholders}`,
             params,
             err => err ? rej(err) : res(newDbItems)
         )
@@ -123,11 +120,10 @@ apiRouter.post("/text", express.json(), async (req, res) => {
         return res.status(400).send()
 
     const newItem: TextJson = {
-        is_file: 0,
+        type: "text",
         id: uuid(),
         title: req.body.title || "",
         ip: getClientIp(req) || "unknown",
-        is_img: 0,
         text: req.body.text,
         created_at: new Date()
     }
@@ -137,7 +133,7 @@ apiRouter.post("/text", express.json(), async (req, res) => {
     params.splice(-1)
 
     db.run(
-        `INSERT INTO items(is_file, id, title, ip, is_img, text) VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO items(type, id, title, ip, text) VALUES (?, ?, ?, ?, ?)`,
         params,
         err => {
             if (err) return res.status(500).send()

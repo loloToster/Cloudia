@@ -1,11 +1,13 @@
 import { render, screen } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
 
-import { Item } from "@backend-types/types"
+import { FileJson, TextJson } from "@backend-types/types"
 
 import ItemList from "./ItemList"
 
-function createDummyItem(data: Omit<Item, "id" | "created_at" | "ip">) {
+type OmittedItem<I> = Omit<I, "id" | "created_at" | "ip">
+
+function createDummyItem(data: OmittedItem<FileJson> | OmittedItem<TextJson>) {
     return {
         ...data,
         id: "id" + Math.random().toString(16).slice(2),
@@ -23,20 +25,15 @@ const MockItemList = (props: any) => (
 describe("ItemList", () => {
     const testItems = [
         createDummyItem({
-            is_file: 1,
-            is_img: 1,
-            text: "",
+            type: "img",
             title: "dummy.png"
         }),
         createDummyItem({
-            is_file: 1,
-            is_img: 0,
-            text: "",
+            type: "file",
             title: "dummy.txt"
         }),
         createDummyItem({
-            is_file: 0,
-            is_img: 0,
+            type: "text",
             text: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
             title: "dummy text"
         })
