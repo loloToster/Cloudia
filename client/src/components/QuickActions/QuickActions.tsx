@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
+import { FileDrop } from "react-file-drop"
 
 import "./QuickActions.scss"
 
@@ -10,7 +11,25 @@ type uploadFunc = (c: UploadContent) => Promise<any>
 function QuickActions(props: { upload: uploadFunc }) {
     const { upload } = props
 
+    const [dropActive, setDropActive] = useState(false)
+
     useEffect(() => {
+        let lastTarget: null | EventTarget = null
+
+        window.ondragenter = (e) => {
+            lastTarget = e.target
+            setDropActive(true)
+        }
+
+        window.ondragleave = (e) => {
+            if (e.target !== lastTarget && e.target !== document)
+                return
+
+            setDropActive(false)
+        }
+
+        window.ondrop = () => setDropActive(false)
+
         document.onpaste = e => {
             if (!e.clipboardData) return
 
@@ -31,9 +50,17 @@ function QuickActions(props: { upload: uploadFunc }) {
         }
 
         return () => {
+            lastTarget = null
+            window.ondragenter = null
+            window.ondragleave = null
+            window.ondrop = null
             document.onpaste = null
         }
     })
+
+    const handleFileDrop = (files: FileList | null) => {
+        if (files) upload({ isText: false, files })
+    }
 
     const handleQuickUpload = () => {
         const input = document.createElement("input")
@@ -92,6 +119,14 @@ function QuickActions(props: { upload: uploadFunc }) {
     }
 
     return (<div className="quick-actions">
+        <FileDrop onDrop={handleFileDrop} className={`quick-actions__drop-area ${dropActive ? "active" : ""}`}>
+            <div className="quick-actions__drop-area__content">
+                <svg className="" xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                    <path d="M11 40q-1.2 0-2.1-.9Q8 38.2 8 37v-7.15h3V37h26v-7.15h3V37q0 1.2-.9 2.1-.9.9-2.1.9Zm11.5-7.65V13.8l-6 6-2.15-2.15L24 8l9.65 9.65-2.15 2.15-6-6v18.55Z" />
+                </svg>
+                <h1>Upload files</h1>
+            </div>
+        </FileDrop>
         <button ref={firstActionBtn}
             onClick={handleQuickUpload}
             title="Upload Files"

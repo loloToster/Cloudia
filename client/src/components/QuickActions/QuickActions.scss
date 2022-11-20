@@ -8,6 +8,32 @@ $quick-actions-gap: 8px;
     width: var(--size-of-item);
     aspect-ratio: 1;
 
+    &__drop-area {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+
+        &.active {
+            display: block;
+        }
+
+        &__content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            background-color: #{c.$bg}ee;
+
+            svg {
+                fill: white;
+            }
+        }
+    }
+
     &__action {
         position: relative;
         display: flex;
