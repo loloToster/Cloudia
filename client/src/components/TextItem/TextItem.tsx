@@ -11,6 +11,12 @@ async function copyToClipboard(text: string) {
         console.warn("could not copy with clipboard.writeText")
 
         const textArea = document.createElement("textarea")
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0"
+        textArea.style.left = "0"
+        textArea.style.position = "fixed"
+
         textArea.value = text
         document.body.appendChild(textArea)
         textArea.focus()
@@ -90,7 +96,9 @@ function TextItem(props: { textItem: TextJson, onDelete: Function }) {
                 </svg>
             </button>
         </div>
-        <div className="text-item__text" dangerouslySetInnerHTML={{ __html: urlify(textItem.text) }}></div>
+        <div className="text-item__text">
+            <pre dangerouslySetInnerHTML={{ __html: urlify(textItem.text) }}></pre>
+        </div>
     </div>)
 }
 
