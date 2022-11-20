@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Item } from "@backend-types/types"
 
 import "./ItemList.scss"
@@ -17,22 +17,16 @@ export type UploadContent = {
     files: FileList
 }
 
-function ItemList() {
-    const [loading, setLoading] = useState(true)
-    const [uploads, setUploads] = useState<Upload[]>([])
-    const [items, setItems] = useState<Item[]>([])
+interface Props {
+    loading?: boolean,
+    items: Item[],
+    setItems: React.Dispatch<React.SetStateAction<Item[]>>
+}
 
-    useEffect(() => {
-        fetch("/api/items")
-            .then(async data => {
-                const json = await data.json()
-                setItems(json)
-            }).catch(err => {
-                console.error(err)
-            }).finally(() => {
-                setLoading(false)
-            })
-    }, [])
+function ItemList(props: Props) {
+    const { items, setItems, loading } = props
+
+    const [uploads, setUploads] = useState<Upload[]>([])
 
     const handleUpload = async (content: UploadContent) => {
         if (content.isText) {
@@ -61,6 +55,7 @@ function ItemList() {
 
             req.upload.addEventListener("progress", e => {
                 upload.progress = e.loaded / e.total
+                // force re-render
                 setUploads(prev => [...prev])
             })
 

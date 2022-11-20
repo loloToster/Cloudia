@@ -1,6 +1,4 @@
 import { render, screen } from "@testing-library/react"
-import { rest } from "msw"
-import { setupServer } from "msw/node"
 import { BrowserRouter } from "react-router-dom"
 
 import { Item } from "@backend-types/types"
@@ -16,53 +14,42 @@ function createDummyItem(data: Omit<Item, "id" | "created_at" | "ip">) {
     }
 }
 
-const server = setupServer(
-    rest.get("/api/items", (req, res, ctx) => {
-        return res(
-            ctx.json([
-                createDummyItem({
-                    is_file: 1,
-                    icon: "",
-                    text: "",
-                    title: "dummy.png"
-                }),
-                createDummyItem({
-                    is_file: 1,
-                    icon: "txt.png",
-                    text: "",
-                    title: "dummy.txt"
-                }),
-                createDummyItem({
-                    is_file: 0,
-                    icon: "",
-                    text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem eos nesciunt dolore numquam consequatur repellat quasi! Magnam doloremque veniam officia fuga, possimus sed consectetur labore. Nam exercitationem esse veniam accusantium.",
-                    title: "dummy text"
-                })
-            ])
-        )
-    })
-)
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
-
-const MockItemList = () => (
+const MockItemList = (props: any) => (
     <BrowserRouter>
-        <ItemList />
+        <ItemList {...props} />
     </BrowserRouter>
 )
 
 describe("ItemList", () => {
+    const testItems = [
+        createDummyItem({
+            is_file: 1,
+            icon: "",
+            text: "",
+            title: "dummy.png"
+        }),
+        createDummyItem({
+            is_file: 1,
+            icon: "txt.png",
+            text: "",
+            title: "dummy.txt"
+        }),
+        createDummyItem({
+            is_file: 0,
+            icon: "",
+            text: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+            title: "dummy text"
+        })
+    ]
 
-    it("loads dummies", () => {
-        render(<ItemList />)
+    it("renders dummies", () => {
+        render(<ItemList loading items={[]} setItems={() => { }} />)
 
         expect(screen.getAllByTestId(/dummy-/).length).toBe(5)
     })
 
     it("renders quick actions", async () => {
-        render(<MockItemList />)
+        render(<MockItemList items={[]} />)
 
         const quickUpload = await screen.findByTitle("Upload Files")
         expect(quickUpload).toBeVisible()
@@ -72,7 +59,7 @@ describe("ItemList", () => {
     })
 
     it("renders right amount of items", async () => {
-        render(<MockItemList />)
+        render(<MockItemList items={testItems} />)
 
         // find titles of each item
         const items = await screen.findAllByText(/^dummy/)
