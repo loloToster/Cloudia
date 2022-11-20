@@ -5,7 +5,7 @@ export interface TextJson {
     id: string,
     title: string,
     ip: string,
-    icon: "",
+    is_img: 0,
     text: string,
     created_at: Date
 }
@@ -15,7 +15,7 @@ export interface FileJson {
     id: string,
     title: string,
     ip: string,
-    icon: string,
+    is_img: 1 | 0,
     text: "",
     created_at: Date
 }

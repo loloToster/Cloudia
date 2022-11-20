@@ -3,6 +3,7 @@ import multer from "multer"
 import sqlite3 from "sqlite3"
 import { v4 as uuid } from "uuid"
 import { getClientIp } from "request-ip"
+import { getIconForFile } from "vscode-icons-js"
 
 import path from "path"
 import fs from "fs"
@@ -12,9 +13,7 @@ import { FileJson, TextJson } from "./types/types"
 
 process.title = "Cloudia"
 
-const iconsDir = __dirname + "/client/public/icons"
-const defaultIcon = "file"
-let supportedIcons = fs.readdirSync(iconsDir).map(iconFile => iconFile.split(".")[0])
+const iconsDir = __dirname + "/node_modules/vscode-icons/icons"
 
 const dbPath = __dirname + "/database.db"
 const tmpFileDir = __dirname + "/tmp"
@@ -44,7 +43,7 @@ const db = new DataBase(dbPath, err => {
             id TEXT,
             title TEXT,
             ip TEXT,
-            icon TEXT,
+            is_img INT,
             text TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`
@@ -73,24 +72,6 @@ function addFiles(files: Express.Multer.File[], ip: string) {
                 uuid() + path.extname(file.originalname)
             ).toLowerCase()
 
-            let icon: string
-
-            if (/(.png|.jpg|.jpeg|.gif|.svg)$/.test(id))
-                icon = ""
-            else {
-                const i = id.lastIndexOf(".")
-
-                if (i < 0 || i + 1 == id.length)
-                    icon = defaultIcon
-                else {
-                    const ext = id.substring(i + 1)
-                    if (supportedIcons.includes(ext))
-                        icon = ext
-                    else
-                        icon = defaultIcon
-                }
-            }
-
             try {
                 await renameAsync(file.path, `${cdnDir}/${id}`)
 
@@ -99,7 +80,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
                     id,
                     title: file.originalname,
                     ip,
-                    icon,
+                    is_img: /(.png|.jpg|.jpeg|.gif|.svg)$/.test(id) ? 1 : 0,
                     text: "",
                     created_at: new Date()
                 })
@@ -117,7 +98,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
         }).flat()
 
         db.run(
-            `INSERT INTO items(is_file, id, title, ip, icon, text) VALUES ${paramsPlaceholders}`,
+            `INSERT INTO items(is_file, id, title, ip, is_img, text) VALUES ${paramsPlaceholders}`,
             params,
             err => err ? rej(err) : res(newDbItems)
         )
@@ -146,7 +127,7 @@ apiRouter.post("/text", express.json(), async (req, res) => {
         id: uuid(),
         title: req.body.title || "",
         ip: getClientIp(req) || "unknown",
-        icon: "",
+        is_img: 0,
         text: req.body.text,
         created_at: new Date()
     }
@@ -156,7 +137,7 @@ apiRouter.post("/text", express.json(), async (req, res) => {
     params.splice(-1)
 
     db.run(
-        `INSERT INTO items(is_file, id, title, ip, icon, text) VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO items(is_file, id, title, ip, is_img, text) VALUES (?, ?, ?, ?, ?, ?)`,
         params,
         err => {
             if (err) return res.status(500).send()
@@ -219,9 +200,8 @@ app.get("/cdn/:file", (req, res) => {
 
 // icons
 app.get("/icon/:file", (req, res) => {
-    const ext = path.extname(req.params.file).substring(1)
-    const file = supportedIcons.includes(ext) ? ext : defaultIcon
-    res.sendFile(`${iconsDir}/${file}.png`)
+    const fileName = req.params.file
+    res.sendFile(`${iconsDir}/${getIconForFile(fileName)}`)
 })
 
 // React App

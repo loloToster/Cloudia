@@ -19,11 +19,11 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function }) {
         onDelete(id)
     }
 
-    const icon = fileItem.icon ? `/icons/${fileItem.icon}.png` : `/cdn/${fileItem.id}`
+    const icon = fileItem.is_img ? `/cdn/${fileItem.id}` : `/icon/${fileItem.title}`
 
     return (
         <div onClick={() => handleFileClick(fileItem.id)}
-            className={`file-item ${fileItem.icon ? "file-item--with-icon" : ""}`}
+            className={`file-item ${fileItem.is_img ? "" : "file-item--with-icon"}`}
             key={fileItem.id}>
             <img alt="icon" src={icon} className="file-item__icon" />
             <div className="file-item__options">

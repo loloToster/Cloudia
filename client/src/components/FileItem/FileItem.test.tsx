@@ -7,7 +7,7 @@ import FileItem from "./FileItem"
 function createDummyFileItemData(): FileJson {
     return {
         id: "123",
-        icon: "",
+        is_img: 1,
         ip: "0.0.0.0",
         is_file: 1,
         text: "",
@@ -75,7 +75,7 @@ describe("FileItem", () => {
 
     it("renders icon if present", () => {
         let itemData = createDummyFileItemData()
-        itemData.icon = "test"
+        itemData.is_img = 0
 
         render(<MockFileItem fileItem={itemData} />)
 

@@ -24,19 +24,19 @@ describe("ItemList", () => {
     const testItems = [
         createDummyItem({
             is_file: 1,
-            icon: "",
+            is_img: 1,
             text: "",
             title: "dummy.png"
         }),
         createDummyItem({
             is_file: 1,
-            icon: "txt.png",
+            is_img: 0,
             text: "",
             title: "dummy.txt"
         }),
         createDummyItem({
             is_file: 0,
-            icon: "",
+            is_img: 0,
             text: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
             title: "dummy text"
         })
