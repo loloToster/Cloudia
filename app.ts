@@ -13,8 +13,6 @@ import { FileJson, TextJson } from "./types/types"
 
 process.title = "Cloudia"
 
-const iconsDir = __dirname + "/node_modules/vscode-icons/icons"
-
 const dbPath = __dirname + "/database.db"
 const tmpFileDir = __dirname + "/tmp"
 const cdnDir = __dirname + "/cdn"
@@ -197,7 +195,7 @@ app.get("/cdn/:file", (req, res) => {
 // icons
 app.get("/icon/:file", (req, res) => {
     const fileName = req.params.file
-    res.sendFile(`${iconsDir}/${getIconForFile(fileName)}`)
+    res.redirect(`https://cdn.jsdelivr.net/gh/vscode-icons/vscode-icons/icons/${getIconForFile(fileName)}`)
 })
 
 // React App
