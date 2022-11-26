@@ -66,7 +66,7 @@ The main goal of this app is to simplify the process of quick saving files and t
 Default method
 
 ```bash
-npm run normal-install
+npm install
 ```
 
 Raspberry Pi method

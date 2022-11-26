@@ -5,8 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "test": "ts-node ./app.ts",
-    "normal-install": "npm i --verbose && cd ./client && npm i --verbose",
-    "rPi-install": "npm i sqlite3 --verbose --build-from-source --sqlite=/usr && npm i --verbose && cd ./client && npm i --verbose",
+    "postinstall": "cd ./client && npm i",
+    "rPi-install": "npm i sqlite3 --verbose --build-from-source --sqlite=/usr && npm i",
     "build": "tsc && cd ./client && npm run build",
     "start": "node ./app.js",
     "stop": "pkill --signal SIGTERM Cloudia"
