@@ -13,9 +13,11 @@ import { FileJson, TextJson } from "./types/types"
 
 process.title = "Cloudia"
 
-const dbPath = __dirname + "/database.db"
-const tmpFileDir = __dirname + "/tmp"
-const cdnDir = __dirname + "/cdn"
+const dataFilesDir = fs.existsSync(`${__dirname}/data`) ? `${__dirname}/data` : __dirname
+
+const dbPath = dataFilesDir + "/database.db"
+const cdnDir = dataFilesDir + "/cdn"
+const tmpFileDir = dataFilesDir + "/tmp"
 
 if (fs.existsSync(tmpFileDir))
     fs.rmSync(tmpFileDir, { recursive: true, force: true })
@@ -54,7 +56,7 @@ const db = new DataBase(dbPath, err => {
 // API
 const apiRouter = Router()
 
-const upload = multer({ dest: __dirname + "/tmp" })
+const upload = multer({ dest: tmpFileDir })
 
 apiRouter.get("/", (req, res) => {
     res.send("hello!")

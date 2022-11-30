@@ -1,0 +1,12 @@
+README.md
+readme_assets/
+
+.git/
+.gitignore
+
+**/node_modules
+**/build
+
+cdn/
+tmp/
+database.db
