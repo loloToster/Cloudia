@@ -157,18 +157,22 @@ apiRouter.get("/item/:id", async (req, res) => {
     )
 })
 
-apiRouter.patch("/item/:id/trash",async (req, res) => {
-    const { id } = req.params
-    
-    db.run(
-        "UPDATE items SET trashed=1 WHERE id = ?",
-        [id],
-        async err => {
-            if (err) return res.status(500).send()
-            res.send()
-        }
-    )
-})
+apiRouter.patch(
+    ["/item/:id/trash", "/item/:id/restore"],
+    async (req, res) => {
+        const { id } = req.params
+        const trashed = req.path.includes("trash") ? 1 : 0
+        
+        db.run(
+            `UPDATE items SET trashed=${trashed} WHERE id = ?`,
+            [id],
+            async err => {
+                if (err) return res.status(500).send()
+                res.send()
+            }
+        )
+    }
+)
 
 apiRouter.delete("/item/:id", async (req, res) => {
     const { id } = req.params

@@ -5,18 +5,23 @@ import "./FileItem.scss"
 
 import { FileJson } from "@backend-types/types"
 
-function FileItem(props: { fileItem: FileJson, onDelete: Function }) {
+function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Function }) {
     const navigate = useNavigate()
 
-    const { fileItem, onDelete } = props
+    const { fileItem, onDelete, onRestore } = props
 
     const handleFileClick = (id: string) => {
         navigate("/file/" + id)
     }
 
-    const handleDelete = async (e: React.MouseEvent, id: string) => {
+    const handleRestore = async (e: React.MouseEvent) => {
         e.stopPropagation()
-        onDelete(id)
+        onRestore(fileItem.id)
+    }
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        onDelete(fileItem.id)
     }
 
     const isImg = fileItem.type === "img"
@@ -32,16 +37,26 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function }) {
                     <div className="file-item__title">{fileItem.title}</div>
                     <div className="file-item__user">{fileItem.ip}</div>
                 </div>
-                <a onClick={e => e.stopPropagation()}
-                    title="Download File"
-                    href={`/cdn/${fileItem.id}`}
-                    download={fileItem.id}
-                    className="file-item__button file-item__button--download">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                        <path d="M6 20q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20Zm6-4-5-5 1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11Z" />
-                    </svg>
-                </a>
-                <button onClick={e => handleDelete(e, fileItem.id)}
+                {fileItem.trashed ? (
+                    <button onClick={handleRestore}
+                        title="Restore File"
+                        className="file-item__button file-item__button--download">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                            <path d="M11 16h2v-4.15l1.6 1.55L16 12l-4-4-4 4 1.4 1.4 1.6-1.55Zm-4 5q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
+                        </svg>
+                    </button>
+                ) : (
+                    <a onClick={e => e.stopPropagation()}
+                        title="Download File"
+                        href={`/cdn/${fileItem.id}`}
+                        download={fileItem.id}
+                        className="file-item__button file-item__button--download">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                            <path d="M6 20q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20Zm6-4-5-5 1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11Z" />
+                        </svg>
+                    </a>
+                )}
+                <button onClick={handleDelete}
                     title="Delete File"
                     className="file-item__button file-item__button--delete">
                     {fileItem.trashed ? (

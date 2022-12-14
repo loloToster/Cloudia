@@ -17,10 +17,17 @@ function createDummyTextItemData(): TextJson {
     }
 }
 
-const MockTextItem = ({ textItem, onDelete }: { textItem: TextJson, onDelete?: Function }) => {
+const MockTextItem = (
+    { textItem, onDelete, onRestore }: {
+        textItem: TextJson,
+        onDelete?: Function,
+        onRestore?: Function
+    }
+) => {
     const handleDelete = onDelete || (() => { })
+    const handleRestore = onRestore || (() => { })
 
-    return (<TextItem textItem={textItem} onDelete={handleDelete} />)
+    return (<TextItem textItem={textItem} onDelete={handleDelete} onRestore={handleRestore} />)
 }
 
 describe("TextItem", () => {

@@ -54,8 +54,8 @@ function urlify(text: string) {
     )
 }
 
-function TextItem(props: { textItem: TextJson, onDelete: Function }) {
-    const { textItem, onDelete } = props
+function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Function }) {
+    const { textItem, onDelete, onRestore } = props
 
     const copyBtn = useRef<HTMLButtonElement>(null)
 
@@ -93,14 +93,22 @@ function TextItem(props: { textItem: TextJson, onDelete: Function }) {
                     </svg>
                 )}
             </button>
-            <button onClick={handleCopy} ref={copyBtn} title="Copy Text">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                    <path d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                    <path d="m9.55 18.55-6.3-6.3 1.875-1.875L9.55 14.8l9.375-9.375L20.8 7.3Z" />
-                </svg>
-            </button>
+            {textItem.trashed ? (
+                <button onClick={() => onRestore(textItem.id)} title="Restore Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                        <path d="M11 16h2v-4.15l1.6 1.55L16 12l-4-4-4 4 1.4 1.4 1.6-1.55Zm-4 5q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
+                    </svg>
+                </button>
+            ) : (
+                <button onClick={handleCopy} ref={copyBtn} title="Copy Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                        <path d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                        <path d="m9.55 18.55-6.3-6.3 1.875-1.875L9.55 14.8l9.375-9.375L20.8 7.3Z" />
+                    </svg>
+                </button>
+            )}
         </div>
         <div className="text-item__text">
             <pre dangerouslySetInnerHTML={{ __html: urlify(textItem.text) }}></pre>

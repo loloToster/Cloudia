@@ -15,12 +15,19 @@ function createDummyFileItemData(): FileJson {
     }
 }
 
-const MockFileItem = ({ fileItem, onDelete }: { fileItem: FileJson, onDelete?: Function }) => {
+const MockFileItem = (
+    { fileItem, onDelete, onRestore }: {
+        fileItem: FileJson,
+        onDelete?: Function,
+        onRestore?: Function
+    }
+) => {
     const handleDelete = onDelete || (() => { })
+    const handleRestore = onRestore || (() => { })
 
     return (
         <BrowserRouter >
-            <FileItem fileItem={fileItem} onDelete={handleDelete} />
+            <FileItem fileItem={fileItem} onDelete={handleDelete} onRestore={handleRestore} />
         </BrowserRouter>
     )
 }

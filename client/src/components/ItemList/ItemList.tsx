@@ -74,14 +74,21 @@ function ItemList(props: Props) {
         }
     }
 
+    const rmItem = (id: string) => setItems(items.filter(i => i.id !== id))
+
     const handleTrash = async (id: string) => {
         let res = await fetch(`/api/item/${id}/trash`, { method: "PATCH" })
-        if (res.ok) setItems(items.filter(i => i.id !== id))
+        if (res.ok) rmItem(id)
+    }
+
+    const handleRestore = async (id: string) => {
+        let res = await fetch(`/api/item/${id}/restore`, { method: "PATCH" })
+        if (res.ok) rmItem(id)
     }
 
     const handleDelete = async (id: string) => {
         let res = await fetch("/api/item/" + id, { method: "DELETE" })
-        if (res.ok) setItems(items.filter(i => i.id !== id))
+        if (res.ok) rmItem(id)
     }
 
     return (
@@ -94,12 +101,16 @@ function ItemList(props: Props) {
                 <UploadItem key={i} {...up} />
             ))}
             {!loading && items.map(item => {
-                const onDelete = item.trashed ? handleDelete : handleTrash
+                const itemProps = {
+                    key: item.id,
+                    onRestore: handleRestore,
+                    onDelete: item.trashed ? handleDelete : handleTrash
+                }
 
                 if (item.type === "text")
-                    return <TextItem key={item.id} textItem={item} onDelete={onDelete} />
+                    return <TextItem textItem={item} {...itemProps} />
                 else
-                    return <FileItem key={item.id} fileItem={item} onDelete={onDelete} />
+                    return <FileItem fileItem={item} {...itemProps} />
             })}
         </div>
     )
