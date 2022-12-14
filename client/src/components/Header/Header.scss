@@ -21,4 +21,32 @@
         color: c.$main;
         text-decoration: none;
     }
+
+    --fab-size: min(15vw, 15vh);
+
+    &__fab {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        bottom: 22px;
+        right: 22px;
+        width: var(--fab-size);
+        height: var(--fab-size);
+        border-radius: 50%;
+        background-color: c.$main;
+        color: white;
+        text-decoration: none;
+        font-size: calc(var(--fab-size) / 2);
+    }
+
+    @media (max-width: 580px) {
+        .action-btn {
+            display: none;
+        }
+
+        &__fab {
+            display: flex;
+        }
+    }
 }
