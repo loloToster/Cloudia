@@ -10,7 +10,8 @@ function createDummyFileItemData(): FileJson {
         id: "123",
         ip: "0.0.0.0",
         title: "dummy.png",
-        created_at: new Date()
+        created_at: new Date(),
+        trashed: 0
     }
 }
 

@@ -48,6 +48,12 @@ const db = new DataBase(dbPath, err => {
         )`
     )
 
+    db.run(
+        `ALTER TABLE items ADD COLUMN trashed INTEGER DEFAULT 0`,
+        // ignore error if column already exists
+        () => null
+    )
+
     app.listen(PORT, () => {
         console.log("Listening on port", PORT)
     })
@@ -57,10 +63,6 @@ const db = new DataBase(dbPath, err => {
 const apiRouter = Router()
 
 const upload = multer({ dest: tmpFileDir })
-
-apiRouter.get("/", (req, res) => {
-    res.send("hello!")
-})
 
 function addFiles(files: Express.Multer.File[], ip: string) {
     return new Promise<FileJson[]>(async (res, rej) => {
@@ -79,7 +81,8 @@ function addFiles(files: Express.Multer.File[], ip: string) {
                     id,
                     title: file.originalname,
                     ip,
-                    created_at: new Date()
+                    created_at: new Date(),
+                    trashed: 0
                 })
             } catch (err) {
                 console.error(err)
@@ -89,8 +92,8 @@ function addFiles(files: Express.Multer.File[], ip: string) {
         const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?)").join(", ")
         const params = newDbItems.map(item => {
             let parsedItem = Object.values(item)
-            // remove created_at
-            parsedItem.splice(-1)
+            // remove created_at & trashed
+            parsedItem.splice(-2)
             return parsedItem
         }).flat()
 
@@ -125,12 +128,13 @@ apiRouter.post("/text", express.json(), async (req, res) => {
         title: req.body.title || "",
         ip: getClientIp(req) || "unknown",
         text: req.body.text,
-        created_at: new Date()
+        created_at: new Date(),
+        trashed: 0
     }
 
     let params = Object.values(newItem)
-    // remove created_at
-    params.splice(-1)
+    // remove created_at & trashed
+    params.splice(-2)
 
     db.run(
         `INSERT INTO items(type, id, title, ip, text) VALUES (?, ?, ?, ?, ?)`,
@@ -149,6 +153,19 @@ apiRouter.get("/item/:id", async (req, res) => {
         (err, row) => {
             if (err) return res.status(500).send()
             res.send(row)
+        }
+    )
+})
+
+apiRouter.patch("/item/:id/trash",async (req, res) => {
+    const { id } = req.params
+    
+    db.run(
+        "UPDATE items SET trashed=1 WHERE id = ?",
+        [id],
+        async err => {
+            if (err) return res.status(500).send()
+            res.send()
         }
     )
 })
@@ -173,8 +190,10 @@ apiRouter.delete("/item/:id", async (req, res) => {
 })
 
 apiRouter.get("/items", async (req, res) => {
+    const trashed = req.query.trashed === "true" ? 1 : 0
+
     db.all(
-        "SELECT * FROM items ORDER BY created_at DESC",
+        `SELECT * FROM items WHERE trashed = ${trashed} ORDER BY created_at DESC`,
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)

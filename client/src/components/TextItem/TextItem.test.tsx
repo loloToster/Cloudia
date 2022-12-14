@@ -12,7 +12,8 @@ function createDummyTextItemData(): TextJson {
         ip: "0.0.0.0",
         text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda natus vitae cumque laboriosam a, quos excepturi facere sapiente voluptatibus. Consectetur odio eius numquam quaerat ratione illo aspernatur libero, assumenda sed.",
         title: "Lorem Ipsum",
-        created_at: new Date()
+        created_at: new Date(),
+        trashed: 0
     }
 }
 

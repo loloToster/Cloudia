@@ -4,7 +4,6 @@
     position: sticky;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     top: 0;
     width: 100%;
     padding: 20px 60px;
@@ -20,6 +19,7 @@
         font-size: 2rem;
         color: c.$main;
         text-decoration: none;
+        margin-right: auto;
     }
 
     --fab-size: min(15vw, 15vh);
@@ -40,6 +40,20 @@
         font-size: calc(var(--fab-size) / 2);
     }
 
+    &__secondary {
+        display: flex;
+        align-items: center;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: c.$light-grey;
+        text-decoration: none;
+        margin-right: 16px;
+
+        svg {
+            fill: currentColor;
+        }
+    }
+
     @media (max-width: 580px) {
         .action-btn {
             display: none;
@@ -47,6 +61,14 @@
 
         &__fab {
             display: flex;
+        }
+
+        &__secondary {
+            margin-right: 0;
+
+            span {
+                display: none;
+            }
         }
     }
 }

@@ -2,7 +2,8 @@ export interface ItemBaseJson {
     id: string,
     ip: string,
     title: string,
-    created_at: Date
+    created_at: Date,
+    trashed: 0 | 1
 }
 
 export interface FileJson extends ItemBaseJson {

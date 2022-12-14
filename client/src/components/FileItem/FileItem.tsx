@@ -44,9 +44,15 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function }) {
                 <button onClick={e => handleDelete(e, fileItem.id)}
                     title="Delete File"
                     className="file-item__button file-item__button--delete">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                        <path d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM9 17h2V8H9Zm4 0h2V8h-2ZM7 6v13Z" />
-                    </svg>
+                    {fileItem.trashed ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                            <path d="m9.4 16.5 2.6-2.6 2.6 2.6 1.4-1.4-2.6-2.6L16 9.9l-1.4-1.4-2.6 2.6-2.6-2.6L8 9.9l2.6 2.6L8 15.1ZM7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+                            <path d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM9 17h2V8H9Zm4 0h2V8h-2ZM7 6v13Z"></path>
+                        </svg>
+                    )}
                 </button>
             </div>
         </div>

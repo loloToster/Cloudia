@@ -18,13 +18,14 @@ export type UploadContent = {
 }
 
 interface Props {
-    loading?: boolean,
     items: Item[],
-    setItems: React.Dispatch<React.SetStateAction<Item[]>>
+    setItems: React.Dispatch<React.SetStateAction<Item[]>>,
+    loading?: boolean,
+    showQuickActions?: boolean
 }
 
 function ItemList(props: Props) {
-    const { items, setItems, loading } = props
+    const { items, setItems, loading, showQuickActions = true } = props
 
     const [uploads, setUploads] = useState<Upload[]>([])
 
@@ -73,6 +74,11 @@ function ItemList(props: Props) {
         }
     }
 
+    const handleTrash = async (id: string) => {
+        let res = await fetch(`/api/item/${id}/trash`, { method: "PATCH" })
+        if (res.ok) setItems(items.filter(i => i.id !== id))
+    }
+
     const handleDelete = async (id: string) => {
         let res = await fetch("/api/item/" + id, { method: "DELETE" })
         if (res.ok) setItems(items.filter(i => i.id !== id))
@@ -83,15 +89,17 @@ function ItemList(props: Props) {
             {loading && [...Array(5)].map((_, i) => (
                 <div key={i} data-testid={"dummy-" + i} className="items__dummy"></div>
             ))}
-            {!loading && <QuickActions upload={handleUpload} />}
+            {!loading && showQuickActions && <QuickActions upload={handleUpload} />}
             {uploads.map((up, i) => (
                 <UploadItem key={i} {...up} />
             ))}
             {!loading && items.map(item => {
+                const onDelete = item.trashed ? handleDelete : handleTrash
+
                 if (item.type === "text")
-                    return <TextItem key={item.id} textItem={item} onDelete={handleDelete} />
+                    return <TextItem key={item.id} textItem={item} onDelete={onDelete} />
                 else
-                    return <FileItem key={item.id} fileItem={item} onDelete={handleDelete} />
+                    return <FileItem key={item.id} fileItem={item} onDelete={onDelete} />
             })}
         </div>
     )
