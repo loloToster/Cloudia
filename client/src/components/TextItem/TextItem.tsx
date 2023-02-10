@@ -1,4 +1,7 @@
-import { useRef, MouseEvent } from "react"
+import { useRef, MouseEvent, useState, ChangeEvent } from "react"
+import useDebounce from "src/hooks/useDebounce"
+import useAfterMountEffect from "src/hooks/useAfterMountEffect"
+
 import { TextJson } from "@backend-types/types"
 
 import "./TextItem.scss"
@@ -58,6 +61,23 @@ function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Fu
     const { textItem, onDelete, onRestore } = props
 
     const copyBtn = useRef<HTMLButtonElement>(null)
+    const [title, setTitle] = useState(textItem.title || "No Title")
+    const debouncedTitle = useDebounce(title)
+
+    useAfterMountEffect(() => {
+        fetch(`/api/item/${textItem.id}`, {
+            method: "PATCH",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                field: "title",
+                value: debouncedTitle
+            })
+        })
+    }, [debouncedTitle])
+
+    const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value)
+    }
 
     let copyTimeout: any
     const handleCopy = (e: MouseEvent) => {
@@ -79,7 +99,7 @@ function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Fu
     return (<div className="text-item">
         <div className="text-item__options">
             <div className="text-item__metadata">
-                <div className="text-item__title">{textItem.title || "No Title"}</div>
+                <input type="text" className="text-item__title" value={title} onChange={handleTitleChange}/>
                 <div className="text-item__user">{textItem.ip}</div>
             </div>
             <button onClick={() => onDelete(textItem.id)} title="Delete Text">

@@ -59,9 +59,16 @@
     }
 
     &__title {
-        line-height: 110%;
+        display: block;
         overflow: hidden;
+        width: 100%;
+        line-height: 110%;
+        font-size: 1rem;
         text-overflow: ellipsis;
+
+        ::spelling-error {
+            text-decoration: none;
+        }
     }
 
     &__user {
