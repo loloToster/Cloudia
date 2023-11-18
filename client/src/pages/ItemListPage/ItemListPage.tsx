@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
-import { Item } from "@backend-types/types"
+import { useItemsCache } from "src/contexts/itemsCacheContext"
 import ItemList from "src/components/ItemList/ItemList"
 
 function ItemListPage() {
-    const [loading, setLoading] = useState(true)
-    const [items, setItems] = useState<Item[]>([])
+    const { items, setItems, loadingItems, setLoadingItems } = useItemsCache()
 
     useEffect(() => {
         fetch("/api/items")
@@ -15,11 +14,11 @@ function ItemListPage() {
             }).catch(err => {
                 console.error(err)
             }).finally(() => {
-                setLoading(false)
+                setLoadingItems(false)
             })
     }, [])
 
-    return (<ItemList loading={loading} items={items} setItems={setItems} />)
+    return (<ItemList loading={loadingItems} items={items} setItems={setItems} />)
 }
 
 export default ItemListPage
