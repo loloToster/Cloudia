@@ -157,14 +157,18 @@ apiRouter.get("/item/:id", async (req, res) => {
     )
 })
 
+const supportedPatchFields: Record<string, string | undefined> = {
+    title: "string", 
+    text: "string"
+}
+
 apiRouter.patch("/item/:id", express.json(), async (req, res) => {
     const { id } = req.params
 
     const { field, value } = req.body
 
     if (
-        !["title"].includes(field) ||
-        typeof value !== "string"
+        typeof value !== supportedPatchFields[field]
     ) {
         return res.status(400).send()
     }
