@@ -1,26 +1,20 @@
 import React from "react"
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import "./FileItem.scss"
 
 import { FileJson } from "@backend-types/types"
 
 function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Function }) {
-    const navigate = useNavigate()
-
     const { fileItem, onDelete, onRestore } = props
 
-    const handleFileClick = (id: string) => {
-        navigate("/file/" + id)
-    }
-
     const handleRestore = async (e: React.MouseEvent) => {
-        e.stopPropagation()
+        e.preventDefault()
         onRestore(fileItem.id)
     }
 
     const handleDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation()
+        e.preventDefault()
         onDelete(fileItem.id)
     }
 
@@ -28,7 +22,7 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Fu
     const icon = isImg ? `/cdn/${fileItem.id}` : `/icon/${fileItem.title}`
 
     return (
-        <div onClick={() => handleFileClick(fileItem.id)}
+        <Link to={`/file/${fileItem.id}`}
             className={`file-item ${isImg ? "" : "file-item--with-icon"}`}
             key={fileItem.id}>
             <img alt="icon" src={icon} className="file-item__icon" />
@@ -49,7 +43,7 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Fu
                     <a onClick={e => e.stopPropagation()}
                         title="Download File"
                         href={`/cdn/${fileItem.id}`}
-                        download={fileItem.id}
+                        download={fileItem.title}
                         className="file-item__button file-item__button--download">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                             <path d="M6 20q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20Zm6-4-5-5 1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11Z" />
@@ -70,7 +64,7 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Fu
                     )}
                 </button>
             </div>
-        </div>
+        </Link>
     )
 }
 

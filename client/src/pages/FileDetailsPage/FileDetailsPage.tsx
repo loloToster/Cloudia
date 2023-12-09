@@ -9,7 +9,7 @@ import ActionBtn from "src/components/ActionBtn/ActionBtn"
 function FileDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
-    
+
     const [file, setFile] = useState<FileJson | null>(null)
     const [deleting, setDeleting] = useState(false)
 
@@ -28,7 +28,7 @@ function FileDetails() {
     const handleDelete = () => {
         setDeleting(true)
 
-        const path = file.trashed ? 
+        const path = file.trashed ?
             `/api/item/${file.id}` :
             `/api/item/${file.id}/trash`
 
@@ -60,7 +60,7 @@ function FileDetails() {
                 <div className="file-details__btns">
                     <ActionBtn text="Download"
                         onClick={`/cdn/${file.id}`}
-                        download={file.id}
+                        download={file.title}
                         className="file-details__btn--download" />
                     <ActionBtn text="Open in new tab"
                         onClick={`/cdn/${file.id}`}

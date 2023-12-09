@@ -5,7 +5,7 @@ $gap: 6px;
 .items {
     --items-in-row: 4;
 
-    @media (max-width: 1400px) {
+    @media (max-width: 1800px) {
         --items-in-row: 3;
     }
 
@@ -23,7 +23,9 @@ $gap: 6px;
     width: var(--app-width);
     margin: 8px 0;
 
-    --size-of-item: calc((var(--app-width) / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row)));
+    --size-of-item: calc(
+        (var(--app-width) / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row))
+    );
 
     * {
         scrollbar-width: thin;
@@ -60,6 +62,6 @@ $gap: 6px;
         width: var(--size-of-item);
         aspect-ratio: 1;
         background-color: c.$grey;
-        animation: dummy-animation .8s infinite alternate linear;
+        animation: dummy-animation 0.8s infinite alternate linear;
     }
 }
