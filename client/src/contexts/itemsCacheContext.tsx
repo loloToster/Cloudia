@@ -5,17 +5,17 @@ import {
     useContext,
     useState
 } from "react"
-import { Item } from "@backend-types/types"
+import { ClientItem } from "@backend-types/types"
 
-export type ItemSetter = Dispatch<SetStateAction<Item[]>>
+export type ItemSetter = Dispatch<SetStateAction<ClientItem[]>>
 export type LoadingSetter = Dispatch<SetStateAction<boolean>>
 
 export interface ItemsCacheContextI {
-    items: Item[]
+    items: ClientItem[]
     loadingItems: boolean
     setLoadingItems: LoadingSetter
     setItems: ItemSetter
-    trashedItems: Item[]
+    trashedItems: ClientItem[]
     loadingTrashedItems: boolean
     setLoadingTrashedItems: LoadingSetter
     setTrashedItems: ItemSetter
@@ -35,9 +35,9 @@ export const ItemsCacheContext = createContext<ItemsCacheContextI>({
 export const ItemsCacheContextProvider = (props: {
     children: React.ReactNode
 }) => {
-    const [items, setItems] = useState<Item[]>([])
+    const [items, setItems] = useState<ClientItem[]>([])
     const [loadingItems, setLoadingItems] = useState(true)
-    const [trashedItems, setTrashedItems] = useState<Item[]>([])
+    const [trashedItems, setTrashedItems] = useState<ClientItem[]>([])
     const [loadingTrashedItems, setLoadingTrashedItems] = useState(true)
 
     return (

@@ -2,7 +2,7 @@ import { useRef, useState, ChangeEvent } from "react"
 import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 
-import { TextJson } from "@backend-types/types"
+import { ClientTextJson } from "@backend-types/types"
 
 import "./TextItem.scss"
 
@@ -57,12 +57,24 @@ function urlify(text: string) {
     )
 }
 
-function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Function }) {
-    const { textItem, onDelete, onRestore } = props
+function TextItem(props: {
+    textItem: ClientTextJson,
+    onDelete: Function,
+    onRestore: Function,
+    onSelect: Function,
+    onRangeSelect: Function
+}) {
+    const {
+        textItem,
+        onDelete,
+        onRestore,
+        onSelect,
+        onRangeSelect
+    } = props
 
     const [text, setText] = useState(textItem.text)
     const [title, setTitle] = useState(textItem.title || "No Title")
-    
+
     const debouncedTitle = useDebounce(title)
 
     useAfterMountEffect(() => {
@@ -103,7 +115,7 @@ function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Fu
     const handleEditSave = async () => {
         setText(textareaVal)
         setEditing(false)
-        
+
         fetch(`/api/item/${textItem.id}`, {
             method: "PATCH",
             headers: { "content-type": "application/json" },
@@ -132,22 +144,30 @@ function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Fu
         }, 3000)
     }
 
-    return (<div className="text-item">
+    const handleSelect = (e: React.MouseEvent) => {
+        if (e.shiftKey) {
+            onRangeSelect(textItem.id)
+        } else {
+            onSelect(textItem.id)
+        }
+    }
+
+    return (<div className={`item text-item ${textItem.selected ? "text-item--selected" : ""}`}>
         <div className="text-item__options">
             <div className="text-item__metadata">
-                <input type="text" className="text-item__title" value={title} onChange={handleTitleChange}/>
+                <input type="text" className="text-item__title" value={title} onChange={handleTitleChange} />
                 <div className="text-item__user">{textItem.ip}</div>
             </div>
             {editing ? (
                 <>
                     <button onClick={handleEditCancel} title="Cancel Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24">
-                            <path d="m256 856-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                            <path d="m256 856-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
                         </svg>
                     </button>
                     <button onClick={handleEditSave} title="Save Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24">
-                            <path d="M382 816 154 588l57-57 171 171 367-367 57 57-424 424Z"/>
+                            <path d="M382 816 154 588l57-57 171 171 367-367 57 57-424 424Z" />
                         </svg>
                     </button>
                 </>
@@ -155,7 +175,7 @@ function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Fu
                 <>
                     <button onClick={handleEditStart} title="Edit Text">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24">
-                            <path d="M200 856h56l345-345-56-56-345 345v56Zm572-403L602 285l56-56q23-23 56.5-23t56.5 23l56 56q23 23 24 55.5T829 396l-57 57Zm-58 59L290 936H120V766l424-424 170 170Zm-141-29-28-28 56 56-28-28Z"/>
+                            <path d="M200 856h56l345-345-56-56-345 345v56Zm572-403L602 285l56-56q23-23 56.5-23t56.5 23l56 56q23 23 24 55.5T829 396l-57 57Zm-58 59L290 936H120V766l424-424 170 170Zm-141-29-28-28 56 56-28-28Z" />
                         </svg>
                     </button>
                     <button onClick={() => onDelete(textItem.id)} title="Delete Text">
@@ -185,6 +205,17 @@ function TextItem(props: { textItem: TextJson, onDelete: Function, onRestore: Fu
                             </svg>
                         </button>
                     )}
+                    <button onClick={handleSelect} title="Select Text">
+                        {textItem.selected ? (
+                            <svg className="selected" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                                <path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                                <path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z" />
+                            </svg>
+                        )}
+                    </button>
                 </>
             )}
         </div>

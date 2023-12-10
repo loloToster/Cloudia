@@ -3,10 +3,36 @@ import { Link } from "react-router-dom"
 
 import "./FileItem.scss"
 
-import { FileJson } from "@backend-types/types"
+import { ClientFileJson } from "@backend-types/types"
 
-function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Function }) {
-    const { fileItem, onDelete, onRestore } = props
+function FileItem(props: {
+    fileItem: ClientFileJson,
+    onDelete: Function,
+    onRestore: Function,
+    onSelect: Function,
+    onRangeSelect: Function
+}) {
+    const {
+        fileItem,
+        onDelete,
+        onRestore,
+        onSelect,
+        onRangeSelect
+    } = props
+
+    const handleClick = (e: React.MouseEvent) => {
+        if (!e.ctrlKey && !e.shiftKey) return
+
+        if (e.ctrlKey) {
+            onSelect(fileItem.id)
+        } else if (e.shiftKey) {
+            onRangeSelect(fileItem.id)
+        } else {
+            return
+        }
+
+        e.preventDefault()
+    }
 
     const handleRestore = async (e: React.MouseEvent) => {
         e.preventDefault()
@@ -22,8 +48,10 @@ function FileItem(props: { fileItem: FileJson, onDelete: Function, onRestore: Fu
     const icon = isImg ? `/cdn/${fileItem.id}` : `/icon/${fileItem.title}`
 
     return (
-        <Link to={`/file/${fileItem.id}`}
-            className={`file-item ${isImg ? "" : "file-item--with-icon"}`}
+        <Link
+            onClick={e => handleClick(e)}
+            to={`/file/${fileItem.id}`}
+            className={`item file-item ${isImg ? "" : "file-item--with-icon"} ${fileItem.selected ? "file-item--selected" : ""}`}
             key={fileItem.id}>
             <img alt="icon" src={icon} className="file-item__icon" />
             <div className="file-item__options">

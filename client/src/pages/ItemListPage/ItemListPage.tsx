@@ -10,7 +10,7 @@ function ItemListPage() {
         fetch("/api/items")
             .then(async data => {
                 const json = await data.json()
-                setItems(json)
+                setItems(json.map((i: any) => ({ ...i, selected: false })))
             }).catch(err => {
                 console.error(err)
             }).finally(() => {

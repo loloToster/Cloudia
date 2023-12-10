@@ -16,3 +16,9 @@ export interface TextJson extends ItemBaseJson {
 }
 
 export type Item = FileJson | TextJson
+
+export interface ClientBase { selected: boolean }
+
+export type ClientFileJson = FileJson & ClientBase
+export type ClientTextJson = TextJson & ClientBase
+export type ClientItem = ClientFileJson | ClientTextJson

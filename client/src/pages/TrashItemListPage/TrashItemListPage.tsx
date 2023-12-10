@@ -15,7 +15,7 @@ function ItemListPage() {
         fetch("/api/items?trashed=true")
             .then(async data => {
                 const json = await data.json()
-                setTrashedItems(json)
+                setTrashedItems(json.map((i: any) => ({ ...i, selected: false })))
             }).catch(err => {
                 console.error(err)
             }).finally(() => {

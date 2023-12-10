@@ -63,6 +63,7 @@ const db = new DataBase(dbPath, err => {
 const apiRouter = Router()
 
 const upload = multer({ dest: tmpFileDir })
+const jsonParser = express.json()
 
 function addFiles(files: Express.Multer.File[], ip: string) {
     return new Promise<FileJson[]>(async (res, rej) => {
@@ -118,7 +119,7 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     res.send(newItems)
 })
 
-apiRouter.post("/text", express.json(), async (req, res) => {
+apiRouter.post("/text", jsonParser, async (req, res) => {
     if (typeof req.body.text !== "string")
         return res.status(400).send()
 
@@ -158,11 +159,11 @@ apiRouter.get("/item/:id", async (req, res) => {
 })
 
 const supportedPatchFields: Record<string, string | undefined> = {
-    title: "string", 
+    title: "string",
     text: "string"
 }
 
-apiRouter.patch("/item/:id", express.json(), async (req, res) => {
+apiRouter.patch("/item/:id", jsonParser, async (req, res) => {
     const { id } = req.params
 
     const { field, value } = req.body
@@ -227,6 +228,58 @@ apiRouter.get("/items", async (req, res) => {
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)
+        }
+    )
+})
+
+function validateIdsBody(body: Record<string, unknown>) {
+    return Array.isArray(body?.ids) &&
+        body.ids.every(id => typeof id === "string") &&
+        body.ids.length
+}
+
+apiRouter.patch(["/items/trash", "/items/restore"], jsonParser, (req, res) => {
+    if (!validateIdsBody(req.body)) {
+        return res.status(400).send()
+    }
+
+    const trashed = req.path.includes("trash") ? 1 : 0
+    const { ids } = req.body
+    const idsPlaceholders = "?, ".repeat(ids.length).slice(0, -2)
+
+    db.run(
+        `UPDATE items SET trashed=${trashed} WHERE id IN (${idsPlaceholders})`,
+        ids,
+        err => {
+            if (err) return res.status(500).send()
+            res.send()
+        }
+    )
+})
+
+apiRouter.delete("/items", jsonParser, (req, res) => {
+    if (!validateIdsBody(req.body)) {
+        return res.status(400).send()
+    }
+
+    const { ids } = req.body
+    const idsPlaceholders = "?, ".repeat(ids.length).slice(0, -2)
+
+    db.run(
+        `DELETE FROM items WHERE id IN (${idsPlaceholders})`,
+        ids,
+        async err => {
+            if (err) return res.status(500).send()
+
+            try {
+                for (const id of ids) {
+                    await removeAsync(`${cdnDir}/${id}`, { force: true })
+                }
+
+                res.send()
+            } catch {
+                res.status(500).send()
+            }
         }
     )
 })

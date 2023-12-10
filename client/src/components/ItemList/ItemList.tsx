@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Item } from "@backend-types/types"
+import { useEffect, useRef, useState } from "react"
+import { ClientItem } from "@backend-types/types"
 
 import "./ItemList.scss"
 
@@ -18,8 +18,8 @@ export type UploadContent = {
 }
 
 interface Props {
-    items: Item[],
-    setItems: React.Dispatch<React.SetStateAction<Item[]>>,
+    items: ClientItem[],
+    setItems: React.Dispatch<React.SetStateAction<ClientItem[]>>,
     loading?: boolean,
     showQuickActions?: boolean
 }
@@ -28,6 +28,21 @@ function ItemList(props: Props) {
     const { items, setItems, loading, showQuickActions = true } = props
 
     const [uploads, setUploads] = useState<Upload[]>([])
+    const shiftSelectBorderItem = useRef<string | null>(null)
+
+    useEffect(() => {
+        const onWindowClick = (e: MouseEvent) => { // todo: remove magic string
+            const clickOnItem = e.composedPath().some(el => (el as HTMLElement).classList?.contains("item"))
+
+            if (clickOnItem) return
+
+            setItems(prev => prev.map(i => ({ ...i, selected: false })))
+            shiftSelectBorderItem.current = null
+        }
+
+        window.addEventListener("click", onWindowClick)
+        return () => window.removeEventListener("click", onWindowClick)
+    }, [setItems])
 
     const handleUpload = async (content: UploadContent) => {
         if (content.isText) {
@@ -74,21 +89,81 @@ function ItemList(props: Props) {
         }
     }
 
-    const rmItem = (id: string) => setItems(items.filter(i => i.id !== id))
+    const rmItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id))
+    const rmItems = (ids: string[]) => setItems(prev => prev.filter(i => !ids.includes(i.id)))
+
+    const selectItem = (id: string) => setItems(prev => prev.map(i => i.id === id ? ({ ...i, selected: !i.selected }) : i))
+
+    const beforeSelect = () => {
+        if (items.every(i => i.id !== shiftSelectBorderItem.current))
+            shiftSelectBorderItem.current = null
+    }
+
+    const handleSelect = (id: string) => {
+        beforeSelect()
+
+        shiftSelectBorderItem.current = id
+        selectItem(id)
+    }
+
+    const handleRangeSelect = (id: string) => {
+        beforeSelect()
+
+        if (!shiftSelectBorderItem.current) {
+            shiftSelectBorderItem.current = id
+            selectItem(id)
+            return
+        } else if (shiftSelectBorderItem.current === id) {
+            setItems(prev => prev.map(i => ({ ...i, selected: i.id === id })))
+            return
+        }
+
+        let inRange = false
+
+        setItems(prev => prev.map(i => {
+            let lastOrFirst = false
+
+            if (i.id === shiftSelectBorderItem.current || i.id === id) {
+                inRange = !inRange
+                lastOrFirst = true
+            }
+
+            return { ...i, selected: inRange || lastOrFirst }
+        }))
+    }
+
+    const handleItemRemoval = async (id: string, type: "restore" | "trash" | "delete") => {
+        const hardDelete = type === "delete"
+        const method = hardDelete ? "DELETE" : "PATCH"
+        const apiPath = hardDelete ? "" : type
+
+        if (items.find(i => i.id === id)?.selected) {
+            const selectedIds = items.filter(i => i.selected).map(i => i.id)
+
+            let res = await fetch(`/api/items/${apiPath}`, {
+                method,
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+
+            if (res.ok) rmItems(selectedIds)
+        } else {
+            let res = await fetch(`/api/item/${id}/${apiPath}`, { method })
+            if (res.ok) rmItem(id)
+        }
+
+    }
 
     const handleTrash = async (id: string) => {
-        let res = await fetch(`/api/item/${id}/trash`, { method: "PATCH" })
-        if (res.ok) rmItem(id)
+        handleItemRemoval(id, "trash")
     }
 
     const handleRestore = async (id: string) => {
-        let res = await fetch(`/api/item/${id}/restore`, { method: "PATCH" })
-        if (res.ok) rmItem(id)
+        handleItemRemoval(id, "restore")
     }
 
     const handleDelete = async (id: string) => {
-        let res = await fetch("/api/item/" + id, { method: "DELETE" })
-        if (res.ok) rmItem(id)
+        handleItemRemoval(id, "delete")
     }
 
     return (
@@ -104,7 +179,9 @@ function ItemList(props: Props) {
                 const itemProps = {
                     key: item.id,
                     onRestore: handleRestore,
-                    onDelete: item.trashed ? handleDelete : handleTrash
+                    onDelete: item.trashed ? handleDelete : handleTrash,
+                    onSelect: handleSelect,
+                    onRangeSelect: handleRangeSelect
                 }
 
                 if (item.type === "text")

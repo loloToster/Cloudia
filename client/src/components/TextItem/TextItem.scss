@@ -8,6 +8,12 @@
     padding: 8px;
     border: c.$grey 2px solid;
 
+    &--selected {
+        $outline-width: 4px;
+        outline: $outline-width c.$download-blue solid;
+        outline-offset: -$outline-width;
+    }
+
     &__options {
         display: flex;
         align-items: center;
@@ -32,6 +38,10 @@
                 }
             }
 
+            svg.selected {
+                fill: c.$download-blue;
+            }
+
             & svg:nth-child(2) {
                 display: none;
             }
@@ -49,7 +59,7 @@
             }
 
             &:hover svg {
-                filter: brightness(.8);
+                filter: brightness(0.8);
             }
         }
     }
@@ -72,7 +82,7 @@
     }
 
     &__user {
-        font-size: .8rem;
+        font-size: 0.8rem;
         line-height: 110%;
         color: #909090;
         overflow: hidden;

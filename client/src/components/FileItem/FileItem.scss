@@ -16,6 +16,12 @@
         padding: 25%;
     }
 
+    &--selected {
+        $outline-width: 4px;
+        outline: $outline-width c.$download-blue solid;
+        outline-offset: -$outline-width;
+    }
+
     $options-size: 50px;
     $options-gap: 5px;
 
@@ -30,7 +36,7 @@
         padding: $options-gap;
         padding-bottom: 0;
 
-        &>* {
+        & > * {
             height: $options-size;
             background-color: #212121dd;
             border-radius: 100vh;
@@ -53,12 +59,13 @@
 
     &__title {
         line-height: 110%;
+        color: white;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     &__user {
-        font-size: .8rem;
+        font-size: 0.8rem;
         line-height: 110%;
         color: #909090;
         overflow: hidden;

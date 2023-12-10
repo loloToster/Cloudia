@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { TextJson } from "@backend-types/types"
+import { ClientTextJson } from "@backend-types/types"
 
 import TextItem from "./TextItem"
 
-function createDummyTextItemData(): TextJson {
+function createDummyTextItemData(): ClientTextJson {
     return {
         type: "text",
         id: "123",
@@ -13,21 +13,30 @@ function createDummyTextItemData(): TextJson {
         text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda natus vitae cumque laboriosam a, quos excepturi facere sapiente voluptatibus. Consectetur odio eius numquam quaerat ratione illo aspernatur libero, assumenda sed.",
         title: "Lorem Ipsum",
         created_at: new Date(),
-        trashed: 0
+        trashed: 0,
+        selected: false
     }
 }
 
 const MockTextItem = (
     { textItem, onDelete, onRestore }: {
-        textItem: TextJson,
+        textItem: ClientTextJson,
         onDelete?: Function,
         onRestore?: Function
     }
 ) => {
     const handleDelete = onDelete || (() => { })
     const handleRestore = onRestore || (() => { })
+    const handleSelect = () => { }
 
-    return (<TextItem textItem={textItem} onDelete={handleDelete} onRestore={handleRestore} />)
+    return (
+        <TextItem
+            textItem={textItem}
+            onDelete={handleDelete}
+            onRestore={handleRestore}
+            onSelect={handleSelect}
+            onRangeSelect={handleSelect} />
+    )
 }
 
 describe("TextItem", () => {

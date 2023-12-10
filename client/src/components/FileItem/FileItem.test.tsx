@@ -1,33 +1,41 @@
 import { render, screen } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
-import { FileJson } from "@backend-types/types"
+import { ClientFileJson } from "@backend-types/types"
 
 import FileItem from "./FileItem"
 
-function createDummyFileItemData(): FileJson {
+function createDummyFileItemData(): ClientFileJson {
     return {
         type: "img",
         id: "123",
         ip: "0.0.0.0",
         title: "dummy.png",
         created_at: new Date(),
-        trashed: 0
+        trashed: 0,
+        selected: false
     }
 }
 
 const MockFileItem = (
-    { fileItem, onDelete, onRestore }: {
-        fileItem: FileJson,
+    { fileItem, onDelete, onRestore, onClick }: {
+        fileItem: ClientFileJson,
         onDelete?: Function,
-        onRestore?: Function
+        onRestore?: Function,
+        onClick?: Function
     }
 ) => {
     const handleDelete = onDelete || (() => { })
     const handleRestore = onRestore || (() => { })
+    const handleSelect = () => { }
 
     return (
         <BrowserRouter >
-            <FileItem fileItem={fileItem} onDelete={handleDelete} onRestore={handleRestore} />
+            <FileItem
+                fileItem={fileItem}
+                onDelete={handleDelete}
+                onRestore={handleRestore}
+                onSelect={handleSelect}
+                onRangeSelect={handleSelect} />
         </BrowserRouter>
     )
 }
