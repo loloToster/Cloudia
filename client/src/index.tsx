@@ -8,35 +8,11 @@ import App from "./App"
 import reportWebVitals from "./reportWebVitals"
 import "./sass/style.scss"
 
-import ItemListPage from "./pages/ItemListPage/ItemListPage"
-import AddFilePage from "./pages/AddFilesPage/AddFilesPage"
-import TrashItemListPage from "./pages/TrashItemListPage/TrashItemListPage"
-import FileDetailsPage from "./pages/FileDetailsPage/FileDetailsPage"
+import routes from "./routes"
 
 const router = createBrowserRouter([{
   element: <App />,
-  children: [
-    {
-      path: "/",
-      element: <ItemListPage />
-    },
-    {
-      path: "/add",
-      element: <AddFilePage />
-    },
-    {
-      path: "/trash",
-      element: <TrashItemListPage />
-    },
-    {
-      path: "/file/:id",
-      element: <FileDetailsPage />
-    },
-    {
-      path: "/*",
-      element: <span>404</span>
-    }
-  ]
+  children: routes
 }])
 
 ReactDOM.createRoot(
