@@ -10,3 +10,5 @@ readme_assets/
 cdn/
 tmp/
 database.db
+
+cli/

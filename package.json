@@ -9,7 +9,10 @@
     "rPi-install": "npm i sqlite3 --verbose --build-from-source --sqlite=/usr && npm i",
     "build": "tsc && cd ./client && npm run build",
     "start": "node ./app.js",
-    "stop": "pkill --signal SIGTERM Cloudia"
+    "stop": "pkill --signal SIGTERM Cloudia",
+    "build-cli:win": "cd ./cli && go build -o ./build/cloudia.exe && echo 'built for windows'",
+    "build-cli:lnx": "cmd.exe /c \"cd cli&& set GOARCH=arm64&& set GOOS=linux&& go build -o ./build/cloudia\" && echo 'built for linux'",
+    "build-cli": "npm run build-cli:win && npm run build-cli:lnx"
   },
   "author": "loloToster",
   "license": "ISC",
