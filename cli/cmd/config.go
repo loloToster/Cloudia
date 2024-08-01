@@ -12,11 +12,15 @@ import (
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Sets config value",
-	Args:  cobra.MatchAll(cobra.ExactArgs(2)),
+	Args:  cobra.RangeArgs(0, 2),
 	Run: func(cmd *cobra.Command, args []string) {
-		key, val := args[0], args[1]
-		config.SetConfig(key, val)
-		fmt.Println("Setting '" + key + "' to '" + val + "'")
+		if len(args) == 2 {
+			key, val := args[0], args[1]
+			config.SetConfig(key, val)
+			fmt.Println("Setting '" + key + "' to '" + val + "'")
+		} else {
+			fmt.Print(config.GetAllConfig())
+		}
 	},
 }
 

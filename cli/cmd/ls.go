@@ -37,6 +37,7 @@ var lsCmd = &cobra.Command{
 			return err
 		}
 
+		defer res.Body.Close()
 		body, err := io.ReadAll(res.Body)
 
 		if err != nil {

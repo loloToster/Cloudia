@@ -3,11 +3,11 @@ package cmd
 import (
 	"github.com/loloToster/Cloudia/cli/config"
 
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 
+	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
 )
 
@@ -19,8 +19,6 @@ var downloadCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fileId := args[0]
 
-		fmt.Println("Downloading: " + fileId + "...")
-
 		host := config.GetConfig("host")
 		res, err := http.Get(host + "/cdn/" + fileId)
 
@@ -28,16 +26,20 @@ var downloadCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(res.Body)
-
+		defer res.Body.Close()
 		outFile, err := os.Create(fileId)
+		defer outFile.Close()
 
 		if err != nil {
 			return err
 		}
 
-		defer outFile.Close()
-		_, err = io.Copy(outFile, res.Body)
+		bar := progressbar.DefaultBytes(
+			res.ContentLength,
+			"Downloading: "+fileId,
+		)
+
+		_, err = io.Copy(io.MultiWriter(outFile, bar), res.Body)
 
 		if err != nil {
 			return err

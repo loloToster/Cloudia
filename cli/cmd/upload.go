@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
 )
 
@@ -22,8 +23,6 @@ var uploadCmd = &cobra.Command{
 	Args:  cobra.MatchAll(cobra.ExactArgs(1)),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path := args[0]
-
-		fmt.Println("Uploading: " + path + " ...")
 
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
@@ -46,9 +45,16 @@ var uploadCmd = &cobra.Command{
 			return err
 		}
 
-		host := config.GetConfig("host")
-		res, err := http.Post(host+"/api/file", writer.FormDataContentType(), body)
+		reader := progressbar.NewReader(body, progressbar.DefaultBytes(int64(body.Len()), "Uploading"))
 
+		host := config.GetConfig("host")
+		res, err := http.Post(host+"/api/file", writer.FormDataContentType(), &reader)
+
+		if err != nil {
+			return err
+		}
+
+		defer res.Body.Close()
 		resBody, err := io.ReadAll(res.Body)
 
 		if err != nil {

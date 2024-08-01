@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -61,4 +62,24 @@ func GetConfig(key string) string {
 	}
 
 	return value.(string)
+}
+
+func GetAllConfig() string {
+	configPath := createFileIfNotExisting()
+
+	jsonFile, _ := os.Open(configPath)
+	defer jsonFile.Close()
+
+	byteValue, _ := io.ReadAll(jsonFile)
+
+	var result map[string]interface{}
+	json.Unmarshal([]byte(byteValue), &result)
+
+	conf := ""
+
+	for k, v := range result {
+		conf += fmt.Sprintf("%s=%s\n", k, v)
+	}
+
+	return conf
 }
