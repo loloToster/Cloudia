@@ -34,10 +34,8 @@
         gap: 6px;
         border-radius: 4px;
 
-        @media (max-width: 580px) {
-            order: 1;
-            width: 100%;
-            margin-top: 10px;
+        &:has(input:focus) {
+            outline: 2px solid c.$main;
         }
 
         svg {
@@ -53,6 +51,20 @@
                 color: c.$light-grey;
             }
         }
+
+        @media (max-width: 580px) {
+            order: 1;
+            width: 100%;
+            margin-top: 10px;
+
+            input {
+                width: 100%;
+            }
+        }
+    }
+
+    &__spacer {
+        flex-grow: 1;
     }
 
     --fab-size: min(15vw, 15vh);
