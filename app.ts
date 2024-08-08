@@ -221,10 +221,15 @@ apiRouter.delete("/item/:id", async (req, res) => {
 })
 
 apiRouter.get("/items", async (req, res) => {
-    const trashed = req.query.trashed === "true" ? 1 : 0
+    const { trashed, q } = req.query
+
+    const textSearch = typeof q === "string" ?
+        ` AND title LIKE '%' || ? || '%'` :
+        ""
 
     db.all(
-        `SELECT * FROM items WHERE trashed = ${trashed} ORDER BY created_at DESC`,
+        `SELECT * FROM items WHERE trashed = ${trashed === "true" ? 1 : 0}${textSearch} ORDER BY created_at DESC`,
+        [q],
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)

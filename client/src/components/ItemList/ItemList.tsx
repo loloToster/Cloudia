@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { ClientItem } from "@backend-types/types"
 
+import { useSearch } from "src/contexts/searchContext"
+
 import "./ItemList.scss"
 
 import QuickActions from "../QuickActions/QuickActions"
@@ -166,6 +168,8 @@ function ItemList(props: Props) {
         handleItemRemoval(id, "delete")
     }
 
+    const { searchQuery } = useSearch()
+
     return (
         <div className="items">
             {loading && [...Array(5)].map((_, i) => (
@@ -175,20 +179,33 @@ function ItemList(props: Props) {
             {uploads.map((up, i) => (
                 <UploadItem key={i} {...up} />
             ))}
-            {!loading && items.map(item => {
-                const itemProps = {
-                    key: item.id,
-                    onRestore: handleRestore,
-                    onDelete: item.trashed ? handleDelete : handleTrash,
-                    onSelect: handleSelect,
-                    onRangeSelect: handleRangeSelect
-                }
+            {!loading && items.filter(
+                i => {
+                    if (!searchQuery.length) return true
 
-                if (item.type === "text")
-                    return <TextItem textItem={item} {...itemProps} />
-                else
-                    return <FileItem fileItem={item} {...itemProps} />
-            })}
+                    const sq = searchQuery.toLowerCase()
+
+                    if (i.title.toLowerCase().includes(sq))
+                        return true
+
+                    if (i.type === "text" && i.text.toLowerCase().includes(sq))
+                        return true
+
+                    return false
+                }).map(item => {
+                    const itemProps = {
+                        key: item.id,
+                        onRestore: handleRestore,
+                        onDelete: item.trashed ? handleDelete : handleTrash,
+                        onSelect: handleSelect,
+                        onRangeSelect: handleRangeSelect
+                    }
+
+                    if (item.type === "text")
+                        return <TextItem textItem={item} {...itemProps} />
+                    else
+                        return <FileItem fileItem={item} {...itemProps} />
+                })}
         </div>
     )
 }

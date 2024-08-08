@@ -11,6 +11,10 @@
     background-color: #{c.$bg}ee;
     z-index: 1;
 
+    @media (max-width: 580px) {
+        flex-wrap: wrap;
+    }
+
     @media (max-width: 800px) {
         padding: 20px 10px;
     }
@@ -19,7 +23,48 @@
         font-size: 2rem;
         color: c.$main;
         text-decoration: none;
-        margin-right: auto;
+        margin-right: 16px;
+    }
+
+    &__search {
+        display: flex;
+        background-color: c.$grey;
+        margin: 0 auto;
+        padding: 6px;
+        gap: 6px;
+        border-radius: 4px;
+
+        &:has(input:focus) {
+            outline: 2px solid c.$main;
+        }
+
+        svg {
+            fill: c.$light-grey;
+            vertical-align: middle;
+        }
+
+        input {
+            width: 18vw;
+            font-size: 1rem;
+
+            &::placeholder {
+                color: c.$light-grey;
+            }
+        }
+
+        @media (max-width: 580px) {
+            order: 1;
+            width: 100%;
+            margin-top: 10px;
+
+            input {
+                width: 100%;
+            }
+        }
+    }
+
+    &__spacer {
+        flex-grow: 1;
     }
 
     --fab-size: min(15vw, 15vh);
@@ -47,7 +92,7 @@
         font-weight: bold;
         color: c.$light-grey;
         text-decoration: none;
-        margin-right: 16px;
+        margin: 0 16px;
 
         svg {
             fill: currentColor;
@@ -65,10 +110,13 @@
 
         &__secondary {
             margin-right: 0;
+            margin-left: auto;
+        }
+    }
 
-            span {
-                display: none;
-            }
+    @media (max-width: 900px) {
+        &__secondary span {
+            display: none;
         }
     }
 }
