@@ -9,7 +9,7 @@ import path from "path"
 import fs from "fs"
 import { rm as removeAsync, rename as renameAsync } from "fs/promises"
 
-import { FileJson, TextJson } from "./types/types"
+import { FileJson, FolderJson, TextJson } from "./types/types"
 
 process.title = "Cloudia"
 
@@ -54,6 +54,12 @@ const db = new DataBase(dbPath, err => {
         () => null
     )
 
+    db.run(
+        `ALTER TABLE items ADD COLUMN folder TEXT DEFAULT NULL`,
+        // ignore error if column already exists
+        () => null
+    )
+
     app.listen(PORT, () => {
         console.log("Listening on port", PORT)
     })
@@ -65,8 +71,36 @@ const apiRouter = Router()
 const upload = multer({ dest: tmpFileDir })
 const jsonParser = express.json()
 
-function addFiles(files: Express.Multer.File[], ip: string) {
-    return new Promise<FileJson[]>(async (res, rej) => {
+function addFiles(files: Express.Multer.File[], ip: string, folder?: string) {
+    return new Promise<(FileJson | FolderJson)[]>(async (res, rej) => {
+        let newFolder: FolderJson | null = null
+
+        if (typeof folder === "string") {
+            try {
+                newFolder = {
+                    type: "folder",
+                    id: uuid(),
+                    title: folder,
+                    ip,
+                    folder: null,
+                    created_at: new Date(),
+                    trashed: 0
+                }
+
+                await new Promise<void>((r, rj) => {
+                    const { type: t, id, title, ip } = newFolder as FolderJson
+
+                    db.run(
+                        `INSERT INTO items(type, id, title, ip) VALUES (?, ?, ?, ?)`,
+                        [t, id, title, ip],
+                        err => err ? rj(err) : r()
+                    )
+                })
+            } catch (error) {
+                rej(error)
+            }
+        }
+
         let newDbItems: FileJson[] = []
 
         for (const file of files) {
@@ -82,6 +116,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
                     id,
                     title: file.originalname,
                     ip,
+                    folder: newFolder?.id ?? null,
                     created_at: new Date(),
                     trashed: 0
                 })
@@ -90,7 +125,7 @@ function addFiles(files: Express.Multer.File[], ip: string) {
             }
         }
 
-        const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?)").join(", ")
+        const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?, ?)").join(", ")
         const params = newDbItems.map(item => {
             let parsedItem = Object.values(item)
             // remove created_at & trashed
@@ -99,9 +134,9 @@ function addFiles(files: Express.Multer.File[], ip: string) {
         }).flat()
 
         db.run(
-            `INSERT INTO items(type, id, title, ip) VALUES ${paramsPlaceholders}`,
+            `INSERT INTO items(type, id, title, ip, folder) VALUES ${paramsPlaceholders}`,
             params,
-            err => err ? rej(err) : res(newDbItems)
+            err => err ? rej(err) : res(newFolder ? [newFolder] : newDbItems)
         )
     })
 }
@@ -110,11 +145,16 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     const ip = getClientIp(req)
 
     const files = req.files
+    let folder: string | undefined = undefined
+    const bodyFolder: unknown = (req.body.folder)
+
+    if (typeof bodyFolder === "string")
+        folder = bodyFolder
 
     if (!Array.isArray(files) || !files.length)
         return res.status(400).send()
 
-    const newItems = await addFiles(files, ip || "unknown")
+    const newItems = await addFiles(files, ip || "unknown", folder)
 
     res.send(newItems)
 })
@@ -129,6 +169,7 @@ apiRouter.post("/text", jsonParser, async (req, res) => {
         title: req.body.title || "",
         ip: getClientIp(req) || "unknown",
         text: req.body.text,
+        folder: null,
         created_at: new Date(),
         trashed: 0
     }
@@ -138,7 +179,7 @@ apiRouter.post("/text", jsonParser, async (req, res) => {
     params.splice(-2)
 
     db.run(
-        `INSERT INTO items(type, id, title, ip, text) VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO items(type, id, title, ip, text, folder) VALUES (?, ?, ?, ?, ?, ?)`,
         params,
         err => {
             if (err) return res.status(500).send()
@@ -228,8 +269,21 @@ apiRouter.get("/items", async (req, res) => {
         ""
 
     db.all(
-        `SELECT * FROM items WHERE trashed = ${trashed === "true" ? 1 : 0}${textSearch} ORDER BY created_at DESC`,
+        `SELECT * FROM items WHERE folder IS NULL AND trashed = ${trashed === "true" ? 1 : 0}${textSearch} ORDER BY created_at DESC`,
         [q],
+        (err, rows) => {
+            if (err) return res.status(500).send()
+            res.send(rows)
+        }
+    )
+})
+
+apiRouter.get("/folder/:id", async (req, res) => {
+    const { id } = req.params
+
+    db.all(
+        `SELECT * FROM items WHERE folder = ? ORDER BY created_at DESC`,
+        [id],
         (err, rows) => {
             if (err) return res.status(500).send()
             res.send(rows)

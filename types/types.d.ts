@@ -3,7 +3,8 @@ export interface ItemBaseJson {
     ip: string,
     title: string,
     created_at: Date,
-    trashed: 0 | 1
+    trashed: 0 | 1,
+    folder: null | string
 }
 
 export interface FileJson extends ItemBaseJson {
@@ -15,10 +16,16 @@ export interface TextJson extends ItemBaseJson {
     text: string
 }
 
-export type Item = FileJson | TextJson
+export interface FolderJson extends ItemBaseJson {
+    type: "folder"
+}
+
+export type Item = FileJson | TextJson | FolderJson
 
 export interface ClientBase { selected: boolean }
 
 export type ClientFileJson = FileJson & ClientBase
 export type ClientTextJson = TextJson & ClientBase
-export type ClientItem = ClientFileJson | ClientTextJson
+export type ClientFolderJson = FolderJson & ClientBase
+
+export type ClientItem = ClientFileJson | ClientTextJson | ClientFolderJson

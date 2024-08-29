@@ -6,7 +6,7 @@ import "./QuickActions.scss"
 import { UploadContent } from "../ItemList/ItemList"
 import ActionBtn from "src/components/ActionBtn/ActionBtn"
 
-type uploadFunc = (c: UploadContent) => Promise<any>
+type uploadFunc = (c: UploadContent) => void
 
 function QuickActions(props: { upload: uploadFunc }) {
     const { upload } = props

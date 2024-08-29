@@ -1,0 +1,48 @@
+@use "src/sass/abstract/colors" as c;
+
+.folder-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: var(--size-of-item);
+  aspect-ratio: 1;
+  border: c.$grey 2px solid;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+
+  &--selected {
+    $outline-width: 4px;
+    outline: $outline-width c.$download-blue solid;
+    outline-offset: -$outline-width;
+  }
+
+  & > svg {
+    width: 50%;
+    height: 50%;
+    vertical-align: middle;
+    fill: c.$main;
+  }
+
+  &__actions {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px;
+    gap: 6px;
+
+    button {
+      cursor: pointer;
+      svg {
+        fill: #c1c1c1;
+      }
+    }
+  }
+
+  &:hover &__actions {
+    display: flex;
+  }
+}

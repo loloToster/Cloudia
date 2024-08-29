@@ -14,7 +14,8 @@ function createDummyTextItemData(): ClientTextJson {
         title: "Lorem Ipsum",
         created_at: new Date(),
         trashed: 0,
-        selected: false
+        selected: false,
+        folder: null
     }
 }
 

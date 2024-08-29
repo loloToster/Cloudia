@@ -4,6 +4,7 @@ import ItemListPage from "./pages/ItemListPage/ItemListPage"
 import AddFilePage from "./pages/AddFilesPage/AddFilesPage"
 import TrashItemListPage from "./pages/TrashItemListPage/TrashItemListPage"
 import FileDetailsPage from "./pages/FileDetailsPage/FileDetailsPage"
+import FolderPage from "./pages/FolderPage/FolderPage"
 
 export type RouteWithMeta = RouteObject & {
     searchable?: boolean
@@ -27,6 +28,10 @@ const routes: RouteWithMeta[] = [
     {
         path: "/file/:id",
         element: <FileDetailsPage />
+    },
+    {
+        path: "/folder/:id",
+        element: <FolderPage />
     },
     {
         path: "/*",

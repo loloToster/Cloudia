@@ -8,7 +8,9 @@ import "./ItemList.scss"
 import QuickActions from "../QuickActions/QuickActions"
 import FileItem from "../FileItem/FileItem"
 import TextItem from "../TextItem/TextItem"
+import FolderItem from "../FolderItem/FolderItem"
 import UploadItem, { Upload } from "../UploadItem/UploadItem"
+import ActionBtn from "../ActionBtn/ActionBtn"
 
 export type UploadContent = {
     isText: true,
@@ -46,7 +48,11 @@ function ItemList(props: Props) {
         return () => window.removeEventListener("click", onWindowClick)
     }, [setItems])
 
-    const handleUpload = async (content: UploadContent) => {
+    const [folderModalOpen, setFolderModalOpen] = useState(false)
+    const [folderName, setFolderName] = useState("")
+    const [uploadContent, setUploadContent] = useState<UploadContent | null>(null)
+
+    const handleUpload = async (content: UploadContent, folder?: string) => {
         if (content.isText) {
             const res = await fetch("/api/text", {
                 method: "POST",
@@ -61,6 +67,8 @@ function ItemList(props: Props) {
 
             Array.from(content.files)
                 .forEach(f => data.append("files", f))
+
+            if (typeof folder !== "undefined") data.append("folder", folder)
 
             let upload: Upload = {
                 numberOfFiles: content.files.length,
@@ -89,6 +97,36 @@ function ItemList(props: Props) {
             req.open("post", "/api/file")
             req.send(data)
         }
+    }
+
+    const handleUploadAction = (content: UploadContent) => {
+        if (content.isText || content.files.length <= 1)
+            return handleUpload(content)
+
+        setUploadContent(content)
+        setFolderModalOpen(true)
+    }
+
+    const handleUploadAsFolder = async () => {
+        if (!uploadContent) return
+
+        await handleUpload(uploadContent, folderName)
+        setUploadContent(null)
+        setFolderModalOpen(false)
+    }
+
+    const handleUploadStandalone = async () => {
+        if (!uploadContent) return
+
+        await handleUpload(uploadContent)
+        setUploadContent(null)
+        setFolderModalOpen(false)
+
+    }
+
+    const handleCancelUpload = () => {
+        setUploadContent(null)
+        setFolderModalOpen(false)
     }
 
     const rmItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id))
@@ -175,7 +213,7 @@ function ItemList(props: Props) {
             {loading && [...Array(5)].map((_, i) => (
                 <div key={i} data-testid={"dummy-" + i} className="items__dummy"></div>
             ))}
-            {!loading && showQuickActions && <QuickActions upload={handleUpload} />}
+            {!loading && showQuickActions && <QuickActions upload={handleUploadAction} />}
             {uploads.map((up, i) => (
                 <UploadItem key={i} {...up} />
             ))}
@@ -203,9 +241,27 @@ function ItemList(props: Props) {
 
                     if (item.type === "text")
                         return <TextItem textItem={item} {...itemProps} />
+                    else if (item.type === "folder")
+                        return <FolderItem folderItem={item} {...itemProps} />
                     else
                         return <FileItem fileItem={item} {...itemProps} />
                 })}
+            {folderModalOpen && (
+                <div className="items__upload-modal">
+                    <div className="items__upload-modal__wrapper">
+                        <input
+                            value={folderName}
+                            onChange={e => setFolderName(e.target.value)}
+                            type="text"
+                            placeholder="Folder Name" />
+                        <ActionBtn onClick={handleUploadAsFolder} text="Upload as Folder" className="items__upload-modal__btn" />
+                        <div className="items__upload-modal__splitter">or</div>
+                        <ActionBtn onClick={handleUploadStandalone} text="Upload Files" className="items__upload-modal__btn" />
+                        <div className="items__upload-modal__splitter">or</div>
+                        <ActionBtn onClick={handleCancelUpload} text="Cancel Upload" className="items__upload-modal__btn items__upload-modal__btn--cancel" />
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

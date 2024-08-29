@@ -64,4 +64,69 @@ $gap: 6px;
         background-color: c.$grey;
         animation: dummy-animation 0.8s infinite alternate linear;
     }
+
+    &__upload-modal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        background-color: #{c.$bg}ee;
+
+        &__wrapper {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            gap: 1vh;
+            border-radius: 6px;
+            background-color: c.$grey;
+            width: 85vw;
+            max-width: 20rem;
+            padding: 1rem;
+        }
+
+        input {
+            width: 100%;
+            background-color: c.$dark-grey;
+            margin: 0 auto;
+            padding: 6px;
+            gap: 6px;
+            border-radius: 4px;
+            font-size: 1.2rem;
+
+            &:focus {
+                outline: 2px solid c.$main;
+            }
+        }
+
+        &__btn {
+            width: 100%;
+
+            &--cancel {
+                --color: #{c.$red};
+            }
+        }
+
+        &__splitter {
+            display: flex;
+            align-items: center;
+            line-height: 1;
+            color: #b6b6b6;
+            width: 100%;
+
+            &::before,
+            &::after {
+                content: "";
+                display: block;
+                height: 1px;
+                flex-grow: 1;
+                background-color: #b6b6b6;
+                margin: 0 12px;
+            }
+        }
+    }
 }

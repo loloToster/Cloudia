@@ -5,11 +5,12 @@ import { FileJson, TextJson } from "@backend-types/types"
 
 import ItemList from "./ItemList"
 
-type OmittedItem<I> = Omit<I, "id" | "created_at" | "ip" | "trashed">
+type OmittedItem<I> = Omit<I, "id" | "created_at" | "ip" | "trashed" | "folder">
 
 function createDummyItem(data: OmittedItem<FileJson> | OmittedItem<TextJson>) {
     return {
         ...data,
+        folder: null,
         id: "id" + Math.random().toString(16).slice(2),
         ip: "0.0.0.0",
         created_at: new Date(),
