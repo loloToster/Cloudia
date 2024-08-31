@@ -142,6 +142,9 @@ function ItemList(props: Props) {
         setFolderModalOpen(false)
     }
 
+    const pinItems = (ids: string[], pin = false) =>
+        setItems(prev => prev.map(i => ids.includes(i.id) ? ({ ...i, pinned: pin ? 1 : 0 }) : i))
+
     const rmItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id))
     const rmItems = (ids: string[]) => setItems(prev => prev.filter(i => !ids.includes(i.id)))
 
@@ -204,18 +207,42 @@ function ItemList(props: Props) {
             let res = await fetch(`/api/item/${id}/${apiPath}`, { method })
             if (res.ok) rmItem(id)
         }
-
     }
 
-    const handleTrash = async (id: string) => {
+    const handleItemPin = async (id: string, type: "pin" | "unpin") => {
+        if (items.find(i => i.id === id)?.selected) {
+            const selectedIds = items.filter(i => i.selected).map(i => i.id)
+
+            let res = await fetch(`/api/items/${type}`, {
+                method: "PATCH",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+
+            if (res.ok) pinItems(selectedIds, type === "pin")
+        } else {
+            let res = await fetch(`/api/item/${id}/${type}`, { method: "PATCH" })
+            if (res.ok) pinItems([id], type === "pin")
+        }
+    }
+
+    const handlePin = (id: string) => {
+        handleItemPin(id, "pin")
+    }
+
+    const handleUnpin = (id: string) => {
+        handleItemPin(id, "unpin")
+    }
+
+    const handleTrash = (id: string) => {
         handleItemRemoval(id, "trash")
     }
 
-    const handleRestore = async (id: string) => {
+    const handleRestore = (id: string) => {
         handleItemRemoval(id, "restore")
     }
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = (id: string) => {
         handleItemRemoval(id, "delete")
     }
 
@@ -266,13 +293,19 @@ function ItemList(props: Props) {
                             return true
 
                         return false
-                    }).map(item => {
+                    }).sort(
+                        (a, b) => b.created_at - a.created_at
+                    ).sort(
+                        (a, b) => b.pinned - a.pinned
+                    ).map(item => {
                         const itemProps = {
                             key: item.id,
                             onRestore: handleRestore,
                             onDelete: item.trashed ? handleDelete : handleTrash,
                             onSelect: handleSelect,
-                            onRangeSelect: handleRangeSelect
+                            onRangeSelect: handleRangeSelect,
+                            onPin: handlePin,
+                            onUnpin: handleUnpin
                         }
 
                         if (item.type === "text")

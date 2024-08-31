@@ -70,6 +70,11 @@ const db = new DataBase(dbPath, async err => {
         `ALTER TABLE items ADD COLUMN folder TEXT DEFAULT NULL`,
     )
 
+    await dbRunAsync(
+        db,
+        `ALTER TABLE items ADD COLUMN pinned INTEGER DEFAULT 0`,
+    )
+
     app.listen(PORT, () => {
         console.log("Listening on port", PORT)
     })
@@ -93,8 +98,9 @@ function addFiles(files: Express.Multer.File[], ip: string, folder?: string, fol
                     title: folder,
                     ip,
                     folder: folderId ?? null, // todo: check if folder exists
-                    created_at: new Date(),
-                    trashed: 0
+                    created_at: new Date().getTime(),
+                    trashed: 0,
+                    pinned: 0
                 }
 
                 await new Promise<void>((r, rj) => {
@@ -127,8 +133,9 @@ function addFiles(files: Express.Multer.File[], ip: string, folder?: string, fol
                     title: file.originalname,
                     ip,
                     folder: newFolder?.id ?? folderId ?? null,
-                    created_at: new Date(),
-                    trashed: 0
+                    created_at: new Date().getTime(),
+                    trashed: 0,
+                    pinned: 0
                 })
             } catch (err) {
                 console.error(err)
@@ -185,13 +192,14 @@ apiRouter.post("/text", jsonParser, async (req, res) => {
         ip: getClientIp(req) || "unknown",
         text: req.body.text,
         folder: req.body.folderId ?? null, // todo: check if folder exists
-        created_at: new Date(),
-        trashed: 0
+        created_at: new Date().getTime(),
+        trashed: 0,
+        pinned: 0
     }
 
     let params = Object.values(newItem)
-    // remove created_at & trashed
-    params.splice(-2)
+    // remove created_at & trashed & pinned
+    params.splice(-3)
 
     db.run(
         `INSERT INTO items(type, id, title, ip, text, folder) VALUES (?, ?, ?, ?, ?, ?)`,
@@ -248,6 +256,23 @@ apiRouter.patch(
 
         db.run(
             `UPDATE items SET trashed=${trashed} WHERE id = ?`,
+            [id],
+            async err => {
+                if (err) return res.status(500).send()
+                res.send()
+            }
+        )
+    }
+)
+
+apiRouter.patch(
+    ["/item/:id/pin", "/item/:id/unpin"],
+    async (req, res) => {
+        const { id } = req.params
+        const pinned = req.path.includes("unpin") ? 0 : 1
+
+        db.run(
+            `UPDATE items SET pinned=${pinned} WHERE id = ?`,
             [id],
             async err => {
                 if (err) return res.status(500).send()
@@ -332,8 +357,8 @@ apiRouter.get("/items", async (req, res) => {
 
     db.all(
         trashed === "true" ?
-            `SELECT * FROM items WHERE trashed = 1 ${textSearch} ORDER BY created_at DESC` :
-            `SELECT * FROM items WHERE folder IS NULL AND trashed = 0 ${textSearch} ORDER BY created_at DESC`
+            `SELECT * FROM items WHERE trashed = 1 ${textSearch} ORDER BY pinned DESC, created_at DESC` :
+            `SELECT * FROM items WHERE folder IS NULL AND trashed = 0 ${textSearch} ORDER BY pinned DESC, created_at DESC`
         ,
         [q],
         (err, rows) => {
@@ -400,6 +425,25 @@ apiRouter.patch(["/items/trash", "/items/restore"], jsonParser, (req, res) => {
 
     db.run(
         `UPDATE items SET trashed=${trashed} WHERE id IN (${idsPlaceholders})`,
+        ids,
+        err => {
+            if (err) return res.status(500).send()
+            res.send()
+        }
+    )
+})
+
+apiRouter.patch(["/items/pin", "/items/unpin"], jsonParser, (req, res) => {
+    if (!validateIdsBody(req.body)) {
+        return res.status(400).send()
+    }
+
+    const pinned = req.path.includes("unpin") ? 0 : 1
+    const { ids } = req.body
+    const idsPlaceholders = "?, ".repeat(ids.length).slice(0, -2)
+
+    db.run(
+        `UPDATE items SET pinned=${pinned} WHERE id IN (${idsPlaceholders})`,
         ids,
         err => {
             if (err) return res.status(500).send()

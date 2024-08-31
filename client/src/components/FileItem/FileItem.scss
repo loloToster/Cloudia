@@ -48,6 +48,12 @@
         display: flex;
     }
 
+    @media (hover: none) {
+        &__options {
+            display: flex;
+        }
+    }
+
     &__metadata {
         display: flex;
         flex-direction: column;
@@ -160,6 +166,27 @@
                     color: c.$error-red;
                 }
             }
+        }
+    }
+
+    &__pinned {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        border-radius: 50%;
+        background-color: #212121dd;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+            fill: c.$main;
+        }
+
+        .file-item:hover & {
+            display: none;
         }
     }
 }

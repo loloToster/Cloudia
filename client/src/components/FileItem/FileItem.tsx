@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
 import "./FileItem.scss"
@@ -10,17 +10,33 @@ function FileItem(props: {
     onDelete: Function,
     onRestore: Function,
     onSelect: Function,
-    onRangeSelect: Function
+    onRangeSelect: Function,
+    onPin: Function,
+    onUnpin: Function
 }) {
     const {
         fileItem,
         onDelete,
         onRestore,
         onSelect,
-        onRangeSelect
+        onRangeSelect,
+        onPin,
+        onUnpin
     } = props
 
     const [moreOpen, setMoreOpen] = useState(false)
+
+    useEffect(() => {
+        const onWindowClick = (e: MouseEvent) => {
+            const clickOnItem = e.composedPath().some(el => (el as HTMLElement).classList?.contains(`item-${fileItem.id}`))
+            if (clickOnItem) return
+
+            setMoreOpen(false)
+        }
+
+        window.addEventListener("click", onWindowClick)
+        return () => window.removeEventListener("click", onWindowClick)
+    }, [setMoreOpen, fileItem.id])
 
     const handleClick = (e: React.MouseEvent) => {
         if (!e.ctrlKey && !e.shiftKey) return
@@ -34,6 +50,16 @@ function FileItem(props: {
         }
 
         e.preventDefault()
+    }
+
+    const handlePin = () => {
+        onPin(fileItem.id)
+        setMoreOpen(false)
+    }
+
+    const handleUnpin = () => {
+        onUnpin(fileItem.id)
+        setMoreOpen(false)
     }
 
     const handleRestore = async (e: React.MouseEvent) => {
@@ -50,7 +76,7 @@ function FileItem(props: {
     const icon = isImg ? `/cdn/${fileItem.id}` : `/icon/${fileItem.title}`
 
     return (
-        <div className={`item file-item ${isImg ? "" : "file-item--with-icon"} ${fileItem.selected ? "file-item--selected" : ""}`}>
+        <div className={`item item-${fileItem.id} file-item ${isImg ? "" : "file-item--with-icon"} ${fileItem.selected ? "file-item--selected" : ""}`}>
             <Link
                 onClick={e => handleClick(e)}
                 to={`/file/${fileItem.id}`}
@@ -98,6 +124,13 @@ function FileItem(props: {
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg>
                 </button>
                 <div className="file-item__more__wrapper">
+                    {fileItem.pinned ?
+                        (
+                            <button onClick={handleUnpin}>Unpin</button>
+                        ) : (
+                            <button onClick={handlePin}>Pin</button>
+                        )
+                    }
                     <a
                         href={`/cdn/${fileItem.id}`}
                         download={fileItem.title}>
@@ -119,6 +152,13 @@ function FileItem(props: {
                     </button>
                 </div>
             </div>
+            {fileItem.pinned && (
+                <div className="file-item__pinned">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                        <path d="m624-480 96 96v72H516v228l-36 36-36-36v-228H240v-72l96-96v-264h-48v-72h384v72h-48v264Z" />
+                    </svg>
+                </div>
+            )}
         </div>
     )
 }

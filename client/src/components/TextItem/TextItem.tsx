@@ -1,4 +1,4 @@
-import { useRef, useState, ChangeEvent } from "react"
+import { useRef, useState, ChangeEvent, useEffect } from "react"
 import useDebounce from "src/hooks/useDebounce"
 import useAfterMountEffect from "src/hooks/useAfterMountEffect"
 
@@ -62,14 +62,18 @@ function TextItem(props: {
     onDelete: Function,
     onRestore: Function,
     onSelect: Function,
-    onRangeSelect: Function
+    onRangeSelect: Function,
+    onPin: Function,
+    onUnpin: Function
 }) {
     const {
         textItem,
         onDelete,
         onRestore,
         onSelect,
-        onRangeSelect
+        onRangeSelect,
+        onPin,
+        onUnpin
     } = props
 
     const [moreOpen, setMoreOpen] = useState(false)
@@ -92,6 +96,18 @@ function TextItem(props: {
     const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value)
     }
+
+    useEffect(() => {
+        const onWindowClick = (e: MouseEvent) => {
+            const clickOnItem = e.composedPath().some(el => (el as HTMLElement).classList?.contains(`item-${textItem.id}`))
+            if (clickOnItem) return
+
+            setMoreOpen(false)
+        }
+
+        window.addEventListener("click", onWindowClick)
+        return () => window.removeEventListener("click", onWindowClick)
+    }, [setMoreOpen, textItem.id])
 
     const [editing, setEditing] = useState(false)
     const [textareaVal, setTextareaVal] = useState(textItem.text)
@@ -127,6 +143,16 @@ function TextItem(props: {
                 value: textareaVal
             })
         })
+    }
+
+    const handlePin = () => {
+        onPin(textItem.id)
+        setMoreOpen(false)
+    }
+
+    const handleUnpin = () => {
+        onUnpin(textItem.id)
+        setMoreOpen(false)
     }
 
     const handleRestore = () => {
@@ -167,10 +193,17 @@ function TextItem(props: {
         }
     }
 
-    return (<div className={`item text-item ${textItem.selected ? "text-item--selected" : ""}`}>
+    return (<div className={`item item-${textItem.id} text-item ${textItem.selected ? "text-item--selected" : ""}`}>
         <div className="text-item__options">
             <div className="text-item__metadata">
-                <input type="text" className="text-item__title" value={title} onChange={handleTitleChange} />
+                <div className="text-item__title">
+                    {Boolean(textItem.pinned) && (
+                        <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16">
+                            <path d="m624-480 96 96v72H516v228l-36 36-36-36v-228H240v-72l96-96v-264h-48v-72h384v72h-48v264Z" />
+                        </svg>
+                    )}
+                    <input type="text" value={title} onChange={handleTitleChange} />
+                </div>
                 <div className="text-item__user">{textItem.ip}</div>
             </div>
             {editing ? (
@@ -242,6 +275,13 @@ function TextItem(props: {
                 <button onClick={handleEditStart}>
                     Edit Text
                 </button>
+                {textItem.pinned ?
+                    (
+                        <button onClick={handleUnpin}>Unpin</button>
+                    ) : (
+                        <button onClick={handlePin}>Pin</button>
+                    )
+                }
                 <button onClick={handleCopy}>
                     Copy
                 </button>

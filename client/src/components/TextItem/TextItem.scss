@@ -71,15 +71,24 @@
     }
 
     &__title {
-        display: block;
-        overflow: hidden;
-        width: 100%;
-        line-height: 110%;
-        font-size: 1rem;
-        text-overflow: ellipsis;
+        display: flex;
+        gap: 0.3ch;
 
-        ::spelling-error {
-            text-decoration: none;
+        svg {
+            fill: c.$main;
+        }
+
+        input {
+            display: block;
+            overflow: hidden;
+            width: 100%;
+            line-height: 110%;
+            font-size: 1rem;
+            text-overflow: ellipsis;
+
+            ::spelling-error {
+                text-decoration: none;
+            }
         }
     }
 

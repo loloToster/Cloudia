@@ -2,9 +2,10 @@ export interface ItemBaseJson {
     id: string,
     ip: string,
     title: string,
-    created_at: Date,
+    created_at: number,
     trashed: 0 | 1,
-    folder: null | string
+    folder: null | string,
+    pinned: 0 | 1
 }
 
 export interface FileJson extends ItemBaseJson {
