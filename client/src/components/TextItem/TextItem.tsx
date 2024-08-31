@@ -72,6 +72,7 @@ function TextItem(props: {
         onRangeSelect
     } = props
 
+    const [moreOpen, setMoreOpen] = useState(false)
     const [text, setText] = useState(textItem.text)
     const [title, setTitle] = useState(textItem.title || "No Title")
 
@@ -98,6 +99,8 @@ function TextItem(props: {
 
     const handleEditStart = () => {
         setEditing(true)
+        setMoreOpen(false)
+
         setTimeout(() => {
             if (!textarea.current) return
 
@@ -126,11 +129,23 @@ function TextItem(props: {
         })
     }
 
+    const handleRestore = () => {
+        onRestore(textItem.id)
+        setEditing(false)
+    }
+
+    const handleDelete = () => {
+        onDelete(textItem.id)
+        setEditing(false)
+    }
+
     const copyBtn = useRef<HTMLButtonElement>(null)
     let copyTimeout: any
     const handleCopy = () => {
         const button = copyBtn.current
         if (!button) return
+
+        setMoreOpen(false)
 
         clearTimeout(copyTimeout)
         copyToClipboard(text)
@@ -173,24 +188,8 @@ function TextItem(props: {
                 </>
             ) : (
                 <>
-                    <button onClick={handleEditStart} title="Edit Text">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24">
-                            <path d="M200 856h56l345-345-56-56-345 345v56Zm572-403L602 285l56-56q23-23 56.5-23t56.5 23l56 56q23 23 24 55.5T829 396l-57 57Zm-58 59L290 936H120V766l424-424 170 170Zm-141-29-28-28 56 56-28-28Z" />
-                        </svg>
-                    </button>
-                    <button onClick={() => onDelete(textItem.id)} title="Delete Text">
-                        {textItem.trashed ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                                <path d="m9.4 16.5 2.6-2.6 2.6 2.6 1.4-1.4-2.6-2.6L16 9.9l-1.4-1.4-2.6 2.6-2.6-2.6L8 9.9l2.6 2.6L8 15.1ZM7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                                <path d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM9 17h2V8H9Zm4 0h2V8h-2ZM7 6v13Z"></path>
-                            </svg>
-                        )}
-                    </button>
                     {textItem.trashed ? (
-                        <button onClick={() => onRestore(textItem.id)} title="Restore Text">
+                        <button onClick={handleRestore} title="Restore Text">
                             <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
                                 <path d="M11 16h2v-4.15l1.6 1.55L16 12l-4-4-4 4 1.4 1.4 1.6-1.55Zm-4 5q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
                             </svg>
@@ -216,6 +215,11 @@ function TextItem(props: {
                             </svg>
                         )}
                     </button>
+                    <button onClick={() => setMoreOpen(true)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                            <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z" />
+                        </svg>
+                    </button>
                 </>
             )}
         </div>
@@ -229,6 +233,33 @@ function TextItem(props: {
             ) : (
                 <pre dangerouslySetInnerHTML={{ __html: urlify(text) }}></pre>
             )}
+        </div>
+        <div className={`text-item__more ${moreOpen ? "active" : ""}`}>
+            <button onClick={() => setMoreOpen(false)} className="text-item__more__close">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg>
+            </button>
+            <div className="text-item__more__wrapper">
+                <button onClick={handleEditStart}>
+                    Edit Text
+                </button>
+                <button onClick={handleCopy}>
+                    Copy
+                </button>
+                {
+                    Boolean(textItem.trashed) && (
+                        <button onClick={handleRestore}>
+                            Restore Text
+                        </button>
+                    )
+                }
+                <button onClick={handleDelete} className="danger">
+                    {textItem.trashed ? (
+                        "Delete Permanently"
+                    ) : (
+                        "Delete"
+                    )}
+                </button>
+            </div>
         </div>
     </div>)
 }
