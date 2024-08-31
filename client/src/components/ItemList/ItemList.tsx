@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import { ClientItem } from "@backend-types/types"
+import { Link } from "react-router-dom"
 
+import { ClientItem, FolderJson } from "@backend-types/types"
 import { useSearch } from "src/contexts/searchContext"
 
 import "./ItemList.scss"
@@ -25,11 +26,22 @@ interface Props {
     items: ClientItem[],
     setItems: React.Dispatch<React.SetStateAction<ClientItem[]>>,
     loading?: boolean,
-    showQuickActions?: boolean
+    showQuickActions?: boolean,
+    folderId?: string,
+    loadingFolderPath?: boolean,
+    folderPath?: FolderJson[]
 }
 
 function ItemList(props: Props) {
-    const { items, setItems, loading, showQuickActions = true } = props
+    const {
+        items,
+        setItems,
+        loading,
+        showQuickActions = true,
+        folderId,
+        loadingFolderPath = false,
+        folderPath
+    } = props
 
     const [uploads, setUploads] = useState<Upload[]>([])
     const shiftSelectBorderItem = useRef<string | null>(null)
@@ -57,7 +69,7 @@ function ItemList(props: Props) {
             const res = await fetch("/api/text", {
                 method: "POST",
                 headers: { "content-type": "application/json" },
-                body: JSON.stringify({ ...content })
+                body: JSON.stringify({ ...content, folderId })
             })
 
             const newItems = await res.json()
@@ -69,6 +81,7 @@ function ItemList(props: Props) {
                 .forEach(f => data.append("files", f))
 
             if (typeof folder !== "undefined") data.append("folder", folder)
+            if (typeof folderId !== "undefined") data.append("folderId", folderId)
 
             let upload: Upload = {
                 numberOfFiles: content.files.length,
@@ -210,42 +223,66 @@ function ItemList(props: Props) {
 
     return (
         <div className="items">
-            {loading && [...Array(5)].map((_, i) => (
-                <div key={i} data-testid={"dummy-" + i} className="items__dummy"></div>
-            ))}
-            {!loading && showQuickActions && <QuickActions upload={handleUploadAction} />}
-            {uploads.map((up, i) => (
-                <UploadItem key={i} {...up} />
-            ))}
-            {!loading && items.filter(
-                i => {
-                    if (!searchQuery.length) return true
-
-                    const sq = searchQuery.toLowerCase()
-
-                    if (i.title.toLowerCase().includes(sq))
-                        return true
-
-                    if (i.type === "text" && i.text.toLowerCase().includes(sq))
-                        return true
-
-                    return false
-                }).map(item => {
-                    const itemProps = {
-                        key: item.id,
-                        onRestore: handleRestore,
-                        onDelete: item.trashed ? handleDelete : handleTrash,
-                        onSelect: handleSelect,
-                        onRangeSelect: handleRangeSelect
+            {Boolean(loadingFolderPath || folderPath?.length) && (
+                <div className="items__header">
+                    {
+                        Boolean(folderPath?.length && !loadingFolderPath) ? (
+                            <>
+                                <div className="items__header__item">Home</div>
+                                {
+                                    folderPath?.map(f => (
+                                        <Link to={"/folder/" + f.id} className="items__header__item" key={f.id}>
+                                            {f.title}
+                                        </Link>
+                                    ))
+                                }
+                            </>
+                        ) : (
+                            <div className="items__header__loading">
+                                Loading
+                            </div>
+                        )
                     }
+                </div>
+            )}
+            <div className="items__wrapper">
+                {loading && [...Array(5)].map((_, i) => (
+                    <div key={i} data-testid={"dummy-" + i} className="items__dummy"></div>
+                ))}
+                {!loading && showQuickActions && <QuickActions upload={handleUploadAction} />}
+                {uploads.map((up, i) => (
+                    <UploadItem key={i} {...up} />
+                ))}
+                {!loading && items.filter(
+                    i => {
+                        if (!searchQuery.length) return true
 
-                    if (item.type === "text")
-                        return <TextItem textItem={item} {...itemProps} />
-                    else if (item.type === "folder")
-                        return <FolderItem folderItem={item} {...itemProps} />
-                    else
-                        return <FileItem fileItem={item} {...itemProps} />
-                })}
+                        const sq = searchQuery.toLowerCase()
+
+                        if (i.title.toLowerCase().includes(sq))
+                            return true
+
+                        if (i.type === "text" && i.text.toLowerCase().includes(sq))
+                            return true
+
+                        return false
+                    }).map(item => {
+                        const itemProps = {
+                            key: item.id,
+                            onRestore: handleRestore,
+                            onDelete: item.trashed ? handleDelete : handleTrash,
+                            onSelect: handleSelect,
+                            onRangeSelect: handleRangeSelect
+                        }
+
+                        if (item.type === "text")
+                            return <TextItem textItem={item} {...itemProps} />
+                        else if (item.type === "folder")
+                            return <FolderItem folderItem={item} {...itemProps} />
+                        else
+                            return <FileItem fileItem={item} {...itemProps} />
+                    })}
+            </div>
             {folderModalOpen && (
                 <div className="items__upload-modal">
                     <div className="items__upload-modal__wrapper">

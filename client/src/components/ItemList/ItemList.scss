@@ -17,36 +17,12 @@ $gap: 6px;
         --items-in-row: 1;
     }
 
-    display: flex;
-    flex-wrap: wrap;
-    gap: $gap;
     width: var(--app-width);
     margin: 8px 0;
 
     --size-of-item: calc(
         (var(--app-width) / var(--items-in-row)) - (#{$gap} * (var(--items-in-row) - 1) / var(--items-in-row))
     );
-
-    * {
-        scrollbar-width: thin;
-    }
-
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: #6f6f71;
-
-        &:hover {
-            background-color: #5c5c5e;
-        }
-    }
-
-    ::-webkit-scrollbar-corner {
-        background-color: transparent;
-    }
 
     @keyframes dummy-animation {
         from {
@@ -55,6 +31,76 @@ $gap: 6px;
 
         to {
             background-color: #2a2a2a;
+        }
+    }
+
+    &__header {
+        display: flex;
+        margin-bottom: 8px;
+
+        &__loading {
+            width: 60%;
+            font-size: 1.2rem;
+            padding: 6px;
+            animation: dummy-animation 0.8s infinite alternate linear;
+            border-radius: 100vh;
+            color: transparent;
+            user-select: none;
+        }
+
+        &__item {
+            font-size: 1.2rem;
+            padding: 6px;
+            text-decoration: none;
+            color: inherit;
+
+            &::before {
+                content: ">";
+                padding-right: 12px;
+            }
+
+            &:hover {
+                outline: 1px grey solid;
+                border-radius: 100vh;
+            }
+
+            &:first-child {
+                &::before {
+                    display: none;
+                }
+
+                &:hover {
+                    outline: none;
+                }
+            }
+        }
+    }
+
+    &__wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $gap;
+        width: 100%;
+
+        * {
+            scrollbar-width: thin;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #6f6f71;
+
+            &:hover {
+                background-color: #5c5c5e;
+            }
+        }
+
+        ::-webkit-scrollbar-corner {
+            background-color: transparent;
         }
     }
 
