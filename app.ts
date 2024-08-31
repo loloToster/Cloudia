@@ -304,7 +304,7 @@ async function getFolderIds(ids: string[]): Promise<string[]> {
             ids,
             (err, rows) => {
                 if (err) return rej(err)
-                res([...ids, ...rows.map(r => r.id)])
+                res([...ids, ...rows.map((r: any) => r.id)])
             }
         )
 
