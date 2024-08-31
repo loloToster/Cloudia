@@ -133,6 +133,12 @@ function FileItem(props: {
                     }
                     <a
                         href={`/cdn/${fileItem.id}`}
+                        target="_blank"
+                        rel="noreferrer">
+                        Open Raw
+                    </a>
+                    <a
+                        href={`/cdn/${fileItem.id}`}
                         download={fileItem.title}>
                         Download File
                     </a>
