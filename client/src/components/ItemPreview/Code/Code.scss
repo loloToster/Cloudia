@@ -1,0 +1,17 @@
+.pre-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  pre {
+    code {
+      min-width: 30vmin;
+      min-height: 30vmin;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow: auto;
+    }
+  }
+}
