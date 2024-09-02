@@ -145,8 +145,8 @@ function addFiles(files: Express.Multer.File[], ip: string, folder?: string, fol
         const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?, ?)").join(", ")
         const params = newDbItems.map(item => {
             let parsedItem = Object.values(item)
-            // remove created_at & trashed
-            parsedItem.splice(-2)
+            // remove created_at & trashed & pinned
+            parsedItem.splice(-3)
             return parsedItem
         }).flat()
 

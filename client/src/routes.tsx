@@ -1,9 +1,7 @@
 import { RouteObject } from "react-router-dom"
 
 import ItemListPage from "./pages/ItemListPage/ItemListPage"
-import AddFilePage from "./pages/AddFilesPage/AddFilesPage"
 import TrashItemListPage from "./pages/TrashItemListPage/TrashItemListPage"
-import FileDetailsPage from "./pages/FileDetailsPage/FileDetailsPage"
 import FolderPage from "./pages/FolderPage/FolderPage"
 
 export type RouteWithMeta = RouteObject & {
@@ -20,14 +18,6 @@ const routes: RouteWithMeta[] = [
         path: "/trash",
         element: <TrashItemListPage />,
         searchable: true
-    },
-    {
-        path: "/add",
-        element: <AddFilePage />
-    },
-    {
-        path: "/file/:id",
-        element: <FileDetailsPage />
     },
     {
         path: "/folder/:id",
