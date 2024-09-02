@@ -1,0 +1,36 @@
+@use "src/sass/abstract/colors" as c;
+
+.pre-sound {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: fit-content;
+  margin: auto;
+  height: 100%;
+  gap: 3px;
+
+  &__time {
+    align-self: flex-end;
+    font-size: 0.75rem;
+
+    span:last-child {
+      opacity: 0.65;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    width: 38px;
+    background-color: #{c.$grey}ee;
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.3);
+    }
+  }
+}

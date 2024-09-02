@@ -6,6 +6,7 @@ import { SUP_LANGS } from "src/utils/hljs"
 import Default from "./Default/Default"
 import Img from "./Img/Img"
 import Video from "./Video/Video"
+import Sound from "./Sound/Sound"
 import Code from "./Code/Code"
 
 export interface PreviewProps {
@@ -17,7 +18,8 @@ type ItemPreviewComp = (props: PreviewProps) => JSX.Element
 const previews: Record<string, ItemPreviewComp> = {
   "": Default,
   "png jpg jpeg gif svg": Img,
-  "mp4 ogg webm": Video,
+  "mp4 webm": Video,
+  "wav mp3": Sound,
   [SUP_LANGS.join(" ")]: Code
 }
 
