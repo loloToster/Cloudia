@@ -1,0 +1,13 @@
+.pre-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  img {
+    object-fit: contain;
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+}

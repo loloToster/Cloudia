@@ -12,6 +12,15 @@ import TextItem from "../TextItem/TextItem"
 import FolderItem from "../FolderItem/FolderItem"
 import UploadItem, { Upload } from "../UploadItem/UploadItem"
 import ActionBtn from "../ActionBtn/ActionBtn"
+import ItemSlider from "../ItemSlider/ItemSlider"
+
+function sortItems(items: ClientItem[]) {
+    return items.sort(
+        (a, b) => b.created_at - a.created_at
+    ).sort(
+        (a, b) => b.pinned - a.pinned
+    )
+}
 
 export type UploadContent = {
     isText: true,
@@ -248,6 +257,19 @@ function ItemList(props: Props) {
 
     const { searchQuery } = useSearch()
 
+    const [itemSliderOpen, setItemSliderOpen] = useState(false)
+    const [itemSliderInit, setItemSliderInit] = useState<null | ClientItem>(null)
+
+    const handleSliderOpen = (item: ClientItem) => {
+        setItemSliderInit(item)
+        setItemSliderOpen(true)
+    }
+
+    const handleSliderClose = () => {
+        setItemSliderInit(null)
+        setItemSliderOpen(false)
+    }
+
     return (
         <div className="items">
             {Boolean(loadingFolderPath || folderPath?.length) && (
@@ -280,41 +302,40 @@ function ItemList(props: Props) {
                 {uploads.map((up, i) => (
                     <UploadItem key={i} {...up} />
                 ))}
-                {!loading && items.filter(
-                    i => {
-                        if (!searchQuery.length) return true
+                {!loading && sortItems(
+                    items.filter(
+                        i => {
+                            if (!searchQuery.length) return true
 
-                        const sq = searchQuery.toLowerCase()
+                            const sq = searchQuery.toLowerCase()
 
-                        if (i.title.toLowerCase().includes(sq))
-                            return true
+                            if (i.title.toLowerCase().includes(sq))
+                                return true
 
-                        if (i.type === "text" && i.text.toLowerCase().includes(sq))
-                            return true
+                            if (i.type === "text" && i.text.toLowerCase().includes(sq))
+                                return true
 
-                        return false
-                    }).sort(
-                        (a, b) => b.created_at - a.created_at
-                    ).sort(
-                        (a, b) => b.pinned - a.pinned
-                    ).map(item => {
-                        const itemProps = {
-                            key: item.id,
-                            onRestore: handleRestore,
-                            onDelete: item.trashed ? handleDelete : handleTrash,
-                            onSelect: handleSelect,
-                            onRangeSelect: handleRangeSelect,
-                            onPin: handlePin,
-                            onUnpin: handleUnpin
-                        }
+                            return false
+                        })
+                ).map(item => {
+                    const itemProps = {
+                        key: item.id,
+                        onRestore: handleRestore,
+                        onDelete: item.trashed ? handleDelete : handleTrash,
+                        onSelect: handleSelect,
+                        onRangeSelect: handleRangeSelect,
+                        onPin: handlePin,
+                        onUnpin: handleUnpin,
+                        onOpenSlider: handleSliderOpen
+                    }
 
-                        if (item.type === "text")
-                            return <TextItem textItem={item} {...itemProps} />
-                        else if (item.type === "folder")
-                            return <FolderItem folderItem={item} {...itemProps} />
-                        else
-                            return <FileItem fileItem={item} {...itemProps} />
-                    })}
+                    if (item.type === "text")
+                        return <TextItem textItem={item} {...itemProps} />
+                    else if (item.type === "folder")
+                        return <FolderItem folderItem={item} {...itemProps} />
+                    else
+                        return <FileItem fileItem={item} {...itemProps} />
+                })}
             </div>
             {folderModalOpen && (
                 <div className="items__upload-modal">
@@ -332,6 +353,7 @@ function ItemList(props: Props) {
                     </div>
                 </div>
             )}
+            {itemSliderOpen && <ItemSlider items={sortItems(items)} initialItem={itemSliderInit} onClose={handleSliderClose} />}
         </div>
     )
 }

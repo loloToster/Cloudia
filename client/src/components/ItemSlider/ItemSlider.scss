@@ -1,0 +1,73 @@
+@use "src/sass/abstract/colors" as c;
+
+.item-slider {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #{c.$bg}ee;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.sitem {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  svg {
+    fill: white;
+  }
+
+  &__header {
+    display: flex;
+    padding: 12px;
+    gap: 12px;
+    font-size: 1.1rem;
+    width: 100%;
+
+    &__close {
+      margin-right: 12px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    &__file-icon {
+      height: 24px;
+      width: 24px;
+      fill: c.$main !important;
+    }
+  }
+
+  &__arrow {
+    $size: 40px;
+    $space: 12px;
+
+    position: absolute;
+    top: 50%;
+    height: $size;
+    width: $size;
+    background-color: #000000aa;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.left {
+      left: $space;
+      transform: rotate(180deg);
+    }
+
+    &.right {
+      right: $space;
+    }
+  }
+
+  &__preview {
+    flex-grow: 1;
+  }
+}

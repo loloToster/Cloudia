@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 
 import "./FileItem.scss"
 
@@ -12,7 +11,8 @@ function FileItem(props: {
     onSelect: Function,
     onRangeSelect: Function,
     onPin: Function,
-    onUnpin: Function
+    onUnpin: Function,
+    onOpenSlider: Function
 }) {
     const {
         fileItem,
@@ -21,7 +21,8 @@ function FileItem(props: {
         onSelect,
         onRangeSelect,
         onPin,
-        onUnpin
+        onUnpin,
+        onOpenSlider
     } = props
 
     const [moreOpen, setMoreOpen] = useState(false)
@@ -39,17 +40,13 @@ function FileItem(props: {
     }, [setMoreOpen, fileItem.id])
 
     const handleClick = (e: React.MouseEvent) => {
-        if (!e.ctrlKey && !e.shiftKey) return
-
         if (e.ctrlKey) {
             onSelect(fileItem.id)
         } else if (e.shiftKey) {
             onRangeSelect(fileItem.id)
         } else {
-            return
+            onOpenSlider(fileItem)
         }
-
-        e.preventDefault()
     }
 
     const handlePin = () => {
@@ -77,12 +74,12 @@ function FileItem(props: {
 
     return (
         <div className={`item item-${fileItem.id} file-item ${isImg ? "" : "file-item--with-icon"} ${fileItem.selected ? "file-item--selected" : ""}`}>
-            <Link
+            <div
+                className="file-item__inner"
                 onClick={e => handleClick(e)}
-                to={`/file/${fileItem.id}`}
                 key={fileItem.id}>
                 <img alt="icon" src={icon} className="file-item__icon" />
-            </Link>
+            </div>
             <div className="file-item__options">
                 <div className="file-item__metadata">
                     <div className="file-item__title">{fileItem.title}</div>
@@ -158,7 +155,7 @@ function FileItem(props: {
                     </button>
                 </div>
             </div>
-            {fileItem.pinned && (
+            {Boolean(fileItem.pinned) && (
                 <div className="file-item__pinned">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                         <path d="m624-480 96 96v72H516v228l-36 36-36-36v-228H240v-72l96-96v-264h-48v-72h384v72h-48v264Z" />
