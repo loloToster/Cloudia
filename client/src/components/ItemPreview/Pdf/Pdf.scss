@@ -1,0 +1,62 @@
+@use "src/sass/abstract/colors" as c;
+
+.pre-pdf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+
+  &__inner {
+    flex-basis: 0;
+    flex-grow: 1;
+    overflow: hidden;
+    width: 90vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__inner {
+      width: fit-content;
+      height: fit-content;
+    }
+  }
+
+  &__pages {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 0;
+
+    & > * {
+      background-color: c.$grey;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    div {
+      padding: 0 6px;
+    }
+
+    button {
+      width: 32px;
+      cursor: pointer;
+      border-radius: 0 6px 6px 0;
+
+      svg {
+        vertical-align: middle;
+      }
+
+      &.left {
+        transform: rotate(180deg);
+      }
+
+      &:hover {
+        filter: brightness(1.2);
+      }
+    }
+  }
+}

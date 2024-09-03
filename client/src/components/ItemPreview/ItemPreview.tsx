@@ -7,6 +7,7 @@ import Default from "./Default/Default"
 import Img from "./Img/Img"
 import Video from "./Video/Video"
 import Sound from "./Sound/Sound"
+import Pdf from "./Pdf/Pdf"
 import Code from "./Code/Code"
 
 export interface PreviewProps {
@@ -20,6 +21,7 @@ const previews: Record<string, ItemPreviewComp> = {
   "png jpg jpeg gif svg": Img,
   "mp4 webm": Video,
   "wav mp3": Sound,
+  "pdf": Pdf,
   [SUP_LANGS.join(" ")]: Code
 }
 
