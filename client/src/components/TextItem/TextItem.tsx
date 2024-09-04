@@ -205,14 +205,7 @@ function TextItem(props: { item: ClientTextJson }) {
         <div className="text-item__metadata">
           <div className="text-item__title">
             {Boolean(item.pinned) && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="16"
-                viewBox="0 -960 960 960"
-                width="16"
-              >
-                <path d="m624-480 96 96v72H516v228l-36 36-36-36v-228H240v-72l96-96v-264h-48v-72h384v72h-48v264Z" />
-              </svg>
+              <span className="material-symbols-rounded">keep</span>
             )}
             <input type="text" value={title} onChange={handleTitleChange} />
           </div>
@@ -221,75 +214,39 @@ function TextItem(props: { item: ClientTextJson }) {
         {editing ? (
           <>
             <button onClick={handleEditCancel} title="Cancel Edit">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24"
-                viewBox="0 96 960 960"
-                width="24"
-              >
-                <path d="m256 856-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-              </svg>
+              <span className="material-symbols-rounded">close</span>
             </button>
             <button onClick={handleEditSave} title="Save Edit">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24"
-                viewBox="0 96 960 960"
-                width="24"
-              >
-                <path d="M382 816 154 588l57-57 171 171 367-367 57 57-424 424Z" />
-              </svg>
+              <span className="material-symbols-rounded">check</span>
             </button>
           </>
         ) : (
           <>
             {item.trashed ? (
               <button onClick={onRestore} title="Restore Text">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                  <path d="M11 16h2v-4.15l1.6 1.55L16 12l-4-4-4 4 1.4 1.4 1.6-1.55Zm-4 5q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
-                </svg>
+                <span className="material-symbols-rounded">
+                  restore_from_trash
+                </span>
               </button>
             ) : (
               <button onClick={handleCopy} ref={copyBtn} title="Copy Text">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                  <path d="M5 22q-.825 0-1.413-.587Q3 20.825 3 20V6h2v14h11v2Zm4-4q-.825 0-1.412-.587Q7 16.825 7 16V4q0-.825.588-1.413Q8.175 2 9 2h9q.825 0 1.413.587Q20 3.175 20 4v12q0 .825-.587 1.413Q18.825 18 18 18Zm0-2h9V4H9v12Zm0 0V4v12Z" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                  <path d="m9.55 18.55-6.3-6.3 1.875-1.875L9.55 14.8l9.375-9.375L20.8 7.3Z" />
-                </svg>
+                <span className="material-symbols-rounded">content_copy</span>
+                <span className="material-symbols-rounded">check</span>
               </button>
             )}
             <button onClick={onSelect} title="Select Text">
               {item.selected ? (
-                <svg
-                  className="selected"
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="24"
-                  viewBox="0 -960 960 960"
-                  width="24"
-                >
-                  <path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z" />
-                </svg>
+                <span className="material-symbols-rounded selected">
+                  check_box
+                </span>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="24"
-                  viewBox="0 -960 960 960"
-                  width="24"
-                >
-                  <path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z" />
-                </svg>
+                <span className="material-symbols-rounded">
+                  check_box_outline_blank
+                </span>
               )}
             </button>
             <button onClick={() => setMoreOpen(true)}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24"
-                viewBox="0 -960 960 960"
-                width="24"
-              >
-                <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z" />
-              </svg>
+              <span className="material-symbols-rounded">more_horiz</span>
             </button>
           </>
         )}
@@ -313,14 +270,7 @@ function TextItem(props: { item: ClientTextJson }) {
           onClick={() => setMoreOpen(false)}
           className="text-item__more__close"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24"
-            viewBox="0 -960 960 960"
-            width="24"
-          >
-            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-          </svg>
+          <span className="material-symbols-rounded">close</span>
         </button>
         <div className="text-item__more__wrapper">
           <button onClick={handleEditStart}>Edit Text</button>

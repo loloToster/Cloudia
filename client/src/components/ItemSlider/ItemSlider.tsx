@@ -26,23 +26,12 @@ function ItemSlider() {
         <div className="sitem">
           <div className="sitem__header">
             <button onClick={closeSlider} className="sitem__header__close">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24"
-                viewBox="0 -960 960 960"
-                width="24"
-              >
-                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-              </svg>
+              <span className="material-symbols-rounded">close</span>
             </button>
             {item.type === "folder" ? (
-              <svg
-                className="sitem__header__file-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 -960 960 960"
-              >
-                <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z" />
-              </svg>
+              <span className="sitem__header__file-icon material-symbols-rounded">
+                folder
+              </span>
             ) : (
               <img
                 className="sitem__header__file-icon"
@@ -60,14 +49,9 @@ function ItemSlider() {
               onClick={() => setIdx((prev) => prev - 1)}
               className="sitem__arrow left"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="20"
-                viewBox="0 -960 960 960"
-                width="20"
-              >
-                <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z" />
-              </svg>
+              <span className="material-symbols-rounded">
+                arrow_forward_ios
+              </span>
             </button>
           )}
           {idx !== displayItems.length - 1 && (
@@ -75,14 +59,9 @@ function ItemSlider() {
               onClick={() => setIdx((prev) => prev + 1)}
               className="sitem__arrow right"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="20"
-                viewBox="0 -960 960 960"
-                width="20"
-              >
-                <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z" />
-              </svg>
+              <span className="material-symbols-rounded">
+                arrow_forward_ios
+              </span>
             </button>
           )}
         </div>

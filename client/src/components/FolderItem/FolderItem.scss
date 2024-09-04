@@ -19,11 +19,9 @@
     outline-offset: -$outline-width;
   }
 
-  & > svg {
-    width: 50%;
-    height: 50%;
-    vertical-align: middle;
-    fill: c.$main;
+  & > .material-symbols-rounded {
+    font-size: calc(var(--size-of-item) / 2);
+    color: c.$main;
   }
 
   &__actions {
@@ -36,8 +34,9 @@
 
     button {
       cursor: pointer;
-      svg {
-        fill: #c1c1c1;
+
+      .material-symbols-rounded {
+        color: #c1c1c1;
       }
     }
   }

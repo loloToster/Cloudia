@@ -2,6 +2,7 @@
 @use "src/sass/abstract/colors" as c;
 
 $quick-actions-gap: 8px;
+$icon-size: 48px;
 
 .quick-actions {
     gap: $quick-actions-gap;
@@ -28,8 +29,9 @@ $quick-actions-gap: 8px;
             height: 100vh;
             background-color: #{c.$bg}ee;
 
-            svg {
-                fill: white;
+            .material-symbols-rounded {
+                color: white;
+                font-size: $icon-size;
             }
         }
     }
@@ -50,8 +52,9 @@ $quick-actions-gap: 8px;
         cursor: pointer;
         transition: all 100ms ease-in;
 
-        svg {
-            fill: c.$grey;
+        .material-symbols-rounded {
+            color: c.$grey;
+            font-size: $icon-size;
             transform: scale(1.3);
         }
 

@@ -21,9 +21,8 @@
         align-items: center;
         padding: 6px 0;
 
-        svg {
-            fill: currentColor;
-            vertical-align: middle;
+        .material-symbols-rounded {
+            color: currentColor;
         }
 
         button {
@@ -32,35 +31,35 @@
 
             @keyframes success {
                 from {
-                    fill: #36df41;
+                    color: #36df41;
                 }
 
                 to {
-                    fill: currentColor;
+                    color: currentColor;
                 }
             }
 
-            svg.selected {
-                fill: c.$download-blue;
+            .material-symbols-rounded.selected {
+                color: c.$download-blue;
             }
 
-            & svg:nth-child(2) {
+            & .material-symbols-rounded:nth-child(2) {
                 display: none;
             }
 
-            &.success svg:nth-child(1) {
+            &.success .material-symbols-rounded:nth-child(1) {
                 display: none;
             }
 
-            &.success svg:nth-child(2) {
+            &.success .material-symbols-rounded:nth-child(2) {
                 display: block;
             }
 
-            &.success svg {
+            &.success .material-symbols-rounded {
                 animation: success 3s ease-in;
             }
 
-            &:hover svg {
+            &:hover .material-symbols-rounded {
                 filter: brightness(0.8);
             }
         }
@@ -74,8 +73,9 @@
         display: flex;
         gap: 0.3ch;
 
-        svg {
-            fill: c.$main;
+        .material-symbols-rounded {
+            color: c.$main;
+            font-size: 16px;
         }
 
         input {
@@ -146,7 +146,6 @@
             right: 4px;
             padding: 2px;
             cursor: pointer;
-            fill: white;
         }
 
         &__wrapper {

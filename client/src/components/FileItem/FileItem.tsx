@@ -96,9 +96,9 @@ function FileItem(props: { item: ClientFileJson }) {
               title="Restore File"
               className="file-item__button file-item__button--download"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                <path d="M11 16h2v-4.15l1.6 1.55L16 12l-4-4-4 4 1.4 1.4 1.6-1.55Zm-4 5q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
-              </svg>
+              <span className="material-symbols-rounded">
+                restore_from_trash
+              </span>
             </button>
             <button
               onClick={onDelete}
@@ -106,13 +106,9 @@ function FileItem(props: { item: ClientFileJson }) {
               className="file-item__button file-item__button--delete"
             >
               {item.trashed ? (
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                  <path d="m9.4 16.5 2.6-2.6 2.6 2.6 1.4-1.4-2.6-2.6L16 9.9l-1.4-1.4-2.6 2.6-2.6-2.6L8 9.9l2.6 2.6L8 15.1ZM7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM7 6v13Z" />
-                </svg>
+                <span className="material-symbols-rounded">delete_forever</span>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-                  <path d="M7 21q-.825 0-1.412-.587Q5 19.825 5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413Q17.825 21 17 21ZM17 6H7v13h10ZM9 17h2V8H9Zm4 0h2V8h-2ZM7 6v13Z"></path>
-                </svg>
+                <span className="material-symbols-rounded">delete</span>
               )}
             </button>
           </>
@@ -121,14 +117,7 @@ function FileItem(props: { item: ClientFileJson }) {
             onClick={() => setMoreOpen(true)}
             className="file-item__button"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24"
-              viewBox="0 -960 960 960"
-              width="24"
-            >
-              <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z" />
-            </svg>
+            <span className="material-symbols-rounded">more_horiz</span>
           </button>
         )}
       </div>
@@ -137,14 +126,7 @@ function FileItem(props: { item: ClientFileJson }) {
           onClick={() => setMoreOpen(false)}
           className="text-item__more__close"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24"
-            viewBox="0 -960 960 960"
-            width="24"
-          >
-            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-          </svg>
+          <span className="material-symbols-rounded">close</span>
         </button>
         <div className="file-item__more__wrapper">
           {item.pinned ? (
@@ -168,14 +150,7 @@ function FileItem(props: { item: ClientFileJson }) {
       </div>
       {Boolean(item.pinned) && (
         <div className="file-item__pinned">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24"
-            viewBox="0 -960 960 960"
-            width="24"
-          >
-            <path d="m624-480 96 96v72H516v228l-36 36-36-36v-228H240v-72l96-96v-264h-48v-72h384v72h-48v264Z" />
-          </svg>
+          <span className="material-symbols-rounded">keep</span>
         </div>
       )}
     </div>

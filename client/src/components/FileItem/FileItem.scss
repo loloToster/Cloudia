@@ -98,17 +98,12 @@
             transform: scale(1.1);
         }
 
-        svg {
-            vertical-align: middle;
-            fill: white;
+        &--download .material-symbols-rounded {
+            color: c.$download-blue;
         }
 
-        &--download svg {
-            fill: c.$download-blue;
-        }
-
-        &--delete svg {
-            fill: c.$red;
+        &--delete .material-symbols-rounded {
+            color: c.$red;
         }
     }
 
@@ -134,7 +129,6 @@
             right: 4px;
             padding: 2px;
             cursor: pointer;
-            fill: white;
         }
 
         &__wrapper {
@@ -187,8 +181,8 @@
         align-items: center;
         justify-content: center;
 
-        svg {
-            fill: c.$main;
+        .material-symbols-rounded {
+            color: c.$main;
         }
 
         .file-item:hover & {

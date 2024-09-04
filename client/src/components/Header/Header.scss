@@ -38,9 +38,8 @@
             outline: 2px solid c.$main;
         }
 
-        svg {
-            fill: c.$light-grey;
-            vertical-align: middle;
+        .material-symbols-rounded {
+            color: c.$light-grey;
         }
 
         input {
@@ -94,8 +93,9 @@
         text-decoration: none;
         margin-left: 16px;
 
-        svg {
-            fill: currentColor;
+        .material-symbols-rounded {
+            color: currentColor;
+            margin-left: 2px;
         }
     }
 
@@ -117,6 +117,10 @@
     @media (max-width: 900px) {
         &__secondary span {
             display: none;
+
+            &.material-symbols-rounded {
+                display: block;
+            }
         }
     }
 }
