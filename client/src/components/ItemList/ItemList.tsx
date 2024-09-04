@@ -1,361 +1,214 @@
-import { useEffect, useRef, useState } from "react"
-import { Link } from "react-router-dom"
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import { ClientItem, FolderJson } from "@backend-types/types"
-import { useSearch } from "src/contexts/searchContext"
+import {
+  ItemListContextProps,
+  useItemList,
+  ItemListContextProvider,
+} from "src/contexts/itemListContext";
 
-import "./ItemList.scss"
+import UploadItem, { Upload } from "../UploadItem/UploadItem";
+import ActionBtn from "../ActionBtn/ActionBtn";
+import QuickActions from "../QuickActions/QuickActions";
+import TextItem from "../TextItem/TextItem";
+import FolderItem from "../FolderItem/FolderItem";
+import FileItem from "../FileItem/FileItem";
+import ItemSlider from "../ItemSlider/ItemSlider";
 
-import QuickActions from "../QuickActions/QuickActions"
-import FileItem from "../FileItem/FileItem"
-import TextItem from "../TextItem/TextItem"
-import FolderItem from "../FolderItem/FolderItem"
-import UploadItem, { Upload } from "../UploadItem/UploadItem"
-import ActionBtn from "../ActionBtn/ActionBtn"
-import ItemSlider from "../ItemSlider/ItemSlider"
+import "./ItemList.scss";
 
-function sortItems(items: ClientItem[]) {
-    return items.sort(
-        (a, b) => b.created_at - a.created_at
-    ).sort(
-        (a, b) => b.pinned - a.pinned
-    )
-}
-
-export type UploadContent = {
-    isText: true,
-    title?: string,
-    text: string
-} | {
-    isText: false,
-    files: FileList
-}
-
-interface Props {
-    items: ClientItem[],
-    setItems: React.Dispatch<React.SetStateAction<ClientItem[]>>,
-    loading?: boolean,
-    showQuickActions?: boolean,
-    folderId?: string,
-    loadingFolderPath?: boolean,
-    folderPath?: FolderJson[]
-}
-
-function ItemList(props: Props) {
-    const {
-        items,
-        setItems,
-        loading,
-        showQuickActions = true,
-        folderId,
-        loadingFolderPath = false,
-        folderPath
-    } = props
-
-    const [uploads, setUploads] = useState<Upload[]>([])
-    const shiftSelectBorderItem = useRef<string | null>(null)
-
-    useEffect(() => {
-        const onWindowClick = (e: MouseEvent) => { // todo: remove magic string
-            const clickOnItem = e.composedPath().some(el => (el as HTMLElement).classList?.contains("item"))
-
-            if (clickOnItem) return
-
-            setItems(prev => prev.map(i => ({ ...i, selected: false })))
-            shiftSelectBorderItem.current = null
-        }
-
-        window.addEventListener("click", onWindowClick)
-        return () => window.removeEventListener("click", onWindowClick)
-    }, [setItems])
-
-    const [folderModalOpen, setFolderModalOpen] = useState(false)
-    const [folderName, setFolderName] = useState("")
-    const [uploadContent, setUploadContent] = useState<UploadContent | null>(null)
-
-    const handleUpload = async (content: UploadContent, folder?: string) => {
-        if (content.isText) {
-            const res = await fetch("/api/text", {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ ...content, folderId })
-            })
-
-            const newItems = await res.json()
-            setItems(prevItems => newItems.concat(prevItems))
-        } else {
-            let data = new FormData()
-
-            Array.from(content.files)
-                .forEach(f => data.append("files", f))
-
-            if (typeof folder !== "undefined") data.append("folder", folder)
-            if (typeof folderId !== "undefined") data.append("folderId", folderId)
-
-            let upload: Upload = {
-                numberOfFiles: content.files.length,
-                progress: 0
-            }
-
-            setUploads(prev => [upload, ...prev])
-
-            const req = new XMLHttpRequest()
-
-            req.upload.addEventListener("progress", e => {
-                upload.progress = e.loaded / e.total
-                // force re-render
-                setUploads(prev => [...prev])
-            })
-
-            req.onload = () => {
-                setUploads(prev => (
-                    [...prev.filter(u => u !== upload)]
-                ))
-
-                const newItems = req.status === 200 ? JSON.parse(req.responseText) : []
-                setItems(prevItems => newItems.concat(prevItems))
-            }
-
-            req.open("post", "/api/file")
-            req.send(data)
-        }
+export type UploadContent =
+  | {
+      isText: true;
+      title?: string;
+      text: string;
     }
+  | {
+      isText: false;
+      files: FileList;
+    };
 
-    const handleUploadAction = (content: UploadContent) => {
-        if (content.isText || content.files.length <= 1)
-            return handleUpload(content)
+function ItemListInner() {
+  const {
+    setItems,
+    displayItems,
+    loading,
+    showQuickActions = true,
+    isFolder,
+    loadingFolderPath,
+    folderPath,
+    folderId,
+    itemSliderOpen,
+  } = useItemList();
 
-        setUploadContent(content)
-        setFolderModalOpen(true)
+  const [uploads, setUploads] = useState<Upload[]>([]);
+
+  const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [uploadContent, setUploadContent] = useState<UploadContent | null>(
+    null
+  );
+
+  const handleUpload = async (content: UploadContent, folder?: string) => {
+    if (content.isText) {
+      const res = await fetch("/api/text", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...content, folderId }),
+      });
+
+      const newItems = await res.json();
+      setItems((prevItems) => newItems.concat(prevItems));
+    } else {
+      let data = new FormData();
+
+      Array.from(content.files).forEach((f) => data.append("files", f));
+
+      if (typeof folder !== "undefined") data.append("folder", folder);
+      if (typeof folderId !== "undefined") data.append("folderId", folderId);
+
+      let upload: Upload = {
+        numberOfFiles: content.files.length,
+        progress: 0,
+      };
+
+      setUploads((prev) => [upload, ...prev]);
+
+      const req = new XMLHttpRequest();
+
+      req.upload.addEventListener("progress", (e) => {
+        upload.progress = e.loaded / e.total;
+        // force re-render
+        setUploads((prev) => [...prev]);
+      });
+
+      req.onload = () => {
+        setUploads((prev) => [...prev.filter((u) => u !== upload)]);
+
+        const newItems = req.status === 200 ? JSON.parse(req.responseText) : [];
+        setItems((prevItems) => newItems.concat(prevItems));
+      };
+
+      req.open("post", "/api/file");
+      req.send(data);
     }
+  };
 
-    const handleUploadAsFolder = async () => {
-        if (!uploadContent) return
+  const handleUploadAction = (content: UploadContent) => {
+    if (content.isText || content.files.length <= 1)
+      return handleUpload(content);
 
-        await handleUpload(uploadContent, folderName)
-        setUploadContent(null)
-        setFolderModalOpen(false)
-    }
+    setUploadContent(content);
+    setFolderModalOpen(true);
+  };
 
-    const handleUploadStandalone = async () => {
-        if (!uploadContent) return
+  const handleUploadAsFolder = async () => {
+    if (!uploadContent) return;
 
-        await handleUpload(uploadContent)
-        setUploadContent(null)
-        setFolderModalOpen(false)
+    await handleUpload(uploadContent, folderName);
+    setUploadContent(null);
+    setFolderModalOpen(false);
+  };
 
-    }
+  const handleUploadStandalone = async () => {
+    if (!uploadContent) return;
 
-    const handleCancelUpload = () => {
-        setUploadContent(null)
-        setFolderModalOpen(false)
-    }
+    await handleUpload(uploadContent);
+    setUploadContent(null);
+    setFolderModalOpen(false);
+  };
 
-    const pinItems = (ids: string[], pin = false) =>
-        setItems(prev => prev.map(i => ids.includes(i.id) ? ({ ...i, pinned: pin ? 1 : 0 }) : i))
+  const handleCancelUpload = () => {
+    setUploadContent(null);
+    setFolderModalOpen(false);
+  };
 
-    const rmItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id))
-    const rmItems = (ids: string[]) => setItems(prev => prev.filter(i => !ids.includes(i.id)))
-
-    const selectItem = (id: string) => setItems(prev => prev.map(i => i.id === id ? ({ ...i, selected: !i.selected }) : i))
-
-    const beforeSelect = () => {
-        if (items.every(i => i.id !== shiftSelectBorderItem.current))
-            shiftSelectBorderItem.current = null
-    }
-
-    const handleSelect = (id: string) => {
-        beforeSelect()
-
-        shiftSelectBorderItem.current = id
-        selectItem(id)
-    }
-
-    const handleRangeSelect = (id: string) => {
-        beforeSelect()
-
-        if (!shiftSelectBorderItem.current) {
-            shiftSelectBorderItem.current = id
-            selectItem(id)
-            return
-        } else if (shiftSelectBorderItem.current === id) {
-            setItems(prev => prev.map(i => ({ ...i, selected: i.id === id })))
-            return
-        }
-
-        let inRange = false
-
-        setItems(prev => prev.map(i => {
-            let lastOrFirst = false
-
-            if (i.id === shiftSelectBorderItem.current || i.id === id) {
-                inRange = !inRange
-                lastOrFirst = true
-            }
-
-            return { ...i, selected: inRange || lastOrFirst }
-        }))
-    }
-
-    const handleItemRemoval = async (id: string, type: "restore" | "trash" | "delete") => {
-        const hardDelete = type === "delete"
-        const method = hardDelete ? "DELETE" : "PATCH"
-        const apiPath = hardDelete ? "" : type
-
-        if (items.find(i => i.id === id)?.selected) {
-            const selectedIds = items.filter(i => i.selected).map(i => i.id)
-
-            let res = await fetch(`/api/items/${apiPath}`, {
-                method,
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-
-            if (res.ok) rmItems(selectedIds)
-        } else {
-            let res = await fetch(`/api/item/${id}/${apiPath}`, { method })
-            if (res.ok) rmItem(id)
-        }
-    }
-
-    const handleItemPin = async (id: string, type: "pin" | "unpin") => {
-        if (items.find(i => i.id === id)?.selected) {
-            const selectedIds = items.filter(i => i.selected).map(i => i.id)
-
-            let res = await fetch(`/api/items/${type}`, {
-                method: "PATCH",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-
-            if (res.ok) pinItems(selectedIds, type === "pin")
-        } else {
-            let res = await fetch(`/api/item/${id}/${type}`, { method: "PATCH" })
-            if (res.ok) pinItems([id], type === "pin")
-        }
-    }
-
-    const handlePin = (id: string) => {
-        handleItemPin(id, "pin")
-    }
-
-    const handleUnpin = (id: string) => {
-        handleItemPin(id, "unpin")
-    }
-
-    const handleTrash = (id: string) => {
-        handleItemRemoval(id, "trash")
-    }
-
-    const handleRestore = (id: string) => {
-        handleItemRemoval(id, "restore")
-    }
-
-    const handleDelete = (id: string) => {
-        handleItemRemoval(id, "delete")
-    }
-
-    const { searchQuery } = useSearch()
-
-    const [itemSliderOpen, setItemSliderOpen] = useState(false)
-    const [itemSliderInit, setItemSliderInit] = useState<null | ClientItem>(null)
-
-    const handleSliderOpen = (item: ClientItem) => {
-        setItemSliderInit(item)
-        setItemSliderOpen(true)
-    }
-
-    const handleSliderClose = () => {
-        setItemSliderInit(null)
-        setItemSliderOpen(false)
-    }
-
-    return (
-        <div className="items">
-            {Boolean(loadingFolderPath || folderPath?.length) && (
-                <div className="items__header">
-                    {
-                        Boolean(folderPath?.length && !loadingFolderPath) ? (
-                            <>
-                                <div className="items__header__item">Home</div>
-                                {
-                                    folderPath?.map(f => (
-                                        <Link to={"/folder/" + f.id} className="items__header__item" key={f.id}>
-                                            {f.title}
-                                        </Link>
-                                    ))
-                                }
-                            </>
-                        ) : (
-                            <div className="items__header__loading">
-                                Loading
-                            </div>
-                        )
-                    }
-                </div>
-            )}
-            <div className="items__wrapper">
-                {loading && [...Array(5)].map((_, i) => (
-                    <div key={i} data-testid={"dummy-" + i} className="items__dummy"></div>
-                ))}
-                {!loading && showQuickActions && <QuickActions upload={handleUploadAction} />}
-                {uploads.map((up, i) => (
-                    <UploadItem key={i} {...up} />
-                ))}
-                {!loading && sortItems(
-                    items.filter(
-                        i => {
-                            if (!searchQuery.length) return true
-
-                            const sq = searchQuery.toLowerCase()
-
-                            if (i.title.toLowerCase().includes(sq))
-                                return true
-
-                            if (i.type === "text" && i.text.toLowerCase().includes(sq))
-                                return true
-
-                            return false
-                        })
-                ).map(item => {
-                    const itemProps = {
-                        key: item.id,
-                        onRestore: handleRestore,
-                        onDelete: item.trashed ? handleDelete : handleTrash,
-                        onSelect: handleSelect,
-                        onRangeSelect: handleRangeSelect,
-                        onPin: handlePin,
-                        onUnpin: handleUnpin,
-                        onOpenSlider: handleSliderOpen
-                    }
-
-                    if (item.type === "text")
-                        return <TextItem textItem={item} {...itemProps} />
-                    else if (item.type === "folder")
-                        return <FolderItem folderItem={item} {...itemProps} />
-                    else
-                        return <FileItem fileItem={item} {...itemProps} />
-                })}
-            </div>
-            {folderModalOpen && (
-                <div className="items__upload-modal">
-                    <div className="items__upload-modal__wrapper">
-                        <input
-                            value={folderName}
-                            onChange={e => setFolderName(e.target.value)}
-                            type="text"
-                            placeholder="Folder Name" />
-                        <ActionBtn onClick={handleUploadAsFolder} text="Upload as Folder" className="items__upload-modal__btn" />
-                        <div className="items__upload-modal__splitter">or</div>
-                        <ActionBtn onClick={handleUploadStandalone} text="Upload Files" className="items__upload-modal__btn" />
-                        <div className="items__upload-modal__splitter">or</div>
-                        <ActionBtn onClick={handleCancelUpload} text="Cancel Upload" className="items__upload-modal__btn items__upload-modal__btn--cancel" />
-                    </div>
-                </div>
-            )}
-            {itemSliderOpen && <ItemSlider items={sortItems(items)} initialItem={itemSliderInit} onClose={handleSliderClose} />}
+  return (
+    <div className="items">
+      {isFolder && Boolean(loadingFolderPath || folderPath?.length) && (
+        <div className="items__header">
+          {Boolean(folderPath?.length && !loadingFolderPath) ? (
+            <>
+              <div className="items__header__item">Home</div>
+              {folderPath?.map((f) => (
+                <Link
+                  to={"/folder/" + f.id}
+                  className="items__header__item"
+                  key={f.id}
+                >
+                  {f.title}
+                </Link>
+              ))}
+            </>
+          ) : (
+            <div className="items__header__loading">Loading</div>
+          )}
         </div>
-    )
+      )}
+      <div className="items__wrapper">
+        {loading &&
+          [...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              data-testid={"dummy-" + i}
+              className="items__dummy"
+            ></div>
+          ))}
+        {!loading && showQuickActions && (
+          <QuickActions upload={handleUploadAction} />
+        )}
+        {uploads.map((up, i) => (
+          <UploadItem key={i} {...up} />
+        ))}
+        {!loading &&
+          displayItems.map((item) => {
+            if (item.type === "text")
+              return <TextItem item={item} key={item.id} />;
+            else if (item.type === "folder")
+              return <FolderItem item={item} key={item.id} />;
+            else return <FileItem item={item} key={item.id} />;
+          })}
+      </div>
+      {folderModalOpen && (
+        <div className="items__upload-modal">
+          <div className="items__upload-modal__wrapper">
+            <input
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+              type="text"
+              placeholder="Folder Name"
+            />
+            <ActionBtn
+              onClick={handleUploadAsFolder}
+              text="Upload as Folder"
+              className="items__upload-modal__btn"
+            />
+            <div className="items__upload-modal__splitter">or</div>
+            <ActionBtn
+              onClick={handleUploadStandalone}
+              text="Upload Files"
+              className="items__upload-modal__btn"
+            />
+            <div className="items__upload-modal__splitter">or</div>
+            <ActionBtn
+              onClick={handleCancelUpload}
+              text="Cancel Upload"
+              className="items__upload-modal__btn items__upload-modal__btn--cancel"
+            />
+          </div>
+        </div>
+      )}
+      {itemSliderOpen && <ItemSlider />}
+    </div>
+  );
 }
 
-export default ItemList
+function ItemList(props: ItemListContextProps) {
+  return (
+    <ItemListContextProvider {...props}>
+      <ItemListInner />
+    </ItemListContextProvider>
+  );
+}
+
+export default ItemList;
