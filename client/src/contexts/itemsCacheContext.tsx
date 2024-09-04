@@ -1,61 +1,56 @@
-import {
-    Dispatch,
-    SetStateAction,
-    createContext,
-    useContext,
-    useState
-} from "react"
-import { ClientItem } from "@backend-types/types"
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
-export type ItemSetter = Dispatch<SetStateAction<ClientItem[]>>
-export type LoadingSetter = Dispatch<SetStateAction<boolean>>
-
-export interface ItemsCacheContextI {
-    items: ClientItem[]
-    loadingItems: boolean
-    setLoadingItems: LoadingSetter
-    setItems: ItemSetter
-    trashedItems: ClientItem[]
-    loadingTrashedItems: boolean
-    setLoadingTrashedItems: LoadingSetter
-    setTrashedItems: ItemSetter
+export interface CacheContextI {
+  cache: Record<string, any>;
+  updateCache: (key: string, value: any) => void;
 }
 
-export const ItemsCacheContext = createContext<ItemsCacheContextI>({
-    items: [],
-    loadingItems: true,
-    setLoadingItems: () => null,
-    setItems: () => null,
-    trashedItems: [],
-    loadingTrashedItems: true,
-    setLoadingTrashedItems: () => null,
-    setTrashedItems: () => null
-})
+export const CacheContext = createContext<CacheContextI>({
+  cache: {},
+  updateCache: () => {},
+});
 
-export const ItemsCacheContextProvider = (props: {
-    children: React.ReactNode
-}) => {
-    const [items, setItems] = useState<ClientItem[]>([])
-    const [loadingItems, setLoadingItems] = useState(true)
-    const [trashedItems, setTrashedItems] = useState<ClientItem[]>([])
-    const [loadingTrashedItems, setLoadingTrashedItems] = useState(true)
+export const CacheContextProvider = (props: { children: React.ReactNode }) => {
+  const [cache, setCache] = useState<Record<string, any>>({});
 
-    return (
-        <ItemsCacheContext.Provider value={{
-            items,
-            loadingItems,
-            setLoadingItems,
-            setItems,
-            trashedItems,
-            loadingTrashedItems,
-            setLoadingTrashedItems,
-            setTrashedItems
-        }}>
-            {props.children}
-        </ItemsCacheContext.Provider>
-    )
-}
+  const updateCache = (key: string, value: any) => {
+    setCache((prevCache) => ({
+      ...prevCache,
+      [key]: value,
+    }));
+  };
 
-export const useItemsCache = () => {
-    return useContext(ItemsCacheContext)
+  return (
+    <CacheContext.Provider value={{ cache, updateCache }}>
+      {props.children}
+    </CacheContext.Provider>
+  );
+};
+
+export const useCache = () => {
+  return useContext(CacheContext);
+};
+
+export function useCachedState<T>(key: string, initialValue: T) {
+  const { cache, updateCache } = useCache();
+
+  const [state, setState] = useState<T>(() => {
+    return cache[key] !== undefined ? cache[key] : initialValue;
+  });
+
+  const previousKeyRef = useRef(key);
+
+  useEffect(() => {
+    if (previousKeyRef.current !== key) {
+      const newState = cache[key] !== undefined ? cache[key] : initialValue;
+      setState(newState);
+      previousKeyRef.current = key;
+    }
+  }, [key, cache, initialValue]);
+
+  useEffect(() => {
+    if (cache[key] !== state) updateCache(key, state);
+  }, [key, state, updateCache, cache]);
+
+  return [state, setState] as const;
 }

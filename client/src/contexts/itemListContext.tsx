@@ -10,6 +10,7 @@ import {
 
 import { ClientItem, FolderJson } from "@backend-types/types";
 import { useSearch } from "./searchContext";
+import { useCachedState } from "./itemsCacheContext";
 
 export interface ItemListContextProps {
   apiUrl: string;
@@ -86,22 +87,32 @@ export const ItemListContextProvider = (
   const { searchQuery } = useSearch();
 
   // ITEMS
-  const [items, setItems] = useState<ClientItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loadingKey = "loading:" + props.apiUrl;
+  const itemsKey = "items:" + props.apiUrl;
+  const [loading, setLoading] = useCachedState(loadingKey, true);
+  const [items, setItems] = useCachedState<ClientItem[]>(itemsKey, []);
+
+  const apiUrlRef = useRef(props.apiUrl);
+
+  useEffect(() => {
+    apiUrlRef.current = props.apiUrl;
+  }, [props.apiUrl]);
 
   useEffect(() => {
     fetch(props.apiUrl)
       .then(async (data) => {
         const json = await data.json();
-        setItems(json.map((i: any) => ({ ...i, selected: false })));
+
+        if (props.apiUrl === apiUrlRef.current)
+          setItems(json.map((i: any) => ({ ...i, selected: false })));
       })
       .catch((err) => {
         console.error(err);
       })
       .finally(() => {
-        setLoading(false);
+        if (props.apiUrl === apiUrlRef.current) setLoading(false);
       });
-  }, [props.apiUrl]);
+  }, [props.apiUrl, setItems, setLoading, itemsKey, loadingKey]);
 
   const sortItems = (items: ClientItem[]) => {
     return items
@@ -248,9 +259,23 @@ export const ItemListContextProvider = (
   };
 
   // FOLDER
+  const loadingFolderPathKey = "loadingfolderpath:" + props.folderId;
+  const folderPathKey = "folderpath:" + props.folderId;
+  const [loadingFolderPath, setLoadingFolderPath] = useCachedState(
+    loadingFolderPathKey,
+    true
+  );
+  const [folderPath, setFolderPath] = useCachedState<FolderJson[]>(
+    folderPathKey,
+    []
+  );
   const [isFolder, setIsFolder] = useState(Boolean(props.folderId));
-  const [folderPath, setFolderPath] = useState<FolderJson[]>([]);
-  const [loadingFolderPath, setLoadingFolderPath] = useState(true);
+
+  const folderIdRef = useRef(props.folderId);
+
+  useEffect(() => {
+    folderIdRef.current = props.folderId;
+  }, [props.folderId]);
 
   useEffect(() => {
     setIsFolder(Boolean(props.folderId));
@@ -259,15 +284,16 @@ export const ItemListContextProvider = (
     fetch("/api/folderpath/" + props.folderId)
       .then(async (data) => {
         const json = await data.json();
-        setFolderPath(json);
+
+        if (props.folderId === folderIdRef.current) setFolderPath(json);
       })
       .catch((err) => {
         console.error(err);
       })
       .finally(() => {
-        setLoadingFolderPath(false);
+        if (props.folderId === folderIdRef.current) setLoadingFolderPath(false);
       });
-  }, [props.folderId]);
+  }, [props.folderId, setFolderPath, setLoadingFolderPath]);
 
   // SLIDER
   const [itemSliderOpen, setItemSliderOpen] = useState(false);
