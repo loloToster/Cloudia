@@ -44,7 +44,7 @@ function FolderItem(props: { item: ClientFolderJson }) {
   };
 
   return (
-    <Item>
+    <Item item={item}>
       <Link
         to={`/folder/${item.id}`}
         onClick={handleClick}

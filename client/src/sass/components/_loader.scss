@@ -13,10 +13,10 @@
 .loader {
     margin: auto;
     margin-top: 30px;
-    border: 10px solid c.$main;
-    border-top: 10px solid c.$dark-grey;
+    border: var(--loader-width, 10px) solid var(--loader-color, c.$main);
+    border-top: var(--loader-width, 10px) solid var(--loader-bg-color, c.$dark-grey);
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: var(--loader-size, 60px);
+    height: var(--loader-size, 60px);
     animation: spin 2s linear infinite;
 }

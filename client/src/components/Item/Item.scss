@@ -1,5 +1,34 @@
+@use "src/sass/abstract/colors" as c;
+
 .item {
   position: relative;
   width: var(--size-of-item);
   aspect-ratio: 1;
+
+  &__status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #{c.$dark-grey}ee;
+    gap: 12px;
+    font-size: 1.3rem;
+
+    &--deleting {
+      --loader-color: #{c.$red};
+    }
+
+    &--restoring {
+      --loader-color: #{c.$download-blue};
+    }
+
+    .loader {
+      margin: 0;
+    }
+  }
 }

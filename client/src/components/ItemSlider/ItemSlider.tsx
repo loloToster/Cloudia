@@ -77,11 +77,13 @@ function ItemSlider() {
               />
             )}
             <div className="sitem__header__title">{item.title}</div>
-            {item.pinned ? (
+            {(item.pinning || item.unpinning) && <div className="loader"></div>}
+            {Boolean(item.pinned) && !(item.pinning || item.unpinning) && (
               <button title="Unpin" onClick={() => onMoveAction(handleUnpin)}>
                 <span className="material-symbols-rounded pinned">keep</span>
               </button>
-            ) : (
+            )}
+            {!item.pinned && !(item.pinning || item.unpinning) && (
               <button title="Pin" onClick={() => onMoveAction(handlePin)}>
                 <span className="material-symbols-rounded">keep</span>
               </button>
@@ -89,35 +91,47 @@ function ItemSlider() {
             {(item.type === "img" || item.type === "file") && (
               <button title="Download">
                 <a href={`/cdn/${item.id}`} download={item.title}>
-                  <span className="material-symbols-rounded">download</span>
+                  <span className="material-symbols-rounded blue">
+                    download
+                  </span>
                 </a>
               </button>
             )}
-            {item.trashed ? (
-              <>
-                <button
-                  title="Restore"
-                  onClick={() => onRemovalAction(handleRestore)}
-                >
-                  <span className="material-symbols-rounded">
-                    restore_from_trash
-                  </span>
-                </button>
-                <button
-                  title="Delete Permanently"
-                  onClick={() => onRemovalAction(handleDelete)}
-                >
-                  <span className="material-symbols-rounded">
-                    delete_forever
-                  </span>
-                </button>
-              </>
-            ) : (
+            {Boolean(item.trashed) && item.restoring && (
+              <div className="loader blue"></div>
+            )}
+            {Boolean(item.trashed) && !item.restoring && (
+              <button
+                title="Restore"
+                onClick={() => onRemovalAction(handleRestore)}
+              >
+                <span className="material-symbols-rounded blue">
+                  restore_from_trash
+                </span>
+              </button>
+            )}
+            {Boolean(item.trashed) && item.deleting && (
+              <div className="loader red"></div>
+            )}
+            {Boolean(item.trashed) && !item.deleting && (
+              <button
+                title="Delete Permanently"
+                onClick={() => onRemovalAction(handleDelete)}
+              >
+                <span className="material-symbols-rounded red">
+                  delete_forever
+                </span>
+              </button>
+            )}
+            {!item.trashed && item.deleting && (
+              <div className="loader red"></div>
+            )}
+            {!item.trashed && !item.deleting && (
               <button
                 title="Move to trash"
                 onClick={() => onRemovalAction(handleTrash)}
               >
-                <span className="material-symbols-rounded">delete</span>
+                <span className="material-symbols-rounded red">delete</span>
               </button>
             )}
           </div>

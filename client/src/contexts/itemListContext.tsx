@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { ClientItem, FolderJson } from "@backend-types/types";
+import { ClientItem, FolderJson, Item } from "@backend-types/types";
 import { ITEM_SELECT_CLASS } from "src/consts";
 
 import { useSearch } from "./searchContext";
@@ -106,7 +106,16 @@ export const ItemListContextProvider = (
         const json = await data.json();
 
         if (props.apiUrl === apiUrlRef.current)
-          setItems(json.map((i: any) => ({ ...i, selected: false })));
+          setItems(
+            (json as Item[]).map((i) => ({
+              ...i,
+              selected: false,
+              deleting: false,
+              restoring: false,
+              pinning: false,
+              unpinning: false,
+            }))
+          );
       })
       .catch((err) => {
         console.error(err);
@@ -208,8 +217,25 @@ export const ItemListContextProvider = (
     const method = hardDelete ? "DELETE" : "PATCH";
     const apiPath = hardDelete ? "" : type;
 
+    const updateItemStatus = (ids: string[]) => {
+      setItems((prev) =>
+        prev.map((i) =>
+          ids.includes(i.id)
+            ? {
+                ...i,
+                deleting:
+                  type === "delete" || type === "trash" ? true : i.deleting,
+                restoring: type === "restore" ? true : i.restoring,
+              }
+            : i
+        )
+      );
+    };
+
     if (items.find((i) => i.id === id)?.selected) {
       const selectedIds = items.filter((i) => i.selected).map((i) => i.id);
+
+      updateItemStatus(selectedIds);
 
       let res = await fetch(`/api/items/${apiPath}`, {
         method,
@@ -219,14 +245,31 @@ export const ItemListContextProvider = (
 
       if (res.ok) rmItems(selectedIds);
     } else {
+      updateItemStatus([id]);
+
       let res = await fetch(`/api/item/${id}/${apiPath}`, { method });
       if (res.ok) rmItem(id);
     }
   };
 
   const handleItemPin = async (id: string, type: "pin" | "unpin") => {
+    const updateItemStatus = (ids: string[], status: boolean) => {
+      setItems((prev) =>
+        prev.map((i) =>
+          ids.includes(i.id)
+            ? {
+                ...i,
+                pinning: type === "pin" ? status : i.pinning,
+                unpinning: type === "unpin" ? status : i.unpinning,
+              }
+            : i
+        )
+      );
+    };
+
     if (items.find((i) => i.id === id)?.selected) {
       const selectedIds = items.filter((i) => i.selected).map((i) => i.id);
+      updateItemStatus(selectedIds, true);
 
       let res = await fetch(`/api/items/${type}`, {
         method: "PATCH",
@@ -234,10 +277,19 @@ export const ItemListContextProvider = (
         body: JSON.stringify({ ids: selectedIds }),
       });
 
-      if (res.ok) pinItems(selectedIds, type === "pin");
+      if (res.ok) {
+        pinItems(selectedIds, type === "pin");
+        updateItemStatus(selectedIds, false);
+      }
     } else {
+      updateItemStatus([id], true);
+
       let res = await fetch(`/api/item/${id}/${type}`, { method: "PATCH" });
-      if (res.ok) pinItems([id], type === "pin");
+
+      if (res.ok) {
+        pinItems([id], type === "pin");
+        updateItemStatus([id], false);
+      }
     }
   };
 

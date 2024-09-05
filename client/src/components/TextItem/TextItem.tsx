@@ -200,6 +200,7 @@ function TextItem(props: { item: ClientTextJson }) {
 
   return (
     <Item
+      item={item}
       className={`${ITEM_SELECT_CLASS} item-${item.id} text-item ${
         item.selected ? "text-item--selected" : ""
       }`}

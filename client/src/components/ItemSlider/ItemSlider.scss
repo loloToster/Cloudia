@@ -28,12 +28,30 @@
       margin-right: 16px;
     }
 
+    $icon-size: 28px;
+
     .material-symbols-rounded {
-      font-size: 28px;
+      font-size: $icon-size;
+    }
+
+    .loader {
+      margin: 0;
+      --loader-size: #{$icon-size};
+      --loader-width: 6px;
     }
 
     .pinned {
       color: c.$main;
+    }
+
+    .blue {
+      color: c.$download-blue;
+      --loader-color: #{c.$download-blue};
+    }
+
+    .red {
+      color: c.$red;
+      --loader-color: #{c.$red};
     }
 
     &__close {

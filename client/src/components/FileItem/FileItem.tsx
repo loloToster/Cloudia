@@ -75,6 +75,7 @@ function FileItem(props: { item: ClientFileJson }) {
 
   return (
     <Item
+      item={item}
       className={`${ITEM_SELECT_CLASS} item-${item.id} file-item ${
         isImg ? "" : "file-item--with-icon"
       } ${item.selected ? "file-item--selected" : ""}`}
