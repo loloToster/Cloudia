@@ -4,7 +4,10 @@ import useDebounce from "src/hooks/useDebounce";
 import useAfterMountEffect from "src/hooks/useAfterMountEffect";
 
 import { ClientTextJson } from "@backend-types/types";
+import { ITEM_SELECT_CLASS } from "src/consts";
 import { useItemList } from "src/contexts/itemListContext";
+
+import Item from "../Item/Item";
 
 import "./TextItem.scss";
 
@@ -196,8 +199,8 @@ function TextItem(props: { item: ClientTextJson }) {
   };
 
   return (
-    <div
-      className={`item item-${item.id} text-item ${
+    <Item
+      className={`${ITEM_SELECT_CLASS} item-${item.id} text-item ${
         item.selected ? "text-item--selected" : ""
       }`}
     >
@@ -288,7 +291,7 @@ function TextItem(props: { item: ClientTextJson }) {
           </button>
         </div>
       </div>
-    </div>
+    </Item>
   );
 }
 

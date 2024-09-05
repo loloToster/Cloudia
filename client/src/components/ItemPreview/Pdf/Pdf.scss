@@ -50,8 +50,13 @@
         font-size: 16px;
       }
 
+      &.right {
+        margin-left: -1px;
+      }
+
       &.left {
         transform: rotate(180deg);
+        margin-right: -1px;
       }
 
       &:hover {

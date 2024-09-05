@@ -6,8 +6,6 @@ $icon-size: 48px;
 
 .quick-actions {
     gap: $quick-actions-gap;
-    width: var(--size-of-item);
-    aspect-ratio: 1;
 
     &__drop-area {
         display: none;

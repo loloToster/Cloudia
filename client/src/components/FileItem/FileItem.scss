@@ -1,9 +1,6 @@
 @use "src/sass/abstract/colors" as c;
 
 .file-item {
-    position: relative;
-    width: var(--size-of-item);
-    height: var(--size-of-item);
     background-color: c.$grey;
     overflow: hidden;
 

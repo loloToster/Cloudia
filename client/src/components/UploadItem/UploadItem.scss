@@ -1,8 +1,6 @@
 @use "src/sass/abstract/colors" as c;
 
 .upload-item {
-    width: var(--size-of-item);
-    aspect-ratio: 1;
     padding: 16px;
     border: c.$grey 2px solid;
 
@@ -47,7 +45,12 @@
             height: 100%;
             aspect-ratio: 1;
             margin: auto;
-            background: conic-gradient(c.$main 0deg, c.$main calc(360deg * var(--progress, 0)), c.$grey calc(360deg * var(--progress, 0)), c.$grey 360deg);
+            background: conic-gradient(
+                c.$main 0deg,
+                c.$main calc(360deg * var(--progress, 0)),
+                c.$grey calc(360deg * var(--progress, 0)),
+                c.$grey 360deg
+            );
             border-radius: 50%;
         }
 

@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+
 import { ClientFolderJson } from "@backend-types/types";
+import { ITEM_SELECT_CLASS } from "src/consts";
 import { useItemList } from "src/contexts/itemListContext";
+import Item from "../Item/Item";
 
 import "./FolderItem.scss";
 
@@ -41,30 +44,34 @@ function FolderItem(props: { item: ClientFolderJson }) {
   };
 
   return (
-    <Link
-      to={`/folder/${item.id}`}
-      onClick={handleClick}
-      className={`item folder-item ${
-        item.selected ? "folder-item--selected" : ""
-      }`}
-    >
-      <span className="material-symbols-rounded">folder</span>
-      <div>{item.title}</div>
-      <div className="folder-item__actions">
-        {Boolean(item.trashed) && (
-          <button onClick={onRestore} title="Restore Folder">
-            <span className="material-symbols-rounded">restore_from_trash</span>
-          </button>
-        )}
-        <button onClick={onDelete} title="Delete Folder">
-          {item.trashed ? (
-            <span className="material-symbols-rounded">delete_forever</span>
-          ) : (
-            <span className="material-symbols-rounded">delete</span>
+    <Item>
+      <Link
+        to={`/folder/${item.id}`}
+        onClick={handleClick}
+        className={`${ITEM_SELECT_CLASS} folder-item ${
+          item.selected ? "folder-item--selected" : ""
+        }`}
+      >
+        <span className="material-symbols-rounded">folder</span>
+        <div>{item.title}</div>
+        <div className="folder-item__actions">
+          {Boolean(item.trashed) && (
+            <button onClick={onRestore} title="Restore Folder">
+              <span className="material-symbols-rounded">
+                restore_from_trash
+              </span>
+            </button>
           )}
-        </button>
-      </div>
-    </Link>
+          <button onClick={onDelete} title="Delete Folder">
+            {item.trashed ? (
+              <span className="material-symbols-rounded">delete_forever</span>
+            ) : (
+              <span className="material-symbols-rounded">delete</span>
+            )}
+          </button>
+        </div>
+      </Link>
+    </Item>
   );
 }
 

@@ -9,6 +9,8 @@ import {
 } from "react";
 
 import { ClientItem, FolderJson } from "@backend-types/types";
+import { ITEM_SELECT_CLASS } from "src/consts";
+
 import { useSearch } from "./searchContext";
 import { useCachedState } from "./cacheContext";
 
@@ -141,10 +143,11 @@ export const ItemListContextProvider = (
 
   useEffect(() => {
     const onWindowClick = (e: MouseEvent) => {
-      // todo: remove magic string
       const clickOnItem = e
         .composedPath()
-        .some((el) => (el as HTMLElement).classList?.contains("item"));
+        .some((el) =>
+          (el as HTMLElement).classList?.contains(ITEM_SELECT_CLASS)
+        );
 
       if (clickOnItem) return;
 

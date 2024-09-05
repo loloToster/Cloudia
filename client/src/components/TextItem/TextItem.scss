@@ -1,11 +1,8 @@
 @use "src/sass/abstract/colors" as c;
 
 .text-item {
-    position: relative;
     display: flex;
     flex-direction: column;
-    width: var(--size-of-item);
-    aspect-ratio: 1;
     padding: 8px;
     border: c.$grey 2px solid;
     overflow: hidden;

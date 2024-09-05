@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import { useItemList } from "src/contexts/itemListContext";
 import { ClientFileJson } from "@backend-types/types";
+import { ITEM_SELECT_CLASS } from "src/consts";
+import { useItemList } from "src/contexts/itemListContext";
+import Item from "../Item/Item";
 
 import "./FileItem.scss";
 
@@ -72,8 +74,8 @@ function FileItem(props: { item: ClientFileJson }) {
   const icon = isImg ? `/cdn/${item.id}` : `/icon/${item.title}`;
 
   return (
-    <div
-      className={`item item-${item.id} file-item ${
+    <Item
+      className={`${ITEM_SELECT_CLASS} item-${item.id} file-item ${
         isImg ? "" : "file-item--with-icon"
       } ${item.selected ? "file-item--selected" : ""}`}
     >
@@ -153,7 +155,7 @@ function FileItem(props: { item: ClientFileJson }) {
           <span className="material-symbols-rounded">keep</span>
         </div>
       )}
-    </div>
+    </Item>
   );
 }
 

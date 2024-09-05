@@ -5,6 +5,7 @@ import "./QuickActions.scss";
 
 import { UploadContent } from "../ItemList/ItemList";
 import ActionBtn from "src/components/ActionBtn/ActionBtn";
+import Item from "../Item/Item";
 
 type uploadFunc = (c: UploadContent) => void;
 
@@ -115,7 +116,7 @@ function QuickActions(props: { upload: uploadFunc }) {
   };
 
   return (
-    <div className="quick-actions">
+    <Item className="quick-actions">
       <FileDrop
         onDrop={handleFileDrop}
         className={`quick-actions__drop-area ${dropActive ? "active" : ""}`}
@@ -163,7 +164,7 @@ function QuickActions(props: { upload: uploadFunc }) {
           </div>
         </div>
       </div>
-    </div>
+    </Item>
   );
 }
 
