@@ -1,9 +1,12 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { ClientFolderJson } from "@backend-types/types";
 import { ITEM_SELECT_CLASS } from "src/consts";
 import { useItemList } from "src/contexts/itemListContext";
+
 import Item from "../Item/Item";
+import ItemMore from "../ItemMore/ItemMore";
 
 import "./FolderItem.scss";
 
@@ -17,6 +20,13 @@ function FolderItem(props: { item: ClientFolderJson }) {
     handleTrash,
     handleRestore,
   } = useItemList();
+
+  const [moreOpen, setMoreOpen] = useState(false);
+  const elIdentifier = "item-" + item.id;
+
+  const handleActionClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     if (!e.ctrlKey && !e.shiftKey) return;
@@ -32,19 +42,8 @@ function FolderItem(props: { item: ClientFolderJson }) {
     e.preventDefault();
   };
 
-  const onRestore = (e: React.MouseEvent) => {
-    e.preventDefault();
-    handleRestore(item.id);
-  };
-
-  const onDelete = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    item.trashed ? handleDelete(item.id) : handleTrash(item.id);
-  };
-
   return (
-    <Item item={item}>
+    <Item className={elIdentifier} item={item}>
       <Link
         to={`/folder/${item.id}`}
         onClick={handleClick}
@@ -54,23 +53,31 @@ function FolderItem(props: { item: ClientFolderJson }) {
       >
         <span className="material-symbols-rounded">folder</span>
         <div>{item.title}</div>
-        <div className="folder-item__actions">
-          {Boolean(item.trashed) && (
-            <button onClick={onRestore} title="Restore Folder">
-              <span className="material-symbols-rounded">
-                restore_from_trash
-              </span>
-            </button>
-          )}
-          <button onClick={onDelete} title="Delete Folder">
-            {item.trashed ? (
-              <span className="material-symbols-rounded">delete_forever</span>
-            ) : (
-              <span className="material-symbols-rounded">delete</span>
-            )}
+        <div onClick={handleActionClick} className="folder-item__actions">
+          <button onClick={() => setMoreOpen(true)}>
+            <span className="material-symbols-rounded">more_horiz</span>
           </button>
         </div>
       </Link>
+      <ItemMore
+        identifier={elIdentifier}
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+      >
+        {Boolean(item.trashed) && (
+          <button onClick={() => handleRestore(item.id)}>Restore Folder</button>
+        )}
+        {Boolean(item.trashed) && (
+          <button className="danger" onClick={() => handleDelete(item.id)}>
+            Delete Permanently
+          </button>
+        )}
+        {!item.trashed && (
+          <button className="danger" onClick={() => handleTrash(item.id)}>
+            Move to trash
+          </button>
+        )}
+      </ItemMore>
     </Item>
   );
 }

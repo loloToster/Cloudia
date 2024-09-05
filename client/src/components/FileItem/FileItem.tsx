@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { ClientFileJson } from "@backend-types/types";
 import { ITEM_SELECT_CLASS } from "src/consts";
 import { useItemList } from "src/contexts/itemListContext";
+
 import Item from "../Item/Item";
+import ItemMore from "../ItemMore/ItemMore";
 
 import "./FileItem.scss";
 
@@ -22,22 +24,7 @@ function FileItem(props: { item: ClientFileJson }) {
   } = useItemList();
 
   const [moreOpen, setMoreOpen] = useState(false);
-
-  useEffect(() => {
-    const onWindowClick = (e: MouseEvent) => {
-      const clickOnItem = e
-        .composedPath()
-        .some((el) =>
-          (el as HTMLElement).classList?.contains(`item-${item.id}`)
-        );
-      if (clickOnItem) return;
-
-      setMoreOpen(false);
-    };
-
-    window.addEventListener("click", onWindowClick);
-    return () => window.removeEventListener("click", onWindowClick);
-  }, [setMoreOpen, item.id]);
+  const elIdentifier = "item-" + item.id;
 
   const handleClick = (e: React.MouseEvent) => {
     if (e.ctrlKey) {
@@ -124,33 +111,29 @@ function FileItem(props: { item: ClientFileJson }) {
           </button>
         )}
       </div>
-      <div className={`file-item__more ${moreOpen ? "active" : ""}`}>
-        <button
-          onClick={() => setMoreOpen(false)}
-          className="text-item__more__close"
-        >
-          <span className="material-symbols-rounded">close</span>
+      <ItemMore
+        identifier={elIdentifier}
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+      >
+        {item.pinned ? (
+          <button onClick={onUnpin}>Unpin</button>
+        ) : (
+          <button onClick={onPin}>Pin</button>
+        )}
+        <a href={`/cdn/${item.id}`} target="_blank" rel="noreferrer">
+          Open Raw
+        </a>
+        <a href={`/cdn/${item.id}`} download={item.title}>
+          Download File
+        </a>
+        {Boolean(item.trashed) && (
+          <button onClick={onRestore}>Restore Text</button>
+        )}
+        <button onClick={onDelete} className="danger">
+          {item.trashed ? "Delete Permanently" : "Move to trash"}
         </button>
-        <div className="file-item__more__wrapper">
-          {item.pinned ? (
-            <button onClick={onUnpin}>Unpin</button>
-          ) : (
-            <button onClick={onPin}>Pin</button>
-          )}
-          <a href={`/cdn/${item.id}`} target="_blank" rel="noreferrer">
-            Open Raw
-          </a>
-          <a href={`/cdn/${item.id}`} download={item.title}>
-            Download File
-          </a>
-          {Boolean(item.trashed) && (
-            <button onClick={onRestore}>Restore Text</button>
-          )}
-          <button onClick={onDelete} className="danger">
-            {item.trashed ? "Delete Permanently" : "Move to trash"}
-          </button>
-        </div>
-      </div>
+      </ItemMore>
       {Boolean(item.pinned) && (
         <div className="file-item__pinned">
           <span className="material-symbols-rounded">keep</span>

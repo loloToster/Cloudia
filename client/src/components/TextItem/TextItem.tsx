@@ -1,4 +1,4 @@
-import { useRef, useState, ChangeEvent, useEffect } from "react";
+import { useRef, useState, ChangeEvent } from "react";
 
 import useDebounce from "src/hooks/useDebounce";
 import useAfterMountEffect from "src/hooks/useAfterMountEffect";
@@ -8,6 +8,7 @@ import { ITEM_SELECT_CLASS } from "src/consts";
 import { useItemList } from "src/contexts/itemListContext";
 
 import Item from "../Item/Item";
+import ItemMore from "../ItemMore/ItemMore";
 
 import "./TextItem.scss";
 
@@ -79,6 +80,8 @@ function TextItem(props: { item: ClientTextJson }) {
   const [text, setText] = useState(item.text);
   const [title, setTitle] = useState(item.title || "No Title");
 
+  const elIdentifier = "item-" + item.id;
+
   const debouncedTitle = useDebounce(title);
 
   useAfterMountEffect(() => {
@@ -95,22 +98,6 @@ function TextItem(props: { item: ClientTextJson }) {
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
-
-  useEffect(() => {
-    const onWindowClick = (e: MouseEvent) => {
-      const clickOnItem = e
-        .composedPath()
-        .some((el) =>
-          (el as HTMLElement).classList?.contains(`item-${item.id}`)
-        );
-      if (clickOnItem) return;
-
-      setMoreOpen(false);
-    };
-
-    window.addEventListener("click", onWindowClick);
-    return () => window.removeEventListener("click", onWindowClick);
-  }, [setMoreOpen, item.id]);
 
   const [editing, setEditing] = useState(false);
   const [textareaVal, setTextareaVal] = useState(item.text);
@@ -269,29 +256,25 @@ function TextItem(props: { item: ClientTextJson }) {
           <pre dangerouslySetInnerHTML={{ __html: urlify(text) }}></pre>
         )}
       </div>
-      <div className={`text-item__more ${moreOpen ? "active" : ""}`}>
-        <button
-          onClick={() => setMoreOpen(false)}
-          className="text-item__more__close"
-        >
-          <span className="material-symbols-rounded">close</span>
+      <ItemMore
+        identifier={elIdentifier}
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+      >
+        <button onClick={handleEditStart}>Edit Text</button>
+        {item.pinned ? (
+          <button onClick={onUnpin}>Unpin</button>
+        ) : (
+          <button onClick={onPin}>Pin</button>
+        )}
+        <button onClick={handleCopy}>Copy</button>
+        {Boolean(item.trashed) && (
+          <button onClick={onRestore}>Restore Text</button>
+        )}
+        <button onClick={onDelete} className="danger">
+          {item.trashed ? "Delete Permanently" : "Move to trash"}
         </button>
-        <div className="text-item__more__wrapper">
-          <button onClick={handleEditStart}>Edit Text</button>
-          {item.pinned ? (
-            <button onClick={onUnpin}>Unpin</button>
-          ) : (
-            <button onClick={onPin}>Pin</button>
-          )}
-          <button onClick={handleCopy}>Copy</button>
-          {Boolean(item.trashed) && (
-            <button onClick={onRestore}>Restore Text</button>
-          )}
-          <button onClick={onDelete} className="danger">
-            {item.trashed ? "Delete Permanently" : "Move to trash"}
-          </button>
-        </div>
-      </div>
+      </ItemMore>
     </Item>
   );
 }

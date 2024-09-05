@@ -104,68 +104,6 @@
         }
     }
 
-    &__more {
-        opacity: 0;
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: #{c.$bg}ee;
-        transition: opacity 100ms;
-
-        &.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        &__close {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            padding: 2px;
-            cursor: pointer;
-        }
-
-        &__wrapper {
-            position: absolute;
-            bottom: -100%;
-            left: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            background-color: #525252;
-            border-radius: 12px 12px 0 0;
-            transition: bottom 200ms;
-
-            .active & {
-                bottom: 0;
-            }
-
-            button,
-            a {
-                display: block;
-                width: 100%;
-                text-align: start;
-                padding: 6px 12px;
-                font-size: 1.075rem;
-                border-radius: 12px;
-                color: white;
-                text-decoration: none;
-                cursor: pointer;
-
-                &:hover {
-                    background-color: c.$light-grey;
-                }
-
-                &.danger {
-                    color: c.$error-red;
-                }
-            }
-        }
-    }
-
     &__pinned {
         position: absolute;
         top: 6px;

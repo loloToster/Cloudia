@@ -4,6 +4,7 @@
   position: relative;
   width: var(--size-of-item);
   aspect-ratio: 1;
+  overflow: hidden;
 
   &__status {
     display: flex;
