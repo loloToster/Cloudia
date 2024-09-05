@@ -10,7 +10,7 @@ import {
 
 import { ClientItem, FolderJson } from "@backend-types/types";
 import { useSearch } from "./searchContext";
-import { useCachedState } from "./itemsCacheContext";
+import { useCachedState } from "./cacheContext";
 
 export interface ItemListContextProps {
   apiUrl: string;

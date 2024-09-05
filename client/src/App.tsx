@@ -1,6 +1,6 @@
 import { Outlet, ScrollRestoration } from "react-router-dom";
 
-import { CacheContextProvider } from "./contexts/itemsCacheContext";
+import { CacheContextProvider } from "./contexts/cacheContext";
 import { SearchContextProvider } from "./contexts/searchContext";
 
 import Header from "./components/Header/Header";
