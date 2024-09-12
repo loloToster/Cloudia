@@ -6,6 +6,6 @@ type JsonItem struct {
 	Title     string `json:"title"`
 	Text      string `json:"text"`
 	Ip        string `json:"ip"`
-	CreatedAt string `json:"created_at"`
+	CreatedAt int    `json:"created_at"`
 	Trashed   int    `json:"trashed"`
 }
