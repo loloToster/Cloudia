@@ -57,6 +57,24 @@ function ItemSlider() {
     setIdx((prev) => prev + offset);
   };
 
+  const sitemPreview = useRef<HTMLDivElement>(null)
+
+  const handlePreviewClick = (e: React.MouseEvent) => {
+    const firstElement = e.target
+
+    if (
+      firstElement instanceof HTMLElement &&
+      (
+        sitemPreview.current === firstElement ||
+        firstElement.classList.contains("close-slider") ||
+        // edge case in image preview
+        firstElement.classList.contains("react-transform-wrapper")
+      )
+    ) {
+      closeSlider()
+    }
+  }
+
   return (
     <div className="item-slider">
       {item && (
@@ -135,7 +153,7 @@ function ItemSlider() {
               </button>
             )}
           </div>
-          <div className="sitem__preview">
+          <div ref={sitemPreview} onClick={handlePreviewClick} className="sitem__preview">
             <ItemPreview item={item} />
           </div>
           {idx !== 0 && (

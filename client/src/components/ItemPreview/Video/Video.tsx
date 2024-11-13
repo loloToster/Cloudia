@@ -5,7 +5,7 @@ function Video(props: PreviewProps) {
   const { item } = props
 
   return (
-    <div className="pre-video">
+    <div className="pre-video close-slider">
       <video src={`/cdn/${item.id}`} controls />
     </div>
   )

@@ -26,7 +26,7 @@ function ImgInner(props: PreviewProps) {
 
 function Img(props: PreviewProps) {
   return (
-    <div className="pre-img">
+    <div className="pre-img close-slider">
       <TransformWrapper
         limitToBounds={false}
         wheel={{ step: 1, smoothStep: 0.005 }}

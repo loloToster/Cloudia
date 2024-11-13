@@ -32,7 +32,7 @@ function Sound(props: PreviewProps) {
   };
 
   return (
-    <div className="pre-sound">
+    <div className="pre-sound close-slider">
       <div ref={containerRef}></div>
       <div className="pre-sound__time">
         <span>{formatTime(currentTime)}</span>
