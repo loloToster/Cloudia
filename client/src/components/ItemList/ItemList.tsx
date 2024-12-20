@@ -25,7 +25,7 @@ export type UploadContent =
     }
   | {
       isText: false;
-      files: FileList;
+      files: FileList | null;
     };
 
 function ItemListInner() {
@@ -43,6 +43,7 @@ function ItemListInner() {
 
   const [uploads, setUploads] = useState<Upload[]>([]);
 
+  const [createEmptyFolder, setCreateEmptyFolder] = useState(false);
   const [folderModalOpen, setFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [uploadContent, setUploadContent] = useState<UploadContent | null>(
@@ -62,13 +63,13 @@ function ItemListInner() {
     } else {
       let data = new FormData();
 
-      Array.from(content.files).forEach((f) => data.append("files", f));
+      Array.from(content.files ?? []).forEach((f) => data.append("files", f));
 
       if (typeof folder !== "undefined") data.append("folder", folder);
       if (typeof folderId !== "undefined") data.append("folderId", folderId);
 
       let upload: Upload = {
-        numberOfFiles: content.files.length,
+        numberOfFiles: content.files?.length ?? 0,
         progress: 0,
       };
 
@@ -95,9 +96,10 @@ function ItemListInner() {
   };
 
   const handleUploadAction = (content: UploadContent) => {
-    if (content.isText || content.files.length <= 1)
+    if (content.isText || (content.files && content.files.length <= 1))
       return handleUpload(content);
 
+    setCreateEmptyFolder(!content.files);
     setUploadContent(content);
     setFolderModalOpen(true);
   };
@@ -180,15 +182,19 @@ function ItemListInner() {
             />
             <ActionBtn
               onClick={handleUploadAsFolder}
-              text="Upload as Folder"
+              text={createEmptyFolder ? "Create Folder" : "Upload as Folder"}
               className="items__upload-modal__btn"
             />
-            <div className="items__upload-modal__splitter">or</div>
-            <ActionBtn
-              onClick={handleUploadStandalone}
-              text="Upload Files"
-              className="items__upload-modal__btn"
-            />
+            {!createEmptyFolder && (
+              <>
+                <div className="items__upload-modal__splitter">or</div>
+                <ActionBtn
+                  onClick={handleUploadStandalone}
+                  text="Upload Files"
+                  className="items__upload-modal__btn"
+                />
+              </>
+            )}
             <div className="items__upload-modal__splitter">or</div>
             <ActionBtn
               onClick={handleCancelUpload}

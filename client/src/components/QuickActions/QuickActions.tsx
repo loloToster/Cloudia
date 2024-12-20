@@ -76,7 +76,11 @@ function QuickActions(props: { upload: uploadFunc }) {
     });
   };
 
-  const firstActionBtn = useRef<HTMLButtonElement>(null);
+  const handleNewFolder = () => {
+    upload({ isText: false, files: null });
+  };
+
+  const firstActionRow = useRef<HTMLDivElement>(null);
   const secondActionBtn = useRef<HTMLDivElement>(null);
 
   const [savingQuickText, setSavingQuickText] = useState(false);
@@ -86,13 +90,13 @@ function QuickActions(props: { upload: uploadFunc }) {
   const handleQuickTextOpen = () => {
     if (secondActionBtn.current?.classList.contains("active")) return;
 
-    firstActionBtn.current?.classList.add("hidden");
+    firstActionRow.current?.classList.add("hidden");
     secondActionBtn.current?.classList.add("active");
     textarea.current?.focus();
   };
 
   const handleQuickTextClose = (e?: React.MouseEvent) => {
-    firstActionBtn.current?.classList.remove("hidden");
+    firstActionRow.current?.classList.remove("hidden");
     secondActionBtn.current?.classList.remove("active");
     if (textarea.current) textarea.current.value = "";
     e?.stopPropagation();
@@ -126,14 +130,22 @@ function QuickActions(props: { upload: uploadFunc }) {
           <h1>Upload files</h1>
         </div>
       </FileDrop>
-      <button
-        ref={firstActionBtn}
-        onClick={handleQuickUpload}
-        title="Upload Files"
-        className="quick-actions__action"
-      >
-        <span className="material-symbols-rounded">upload</span>
-      </button>
+      <div ref={firstActionRow} className="quick-actions__action-row">
+        <button
+          onClick={handleQuickUpload}
+          title="Upload Files"
+          className="quick-actions__action"
+        >
+          <span className="material-symbols-rounded">upload</span>
+        </button>
+        <button
+          onClick={handleNewFolder}
+          title="New Folder"
+          className="quick-actions__action"
+        >
+          <span className="material-symbols-rounded">create_new_folder</span>
+        </button>
+      </div>
       <div
         role="button"
         ref={secondActionBtn}

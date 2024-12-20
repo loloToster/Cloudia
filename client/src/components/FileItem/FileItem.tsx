@@ -76,7 +76,12 @@ function FileItem(props: { item: ClientFileJson }) {
       </div>
       <div className="file-item__options">
         <div className="file-item__metadata">
-          <div className="file-item__title">{item.title}</div>
+          <div className="file-item__title">
+            {Boolean(item.pinned) && (
+              <span className="material-symbols-rounded">keep</span>
+            )}
+            <span>{item.title}</span>
+          </div>
           <div className="file-item__user">{item.ip}</div>
         </div>
         {item.trashed ? (

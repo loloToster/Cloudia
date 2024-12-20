@@ -142,19 +142,25 @@ function addFiles(files: Express.Multer.File[], ip: string, folder?: string, fol
             }
         }
 
-        const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?, ?)").join(", ")
-        const params = newDbItems.map(item => {
-            let parsedItem = Object.values(item)
-            // remove created_at & trashed & pinned
-            parsedItem.splice(-3)
-            return parsedItem
-        }).flat()
+        if (files.length) {
+            const paramsPlaceholders = newDbItems.map(() => "(?, ?, ?, ?, ?)").join(", ")
+            const params = newDbItems.map(item => {
+                let parsedItem = Object.values(item)
+                // remove created_at & trashed & pinned
+                parsedItem.splice(-3)
+                return parsedItem
+            }).flat()
 
-        db.run(
-            `INSERT INTO items(type, id, title, ip, folder) VALUES ${paramsPlaceholders}`,
-            params,
-            err => err ? rej(err) : res(newFolder ? [newFolder] : newDbItems)
-        )
+            db.run(
+                `INSERT INTO items(type, id, title, ip, folder) VALUES ${paramsPlaceholders}`,
+                params,
+                err => err ? rej(err) : res(newFolder ? [newFolder] : newDbItems)
+            )
+        } else if (newFolder) {
+            res([newFolder])
+        } else {
+            console.warn("invalid use of addFiles")
+        }
     })
 }
 
@@ -173,7 +179,7 @@ apiRouter.post("/file", upload.array("files"), async (req, res) => {
     if (typeof bodyFolderId === "string")
         folderId = bodyFolderId
 
-    if (!Array.isArray(files) || !files.length)
+    if (!Array.isArray(files) || (!files.length && typeof folder !== "string"))
         return res.status(400).send()
 
     const newItems = await addFiles(files, ip || "unknown", folder, folderId)

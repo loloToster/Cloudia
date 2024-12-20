@@ -28,15 +28,16 @@
 
     $options-size: 50px;
     $options-gap: 5px;
+    $options-height: $options-size + $options-gap;
 
     &__options {
         position: absolute;
-        display: none;
+        display: flex;
         gap: $options-gap;
         top: 0;
         left: 0;
         width: 100%;
-        height: $options-size + $options-gap;
+        height: $options-height;
         padding: $options-gap;
         padding-bottom: 0;
 
@@ -44,16 +45,6 @@
             height: $options-size;
             background-color: #212121dd;
             border-radius: 100vh;
-        }
-    }
-
-    &:hover &__options {
-        display: flex;
-    }
-
-    @media (hover: none) {
-        &__options {
-            display: flex;
         }
     }
 
@@ -73,6 +64,11 @@
         color: white;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        .material-symbols-rounded {
+            color: c.$main;
+            font-size: 16px;
+        }
     }
 
     &__user {
@@ -104,14 +100,17 @@
         }
     }
 
+    $pinned-padding: 6px;
+    $pinned-size: 36px;
+
     &__pinned {
         position: absolute;
-        top: 6px;
-        left: 6px;
+        top: $pinned-padding;
+        left: $pinned-padding;
         border-radius: 50%;
         background-color: #212121dd;
-        width: 36px;
-        height: 36px;
+        width: $pinned-size;
+        height: $pinned-size;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -120,7 +119,25 @@
             color: c.$main;
         }
 
-        .file-item:hover & {
+        .file-item & {
+            display: none;
+        }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        & &__options {
+            display: none;
+        }
+
+        &:hover &__options {
+            display: flex;
+        }
+
+        & &__pinned {
+            display: flex;
+        }
+
+        &:hover &__pinned {
             display: none;
         }
     }

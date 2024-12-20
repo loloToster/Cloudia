@@ -34,6 +34,20 @@ $icon-size: 48px;
         }
     }
 
+    &__action-row {
+        display: flex;
+        width: calc(100%);
+        height: calc(50% - ($quick-actions-gap / 2));
+        margin-bottom: $quick-actions-gap;
+        transition: all 100ms ease-in;
+
+        &.hidden {
+            height: 0;
+            border-width: 0;
+            margin-bottom: 0;
+        }
+    }
+
     &__action {
         position: relative;
         display: flex;
@@ -107,7 +121,7 @@ $icon-size: 48px;
             margin-bottom: 0;
         }
 
-        &.hidden {
+        .hidden & {
             height: 0;
             border-width: 0;
             margin-bottom: 0;
@@ -119,6 +133,16 @@ $icon-size: 48px;
 
         &.active &__textarea-wrapper {
             display: flex;
+        }
+    }
+
+    &__action-row &__action {
+        width: calc(50% - ($quick-actions-gap / 2));
+        height: calc(100%);
+        margin-right: $quick-actions-gap;
+
+        &:last-child {
+            margin-right: 0;
         }
     }
 }

@@ -22,7 +22,13 @@ function UploadItem(props: Upload) {
   return (
     <Item className="upload-item">
       <div className="upload-item__title">
-        Uploading {numberOfFiles} {fileNaming}
+        {numberOfFiles ? (
+          <>
+            Uploading {numberOfFiles} {fileNaming}
+          </>
+        ) : (
+          "Creating folder"
+        )}
         <span className="upload-item__loading-item">.</span>
         <span className="upload-item__loading-item">.</span>
         <span className="upload-item__loading-item">.</span>
