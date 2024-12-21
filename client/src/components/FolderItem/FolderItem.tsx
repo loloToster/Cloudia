@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { ClientFolderJson } from "@backend-types/types";
 import { ITEM_SELECT_CLASS } from "src/consts";
+import { useZip } from "src/contexts/zipContext";
 import { useItemList } from "src/contexts/itemListContext";
 
 import Item from "../Item/Item";
@@ -20,6 +21,8 @@ function FolderItem(props: { item: ClientFolderJson }) {
     handleTrash,
     handleRestore,
   } = useItemList();
+
+  const { downloadFolder } = useZip();
 
   const [moreOpen, setMoreOpen] = useState(false);
   const elIdentifier = "item-" + item.id;
@@ -64,6 +67,14 @@ function FolderItem(props: { item: ClientFolderJson }) {
         open={moreOpen}
         onClose={() => setMoreOpen(false)}
       >
+        <button
+          onClick={() => {
+            setMoreOpen(false);
+            downloadFolder(item);
+          }}
+        >
+          Download zip
+        </button>
         {Boolean(item.trashed) && (
           <button onClick={() => handleRestore(item.id)}>Restore Folder</button>
         )}

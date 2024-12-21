@@ -24,7 +24,7 @@
   }
 
   &__actions {
-    display: none;
+    display: flex;
     position: absolute;
     top: 0;
     right: 0;
@@ -40,7 +40,13 @@
     }
   }
 
-  &:hover &__actions {
-    display: flex;
+  @media (hover: hover) and (pointer: fine) {
+    & &__actions {
+      display: none;
+    }
+
+    &:hover &__actions {
+      display: flex;
+    }
   }
 }

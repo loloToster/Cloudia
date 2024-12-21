@@ -1,0 +1,90 @@
+@use "src/sass/abstract/colors" as c;
+
+.compressing {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+
+  @keyframes border-lighten {
+    100% {
+      border-color: lighten(c.$main, 10%);
+    }
+  }
+
+  @keyframes bg-lighten {
+    100% {
+      background-color: lighten(c.$main, 10%);
+    }
+  }
+
+  &__portrait {
+    display: none;
+
+    position: relative;
+    padding: 18px;
+    background-color: c.$dark-grey;
+    border-radius: 100vh;
+    border: c.$main 2px solid;
+    animation: border-lighten 600ms infinite alternate;
+
+    .material-symbols-rounded {
+      font-size: 38px;
+    }
+
+    &__num {
+      position: absolute;
+      background-color: c.$main;
+      bottom: 0;
+      right: 0;
+      min-width: 1.3rem;
+      line-height: 1;
+      padding: 2px;
+      border-radius: 100vh;
+      text-align: center;
+      animation: bg-lighten 600ms infinite alternate;
+    }
+  }
+
+  &__horizontal {
+    padding: 10px 16px;
+    background-color: c.$dark-grey;
+    border-radius: 100vh;
+    border: c.$main 2px solid;
+    animation: border-lighten 600ms infinite alternate;
+
+    @keyframes jumping-dots {
+      0% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-5%);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    &__dot {
+      display: inline-block;
+      animation: jumping-dots 900ms infinite;
+
+      @for $i from 0 through 2 {
+        &:nth-child(#{$i + 1}) {
+          animation-delay: #{$i * 200ms};
+        }
+      }
+    }
+  }
+
+  @media (orientation: portrait) {
+    &__horizontal {
+      display: none;
+    }
+
+    &__portrait {
+      display: block;
+    }
+  }
+}
